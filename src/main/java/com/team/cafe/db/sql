@@ -1,0 +1,4 @@
+# DB 생성
+DROP DATABASE IF EXISTS team_cafe;
+CREATE DATABASE team_cafe;
+USE team_cafe;
