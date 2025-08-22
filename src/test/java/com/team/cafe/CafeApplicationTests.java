@@ -21,4 +21,7 @@ class CafeApplicationTests {
 
     }
 
+    @Test
+    void testJpa01() {
+    }
 }
