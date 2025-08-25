@@ -1,3 +1,22 @@
+// users (회원)
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,                // 회원 고유 ID (PK)
+    name VARCHAR(100) NOT NULL,                       // 회원 이름
+    email VARCHAR(255) NOT NULL UNIQUE,               // 이메일
+    password_hash VARCHAR(20) NOT NULL,               // 비밀번호
+    role VARCHAR(20) DEFAULT 'user',                  // 회원 유형
+    status VARCHAR(20) DEFAULT 'active',              // 계정 상태
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   // 가입일
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP // 수정일
+)
+
+
+
+
+
+
+
 // business(사업자 정보) 테이블
 
 CREATE TABLE business (
