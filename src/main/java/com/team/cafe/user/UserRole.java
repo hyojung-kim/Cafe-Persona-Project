@@ -2,6 +2,7 @@ package com.team.cafe.user;
 
 import lombok.Getter;
 
+
 @Getter
 public enum UserRole {
     // 비즈니스

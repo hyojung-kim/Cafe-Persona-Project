@@ -1,6 +1,7 @@
 package com.team.cafe.user;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,5 +25,12 @@ public class SiteUser {
 
 //    @Enumerated(EnumType.STRING)
 //    private Role role;
+
+//    @Builder
+//    public SiteUser(String username, String password_hash, Role role) {
+//        this.username = username;
+//        this.password_hash= password_hash;
+//        this.role= role;
+//    }
 }
 

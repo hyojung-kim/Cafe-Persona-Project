@@ -1,0 +1,8 @@
+DROP DATABASE IF EXISTS cafe_dev;
+CREATE DATABASE cafe_dev;
+USE cafe_dev;
+
+INSERT INTO site_user (userid, username, email, password_hash)
+VALUES ('1', '조현영', 'hy991006@gmail.com', '1234');
+
+SELECT * FROM site_user;
