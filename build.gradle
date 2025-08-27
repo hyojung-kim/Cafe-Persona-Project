@@ -25,36 +25,38 @@ repositories {
 }
 
 dependencies {
-	// --- Web & View ---
-	implementation 'org.springframework.boot:spring-boot-starter-web'       // MVC/REST
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // 템플릿(사용 시)
+// Web & View
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-	// --- DB & JPA ---
+	// JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.h2database:h2'   // 로컬 영구 저장: H2 파일모드
 
-	// --- Validation ---
+	// ✅ MariaDB 드라이버
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
+
+	// Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	// --- Security (회원만 리뷰 작성/좋아요) ---
+	// Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// --- 외부 API 연동용 WebClient ---
-	implementation 'org.springframework:spring-webflux'  // 서버는 MVC, 클라이언트는 WebClient
+	// WebClient (외부 API 연동용)
+	implementation 'org.springframework:spring-webflux'
 
-	// --- 파일 업로드 유틸(선택) ---
+	// 파일 유틸(선택)
 	implementation 'net.coobird:thumbnailator:0.4.20'
 
-	// --- Lombok ---
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
-	// --- 개발 편의(선택) ---
+	// DevTools(선택)
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	// --- 테스트 ---
+	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
