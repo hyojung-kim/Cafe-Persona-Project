@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @SpringBootTest
 class CafeApplicationTests {
 
@@ -33,6 +35,8 @@ class CafeApplicationTests {
 
     @Test
     void join() {
-        SiteUser siteUser = userService.join(null, "test", "1234", "test@test.com");
+        SiteUser user = userService.join( "test", "test@test.com", "1234");
+        assertNotNull(user);
+
     }
 }

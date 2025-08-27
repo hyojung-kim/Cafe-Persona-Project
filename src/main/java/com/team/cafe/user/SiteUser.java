@@ -23,15 +23,15 @@ public class SiteUser {
     @Column(unique = true)
     private String email;
 
-    private String password_hash;
+    private String password;
 
 //    @Enumerated(EnumType.STRING)
 //    private Role role;
-
+//
 //    @Builder
-//    public SiteUser(String username, String password_hash, Role role) {
+//    public SiteUser(String username, String password, Role role) {
 //        this.username = username;
-//        this.password_hash= password_hash;
+//        this.password= password;
 //        this.role= role;
 //    }
 }

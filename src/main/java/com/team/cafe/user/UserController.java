@@ -18,7 +18,7 @@ public class UserController {
     @PreAuthorize("isAnonymous()")
     @GetMapping("/user/login")
     public String login() {
-        return "login_form";
+        return "user_login_form";
     }
 
 //    @GetMapping("/user/login")

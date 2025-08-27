@@ -28,7 +28,7 @@ public class SecurityConfig {
                 // 로그인 폼 url 등록
                 .formLogin((formLogin) -> formLogin
                         .loginPage("/user/login")
-                        .defaultSuccessUrl("/"))
+                        .defaultSuccessUrl("/test/list"))
                 // 로그아웃 폼 url 등록
                 .logout((logout) -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
