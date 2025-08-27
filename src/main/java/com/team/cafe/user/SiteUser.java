@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+@SuperBuilder
 @Getter
 @Setter
 @Entity
@@ -15,10 +17,10 @@ public class SiteUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userid;
 
-    @Column(nullable = false)
+    @Column(unique = true)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
     private String password_hash;
