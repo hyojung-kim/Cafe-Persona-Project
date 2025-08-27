@@ -24,8 +24,13 @@ public class ReviewController {
     @GetMapping("/reviews/{id}")
     public String detail(@PathVariable Long id, Model model) {
         reviewService.increaseView(id);
-        model.addAttribute("review", reviewService.getDetail(id));
-        model.addAttribute("images", reviewService.getDetail(id)); // 템플릿에서 review.images 조회 가능하게 엔티티 매핑/쿼리 조정 가능
+        Review review = reviewService.getDetail(id);
+        model.addAttribute("review", review);
+        // 이미지 목록 전달 (템플릿에서 썸네일/슬라이드에 사용)
+        // ※ Review ↔ ReviewImage 연관을 직접 매핑하지 않았으므로, 리포지토리로 조회해서 전달하는 방식
+        //   (원한다면 Review에 @OneToMany(mappedBy="review") 추가 후 EntityGraph로 최적화 가능)
+        List<ReviewImage> images = reviewImageRepository.findByReview_IdOrderBySortOrderAsc(id);
+        model.addAttribute("images", images);
         return "review/detail";
     }
 

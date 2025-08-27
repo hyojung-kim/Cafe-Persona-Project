@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.5.4'
+	id 'org.springframework.boot' version '3.3.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -25,29 +25,35 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// --- Web & View ---
+	implementation 'org.springframework.boot:spring-boot-starter-web'       // MVC, REST
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // (서버 렌더링을 쓸 경우)
+
+	// --- DB & JPA ---
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.mysql:mysql-connector-j'   // 운영: MySQL 사용 시
+	runtimeOnly 'com.h2database:h2'             // 개발: 인메모리 DB
+
+	// --- Validation (별점/리뷰 길이 검증 등) ---
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// --- Security (회원만 리뷰 작성/좋아요) ---
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// --- 외부 API 연동 (WebClient) ---
+	implementation 'org.springframework:spring-webflux'  // 서버는 MVC, 클라이언트는 WebClient만 사용
+
+	// --- 파일 업로드 유틸(선택: 썸네일 등) ---
+	implementation 'net.coobird:thumbnailator:0.4.20'    // 필요 시 이미지 리사이즈
+
+	// --- Lombok ---
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// --- 테스트 ---
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    //	jpa
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    //	driver
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-    //	Thymeleaf
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
-    //	junit
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    //	스프링 시큐리티
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-
-    //  배일데이션
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

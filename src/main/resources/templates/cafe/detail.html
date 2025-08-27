@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${cafe.name} + ' - 상세'">Cafe Detail</title>
+
+    <!-- CSRF for JS -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <style>
+        .container{max-width:960px;margin:40px auto;padding:0 16px;}
+        .badge{display:inline-block;padding:4px 8px;border-radius:4px;background:#f4f4f4;margin-right:6px}
+        .star {font-size:20px; letter-spacing:1px; color:#999}
+        .star .filled {color:#f5a623}
+        .review-card{border:1px solid #e5e5e5;border-radius:8px;padding:16px;margin:12px 0}
+        .review-meta{color:#666;font-size:13px}
+        .pagination a, .pagination span{margin:0 4px;text-decoration:none}
+        .pagination .current{font-weight:bold}
+        .error{color:#c00}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${cafe.name}">카페 이름</h1>
+    <div>
+        <span class="badge">카테고리: <span th:text="${cafe.category}">COFFEE</span></span>
+        <span class="badge">리뷰 수: <span th:text="${cafe.reviewCount}">0</span></span>
+        <span class="badge">평균 별점: <span th:text="${#numbers.formatDecimal(cafe.avgRating,1,1)}">0.0</span>/5.0</span>
+    </div>
+
+    <hr/>
+
+    <h2>리뷰</h2>
+
+    <!-- 리뷰 목록 -->
+    <div th:if="${reviews.content.size() == 0}">아직 리뷰가 없습니다.</div>
+    <div th:each="rv : ${reviews.content}" class="review-card">
+        <div class="review-meta">
+            작성자: <b th:text="${rv.author.username}">user</b>
+            · 별점:
+            <span class="star"
+                  th:with="score=${rv.rating != null ? rv.rating.score() : 0}">
+        <span th:each="i : ${#numbers.sequence(1,5)}"
+              th:classappend="${i <= T(java.lang.Math).floor(score)} ? 'filled' : ''">&#9733;</span>
+        <span th:text="'(' + #numbers.formatDecimal(score,1,1) + ')'">0.0</span>
+      </span>
+            · <span th:text="${#temporals.format(rv.createdAt, 'yyyy-MM-dd HH:mm')}">2025-08-27</span>
+            · 조회수 <span th:text="${rv.viewCount}">0</span>
+            · 좋아요 <span th:text="${rv.likeCount}">0</span>
+        </div>
+        <div th:utext="${rv.content}">리뷰 내용</div>
+        <div style="margin-top:8px">
+            <a th:href="@{|/reviews/${rv.id}|}">자세히 보기</a>
+        </div>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination" th:if="${reviews.totalPages > 1}">
+        <a th:if="${!reviews.first}" th:href="@{|/cafes/${cafe.id}?page=${reviews.number-1}&size=${reviews.size}|}">이전</a>
+        <span th:each="p : ${#numbers.sequence(0, reviews.totalPages-1)}">
+      <a th:if="${p != reviews.number}"
+         th:href="@{|/cafes/${cafe.id}?page=${p}&size=${reviews.size}|}"
+         th:text="${p+1}">1</a>
+      <span th:if="${p == reviews.number}" class="current" th:text="${p+1}">1</span>
+    </span>
+        <a th:if="${!reviews.last}" th:href="@{|/cafes/${cafe.id}?page=${reviews.number+1}&size=${reviews.size}|}">다음</a>
+    </div>
+
+    <!-- 더보기 버튼 (리뷰 전용 리스트 페이지) -->
+    <div style="margin:12px 0">
+        <a th:href="@{|/cafes/${cafe.id}/reviews?page=0&size=10|}">리뷰 더 보기</a>
+    </div>
+
+    <hr/>
+
+    <!-- 리뷰 작성 (회원만) -->
+    <section sec:authorize="isAuthenticated()">
+        <h3>리뷰 작성</h3>
+        <form th:action="@{|/cafes/${cafe.id}/reviews|}" method="post" enctype="multipart/form-data" onsubmit="return validateReviewForm();">
+            <div>
+                <label>별점(0.5 단위)</label>
+                <select name="rating" required>
+                    <option th:each="s : ${#numbers.sequence(0,10)}"
+                            th:value="${s/2.0}"
+                            th:text="${#numbers.formatDecimal(s/2.0,1,1)} + ' 점'">
+                    </option>
+                </select>
+                <small>0.0 ~ 5.0 (0.5 단위)</small>
+            </div>
+            <div style="margin-top:8px">
+                <label>내용(50자 이상)</label><br/>
+                <textarea name="content" rows="6" cols="80" minlength="50" required placeholder="카페의 장단점, 재방문 의사 등"></textarea>
+            </div>
+            <div style="margin-top:8px">
+                <label>사진(최대 5장)</label><br/>
+                <input type="file" name="images" multiple accept="image/*"/>
+            </div>
+            <div class="error" id="formError" style="display:none;margin-top:8px;"></div>
+            <div style="margin-top:12px">
+                <button type="submit">등록</button>
+            </div>
+        </form>
+    </section>
+    <section sec:authorize="!isAuthenticated()">
+        <p>리뷰를 작성하려면 로그인하세요.</p>
+    </section>
+</div>
+
+<script>
+    function validateReviewForm() {
+      const f = document.forms[0];
+      const content = f.content.value.trim();
+      const files = f.images && f.images.files ? f.images.files : [];
+      const err = document.getElementById('formError');
+      err.style.display = 'none'; err.textContent = '';
+
+      if (content.length < 50) {
+        err.textContent = '리뷰는 50자 이상이어야 합니다.'; err.style.display='block'; return false;
+      }
+      if (files.length > 5) {
+        err.textContent = '이미지는 최대 5장까지 업로드할 수 있습니다.'; err.style.display='block'; return false;
+      }
+      return true;
+    }
+</script>
+</body>
+</html>
