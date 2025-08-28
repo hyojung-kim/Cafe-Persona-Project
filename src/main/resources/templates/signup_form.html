@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .input-group { position: relative; }
+        .validation-message {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.875rem;
+        }
+        .validation-message.text-danger { color: #dc3545; }
+        .validation-message.text-success { color: #28a745; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="container py-5">
+
+<h2 class="mb-4 text-center">회원가입</h2>
+
+<form th:action="@{/user/signup}" method="post" onsubmit="return validateForm(event)">
+
+    <!-- 아이디 -->
+    <div class="mb-3 input-group">
+        <input type="text" class="form-control" id="username" name="username" placeholder="아이디" required>
+        <span class="validation-message text-danger hidden" id="usernameError">이미 사용 중</span>
+        <span class="validation-message text-success hidden" id="usernameSuccess">사용 가능</span>
+    </div>
+
+    <!-- 이메일 -->
+    <div class="mb-3 input-group">
+        <input type="email" class="form-control" id="email" name="email" placeholder="이메일" required>
+        <span class="validation-message text-danger hidden" id="emailError">이미 사용 중</span>
+        <span class="validation-message text-success hidden" id="emailSuccess">사용 가능</span>
+    </div>
+
+    <!-- 닉네임 -->
+    <div class="mb-3 input-group">
+        <input type="text" class="form-control" id="nickname" name="nickname" placeholder="닉네임" required>
+        <span class="validation-message text-danger hidden" id="nicknameError">이미 사용 중</span>
+        <span class="validation-message text-success hidden" id="nicknameSuccess">사용 가능</span>
+    </div>
+
+    <!-- 비밀번호 -->
+    <div class="mb-3 input-group">
+        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호" required>
+        <span class="validation-message text-danger hidden" id="passwordError">8자 이상, 특수문자 포함</span>
+    </div>
+
+    <!-- 비밀번호 확인 -->
+    <div class="mb-3 input-group">
+        <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" placeholder="비밀번호 확인" required>
+        <span class="validation-message text-danger hidden" id="passwordConfirmError">비밀번호 불일치</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">회원가입</button>
+
+    <hr>
+
+    <!-- 카카오 로그인 버튼 -->
+    <a class="btn btn-warning w-100 mt-2"
+       href="https://kauth.kakao.com/oauth/authorize?client_id=a2ed26f1ff8c196702de6b2f52470d05&redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code">
+        카카오 1초 회원가입/로그인
+    </a>
+
+</form>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">알림</h5></div>
+            <div class="modal-body"><p id="alertMessage"></p></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap + JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/signup.js" defer></script>
+
+</body>
+</html>
