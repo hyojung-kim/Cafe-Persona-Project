@@ -9,17 +9,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(indexes = @Index(name="idx_cafe_name", columnList = "name"))
-public class Cafe {
+public class ReviewImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 120)
-    private String name;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Review review;
 
-    private Double lat;
-    private Double lng;
+    @Column(nullable = false, length = 255)
+    private String urlPath;
 
-    private String category;
+    private Long sizeBytes;
 }
