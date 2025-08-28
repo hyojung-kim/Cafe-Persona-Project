@@ -2,6 +2,7 @@ package com.team.cafe.review;
 
 import com.team.cafe.domain.ReviewImage;
 import com.team.cafe.domain.SiteUser;
+import com.team.cafe.service.ReviewService;
 import com.team.cafe.user.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

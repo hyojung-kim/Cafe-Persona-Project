@@ -1,7 +1,7 @@
 package com.team.cafe.cafe;
 
 
-import com.team.cafe.review.ReviewService;
+import com.team.cafe.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

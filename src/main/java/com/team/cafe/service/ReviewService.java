@@ -1,7 +1,13 @@
-package com.team.cafe.review;
+package com.team.cafe.service;
 
 
 import com.team.cafe.cafe.CafeRepository;
+import com.team.cafe.domain.*;
+import com.team.cafe.repository.ReviewImageRepository;
+import com.team.cafe.repository.ReviewLikeRepository;
+import com.team.cafe.repository.ReviewReportRepository;
+import com.team.cafe.repository.ReviewRepository;
+import com.team.cafe.review.ReviewStorage;
 import com.team.cafe.user.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
