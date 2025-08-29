@@ -18,10 +18,12 @@ public class CafeListService {
         return cafeRepository.findAll();
     }
 
-    public Page<Cafe> getCafePage(int page, int size) {
+    public Page<Cafe> getCafes(String kw, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        return cafeRepository.findAll(pageable);
+        String q = (kw == null) ? null : kw.trim(); //null 위험처리
+        return cafeRepository.search(q, pageable);
     }
+
 //    public Cafe getCafe(Integer id) {
 //        return cafeRepository.findById(id)
 //                .orElseThrow(() -> new IllegalArgumentException("카페 없음: " + id));

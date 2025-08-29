@@ -20,9 +20,13 @@ public class CafeListController {
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "3") int size,
+                       @RequestParam(required = false) String kw,
                        Model model) {
-        Page<Cafe> paging = cafeListService.getCafePage(page, size);
+
+        Page<Cafe> paging = cafeListService.getCafes(kw, page, size);
         model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);       // 입력값 유지용
+        model.addAttribute("size", size);   // 페이징 링크에 전달
         return "cafe/cafe_list";
     }
 }
