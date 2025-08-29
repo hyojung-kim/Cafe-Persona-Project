@@ -2,6 +2,7 @@ package com.team.cafe.list;
 
 
 import com.team.cafe.bookmark.Bookmark;
+import com.team.cafe.keyword.CafeKeyword;
 import com.team.cafe.keyword.Keyword;
 import com.team.cafe.review.Review;
 import com.team.cafe.user.SiteUser;
@@ -25,7 +26,7 @@ public class Cafe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cafe_id", columnDefinition = "BIGINT UNSIGNED")
     @Comment("카페 PK")
-    private Long id;
+    private Integer id;
 
     @Column(name = "cafe_name", length = 100, nullable = false)
     @Comment("카페 이름")
@@ -111,6 +112,6 @@ public class Cafe {
 
     // CafeTag.cafe (N:1)  -> Cafe ⟷ Tag 다대다 중간 엔티티
     @OneToMany(mappedBy = "cafe")
-    private List<Keyword> cafeKeyword;
+    private List<CafeKeyword> cafeKeyword;
 
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "keyword",
+@Table(name = "keyword", // 인덱스용 !
         indexes = {
                 @Index(name="idx_keyword_type", columnList = "type_id"),
                 @Index(name="idx_keyword_name", columnList = "name")
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class Keyword {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(length=60, nullable=false)
     private String name;       // 예: "연인 데이트", "주차 편리"

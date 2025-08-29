@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="cafe_keyword",
+@Table(name="cafe_keyword", // 인덱스용 !
         uniqueConstraints = @UniqueConstraint(name="uk_cafe_keyword", columnNames = {"cafe_id","keyword_id"}),
         indexes = {
                 @Index(name="idx_ck_cafe", columnList = "cafe_id"),
@@ -17,7 +17,7 @@ import lombok.Setter;
 public class CafeKeyword {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 단일 PK로 간단히 (복합키도 가능하지만 운영/디버깅이 편함)
+    private Integer id; // 단일 PK로 간단히 (복합키도 가능하지만 운영/디버깅이 편함)
 
     @ManyToOne(fetch = FetchType.LAZY, optional=false)
     @JoinColumn(name="cafe_id")
