@@ -1,0 +1,62 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+    <h2>카페 목록</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>이름</th>
+            <th>주소</th>
+            <th>도시/구</th>
+            <th>영업시간</th>
+            <th>주차</th>
+            <th>전화</th>
+            <th>웹사이트</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 빈 목록 처리 -->
+        <tr th:if="${#lists.isEmpty(cafes)}">
+            <td colspan="8" class="muted">등록된 카페가 없습니다.</td>
+        </tr>
+
+        <!-- 리스트 출력 -->
+        <tr th:each="c : ${cafes}">
+            <td th:text="${c.id}">1</td>
+            <td th:text="${c.name}">카페명</td>
+
+            <td>
+                <span th:text="${c.address1}">주소1</span>
+                <span th:if="${c.address2 != null and !#strings.isEmpty(c.address2)}"
+                      th:text="' ' + ${c.address2}"></span>
+            </td>
+
+            <td>
+                <span th:text="${c.city}">도시</span> /
+                <span th:text="${c.district}">구</span>
+            </td>
+
+            <td>
+                <!-- 둘 다 있을 때만 시간 표시 -->
+                <span th:if="${c.openTime != null and c.closeTime != null}"
+                      th:text="|${#temporals.format(c.openTime,'HH:mm')} ~ ${#temporals.format(c.closeTime,'HH:mm')}|">
+          09:00 ~ 22:00
+        </span>
+                <span th:unless="${c.openTime != null and c.closeTime != null}" class="muted">미등록</span>
+            </td>
+
+            <td th:text="${c.parkingYn} ? '가능' : '불가'">가능</td>
+            <td th:text="${c.phoneNum}">010-0000-0000</td>
+
+            <td>
+                <a th:if="${c.siteUrl != null and !#strings.isEmpty(c.siteUrl)}"
+                   th:href="${c.siteUrl}" target="_blank" rel="noopener">바로가기</a>
+                <span th:unless="${c.siteUrl != null and !#strings.isEmpty(c.siteUrl)}" class="muted">없음</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</html>

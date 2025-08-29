@@ -24,7 +24,7 @@ public class Cafe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cafe_id", columnDefinition = "BIGINT UNSIGNED")
+    @Column(name = "cafe_id")
     @Comment("카페 PK")
     private Integer id;
 
