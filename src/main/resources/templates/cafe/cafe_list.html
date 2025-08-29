@@ -17,46 +17,78 @@
         </thead>
         <tbody>
         <!-- 빈 목록 처리 -->
-        <tr th:if="${#lists.isEmpty(cafes)}">
+        <tr th:if="${#lists.isEmpty(paging)}">
             <td colspan="8" class="muted">등록된 카페가 없습니다.</td>
         </tr>
 
         <!-- 리스트 출력 -->
-        <tr th:each="c : ${cafes}">
-            <td th:text="${c.id}">1</td>
-            <td th:text="${c.name}">카페명</td>
+        <tr th:each="cafeList : ${paging}">
+            <td th:text="${cafeList.id}">1</td>
+            <td th:text="${cafeList.name}">카페명</td>
 
             <td>
-                <span th:text="${c.address1}">주소1</span>
-                <span th:if="${c.address2 != null and !#strings.isEmpty(c.address2)}"
-                      th:text="' ' + ${c.address2}"></span>
+                <span th:text="${cafeList.address1}">주소1</span>
+                <span th:if="${cafeList.address2 != null and !#strings.isEmpty(cafeList.address2)}"
+                      th:text="' ' + ${cafeList.address2}"></span>
             </td>
 
             <td>
-                <span th:text="${c.city}">도시</span> /
-                <span th:text="${c.district}">구</span>
+                <span th:text="${cafeList.city}">도시</span> /
+                <span th:text="${cafeList.district}">구</span>
             </td>
 
             <td>
                 <!-- 둘 다 있을 때만 시간 표시 -->
-                <span th:if="${c.openTime != null and c.closeTime != null}"
-                      th:text="|${#temporals.format(c.openTime,'HH:mm')} ~ ${#temporals.format(c.closeTime,'HH:mm')}|">
+                <span th:if="${cafeList.openTime != null and cafeList.closeTime != null}"
+                      th:text="|${#temporals.format(cafeList.openTime,'HH:mm')} ~ ${#temporals.format(cafeList.closeTime,'HH:mm')}|">
           09:00 ~ 22:00
         </span>
-                <span th:unless="${c.openTime != null and c.closeTime != null}" class="muted">미등록</span>
+                <span th:unless="${cafeList.openTime != null and cafeList.closeTime != null}" class="muted">미등록</span>
             </td>
 
-            <td th:text="${c.parkingYn} ? '가능' : '불가'">가능</td>
-            <td th:text="${c.phoneNum}">010-0000-0000</td>
+            <td th:text="${cafeList.parkingYn} ? '가능' : '불가'">가능</td>
+            <td th:text="${cafeList.phoneNum}">010-0000-0000</td>
 
             <td>
-                <a th:if="${c.siteUrl != null and !#strings.isEmpty(c.siteUrl)}"
-                   th:href="${c.siteUrl}" target="_blank" rel="noopener">바로가기</a>
-                <span th:unless="${c.siteUrl != null and !#strings.isEmpty(c.siteUrl)}" class="muted">없음</span>
+                <a th:if="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}"
+                   th:href="${cafeList.siteUrl}" target="_blank" rel="noopener">바로가기</a>
+                <span th:unless="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}" class="muted">없음</span>
             </td>
         </tr>
         </tbody>
     </table>
+
+    <!-- 페이징처리 시작 -->
+    <div th:if="${!paging.isEmpty()}" style="text-align:center; margin-top:20px;">
+
+        <!-- 이전 -->
+        <a th:classappend="${!paging.hasPrevious()} ? ' disabled'"
+           th:href="@{/cafe/list(page=${paging.number-1}, kw=${param.kw})}">
+            이전
+        </a>
+
+        <!-- 페이지 번호들 (현재±5 범위) -->
+        <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
+              th:if="${p >= paging.number-5 and p <= paging.number+5}"
+              th:classappend="${p == paging.number} ? ' active'">
+        <a th:if="${p != paging.number}"
+           th:text="${p+1}"
+           th:href="@{/cafe/list(page=${p}, kw=${param.kw})}"></a>
+        <span th:if="${p == paging.number}"
+              th:text="${p+1}"
+              style="font-weight:bold; color:red;"></span>
+        </span>
+
+        <!-- 다음 -->
+        <a th:classappend="${!paging.hasNext()} ? ' disabled'"
+           th:href="@{/cafe/list(page=${paging.number+1}, kw=${param.kw})}">
+            다음
+        </a>
+    </div>
+    <!-- 페이징처리 끝 -->
+
+
+
 
 </div>
 </html>

@@ -1,0 +1,17 @@
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    color: #999;
+}
+.active {
+    font-weight: bold;
+}
+a {
+    margin: 0 4px;
+    text-decoration: none;
+    color: #0073e6;
+}
+a:hover {
+    text-decoration: underline;
+}
+
