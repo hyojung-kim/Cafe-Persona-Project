@@ -23,6 +23,20 @@
         </select>
         <input type="hidden" name="size" th:value="${size}">
         <button type="submit">적용</button>
+
+        <div style="display:flex; gap:12px; align-items:center;">
+            <label>
+                <input type="checkbox" name="parking" value="true"
+                       th:checked="${parking != null and parking}"
+                       onchange="this.form.submit()"> 주차 가능만
+            </label>
+
+            <label>
+                <input type="checkbox" name="openNow" value="true"
+                       th:checked="${openNow != null and openNow}"
+                       onchange="this.form.submit()"> 지금 영업중만
+            </label>
+        </div>
     </form>
 
     <table>
@@ -81,21 +95,21 @@
         </tbody>
     </table>
 
-    <!-- 페이징: kw / size / sort / dir 유지 -->
+    <!-- 페이징: 모든 파라미터 유지 -->
     <div style="margin-top:20px; text-align:center" th:if="${!paging.isEmpty()}">
         <a th:if="${!paging.first}"
-           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir})}">이전</a>
+           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">이전</a>
 
         <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
               th:if="${p >= paging.number-5 and p <= paging.number+5}">
-    <a th:if="${p != paging.number}"
-       th:text="${p+1}"
-       th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir})}"></a>
-    <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
-  </span>
+            <a th:if="${p != paging.number}"
+                th:text="${p+1}"
+                th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}"></a>
+            <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
+        </span>
 
         <a th:if="${!paging.last}"
-           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir})}">다음</a>
+           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">다음</a>
     </div>
 
 

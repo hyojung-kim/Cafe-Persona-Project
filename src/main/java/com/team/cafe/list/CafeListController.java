@@ -23,14 +23,19 @@ public class CafeListController {
                        @RequestParam(required = false) String kw,
                        @RequestParam(defaultValue = "createdAt") String sort,
                        @RequestParam(defaultValue = "desc") String dir,
+                       @RequestParam(required = false) Boolean parking,  // true면 가능만
+                       @RequestParam(required = false) Boolean openNow,  // true면 영업중만
                        Model model) {
 
-        Page<Cafe> paging = cafeListService.getCafes(kw, page, size, sort, dir);
+        var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
+
         model.addAttribute("paging", paging);
-        model.addAttribute("kw", kw);       // 입력값 유지용
-        model.addAttribute("size", size);   // 페이징 링크에 전달
+        model.addAttribute("kw", kw);
+        model.addAttribute("size", size);
         model.addAttribute("sort", sort);
         model.addAttribute("dir", dir);
+        model.addAttribute("parking", parking);
+        model.addAttribute("openNow", openNow);
         return "cafe/cafe_list";
     }
 }

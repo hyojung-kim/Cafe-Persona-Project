@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -18,13 +19,21 @@ public class CafeListService {
         return cafeRepository.findAll();
     }
 
-    public Page<Cafe> getCafes(String kw, int page, int size, String sort, String dir) {
+    public Page<Cafe> getCafes(String kw, int page, int size, String sort, String dir,
+                               Boolean parking, Boolean openNow) {
         Sort sortSpec = buildSort(sort, dir);
         Pageable pageable = PageRequest.of(page, size, sortSpec);
+        String kwTrim = (kw == null) ? null : kw.trim();
 
-        String q = (kw == null) ? null : kw.trim();
-        return cafeRepository.search(q, pageable);
+        // 현재 시간(한국)
+        LocalTime now = null;
+        if (Boolean.TRUE.equals(openNow)) {
+            now = LocalTime.now(java.time.ZoneId.of("Asia/Seoul"));
+        }
+
+        return cafeRepository.searchWithFilters(kwTrim, parking, now, pageable);
     }
+
 
     // 허용된 정렬 키만 사용 (예외/보안/실수 방지)
     private Sort buildSort(String sort, String dir) {
