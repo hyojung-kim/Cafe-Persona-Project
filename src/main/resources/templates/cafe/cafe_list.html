@@ -9,6 +9,22 @@
         <button type="submit">검색</button>
     </form>
 
+    <!-- 검색 + 정렬 폼 -->
+    <form th:action="@{/cafe/list}" method="get" style="margin-bottom:12px; display:flex; gap:8px; justify-content:flex-end;">
+        <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}">
+        <select name="sort" th:value="${sort}">
+            <option value="createdAt">최신순</option>
+            <option value="name">이름순</option>
+            <option value="hit">인기순</option>
+        </select>
+        <select name="dir" th:value="${dir}">
+            <option value="desc">내림차순</option>
+            <option value="asc">오름차순</option>
+        </select>
+        <input type="hidden" name="size" th:value="${size}">
+        <button type="submit">적용</button>
+    </form>
+
     <table>
         <thead>
         <tr>
@@ -65,34 +81,22 @@
         </tbody>
     </table>
 
-    <!-- 페이징처리 시작 -->
-    <div th:if="${!paging.isEmpty()}" style="text-align:center; margin-top:20px;">
+    <!-- 페이징: kw / size / sort / dir 유지 -->
+    <div style="margin-top:20px; text-align:center" th:if="${!paging.isEmpty()}">
+        <a th:if="${!paging.first}"
+           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir})}">이전</a>
 
-        <!-- 이전 -->
-        <a th:classappend="${!paging.hasPrevious()} ? ' disabled'"
-           th:href="@{/cafe/list(page=${paging.number-1}, kw=${param.kw})}">
-            이전
-        </a>
-
-        <!-- 페이지 번호들 (현재±5 범위) -->
         <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
-              th:if="${p >= paging.number-5 and p <= paging.number+5}"
-              th:classappend="${p == paging.number} ? ' active'">
-        <a th:if="${p != paging.number}"
-           th:text="${p+1}"
-           th:href="@{/cafe/list(page=${p}, kw=${param.kw})}"></a>
-        <span th:if="${p == paging.number}"
-              th:text="${p+1}"
-              style="font-weight:bold; color:red;"></span>
-        </span>
+              th:if="${p >= paging.number-5 and p <= paging.number+5}">
+    <a th:if="${p != paging.number}"
+       th:text="${p+1}"
+       th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir})}"></a>
+    <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
+  </span>
 
-        <!-- 다음 -->
-        <a th:classappend="${!paging.hasNext()} ? ' disabled'"
-           th:href="@{/cafe/list(page=${paging.number+1}, kw=${param.kw})}">
-            다음
-        </a>
+        <a th:if="${!paging.last}"
+           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir})}">다음</a>
     </div>
-    <!-- 페이징처리 끝 -->
 
 
 

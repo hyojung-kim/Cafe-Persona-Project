@@ -18,10 +18,27 @@ public class CafeListService {
         return cafeRepository.findAll();
     }
 
-    public Page<Cafe> getCafes(String kw, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        String q = (kw == null) ? null : kw.trim(); //null 위험처리
+    public Page<Cafe> getCafes(String kw, int page, int size, String sort, String dir) {
+        Sort sortSpec = buildSort(sort, dir);
+        Pageable pageable = PageRequest.of(page, size, sortSpec);
+
+        String q = (kw == null) ? null : kw.trim();
         return cafeRepository.search(q, pageable);
+    }
+
+    // 허용된 정렬 키만 사용 (예외/보안/실수 방지)
+    private Sort buildSort(String sort, String dir) {
+        // 기본값: 최신순 (createdAt desc)
+        String key = (sort == null || sort.isBlank()) ? "createdAt" : sort;
+        Sort.Direction direction = "asc".equalsIgnoreCase(dir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        // 화이트리스트 매핑 (엔티티 필드명 기준!)
+        return switch (key) {
+            case "name"      -> Sort.by(direction, "name");        // 이름순
+            case "hit"       -> Sort.by(direction, "hitCount");    // 인기순(조회수)
+            case "createdAt" -> Sort.by(direction, "createdAt");   // 최신순
+            default          -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
     }
 
 //    public Cafe getCafe(Integer id) {

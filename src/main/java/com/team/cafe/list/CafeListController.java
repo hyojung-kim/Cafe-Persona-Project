@@ -21,12 +21,16 @@ public class CafeListController {
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "3") int size,
                        @RequestParam(required = false) String kw,
+                       @RequestParam(defaultValue = "createdAt") String sort,
+                       @RequestParam(defaultValue = "desc") String dir,
                        Model model) {
 
-        Page<Cafe> paging = cafeListService.getCafes(kw, page, size);
+        Page<Cafe> paging = cafeListService.getCafes(kw, page, size, sort, dir);
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);       // 입력값 유지용
         model.addAttribute("size", size);   // 페이징 링크에 전달
+        model.addAttribute("sort", sort);
+        model.addAttribute("dir", dir);
         return "cafe/cafe_list";
     }
 }
