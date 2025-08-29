@@ -1,6 +1,9 @@
 package com.team.cafe.list;
 
 
+import com.team.cafe.bookmark.Bookmark;
+import com.team.cafe.keyword.Keyword;
+import com.team.cafe.review.Review;
 import com.team.cafe.user.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -10,14 +13,13 @@ import org.hibernate.annotations.Comment;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
-public class CafeList {
+public class Cafe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -92,19 +94,23 @@ public class CafeList {
     //관계구조
 
     @ManyToMany
-    @Comment("좋아요 누른 사용자 목록")
-    private Set<SiteUser> likeCount;
+    @JoinTable(
+            name = "cafe_like",
+            joinColumns = @JoinColumn(name = "cafe_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<SiteUser> likedUsers;
 
     // Review.cafe (N:1)
     @OneToMany(mappedBy = "cafe")
-    private List<Review> reviews = new ArrayList<>();
+    private List<Review> reviews;
 
     // Bookmark.cafe (N:1)
     @OneToMany(mappedBy = "cafe")
-    private List<Bookmark> bookmarks = new ArrayList<>();
+    private List<Bookmark> bookmarks;
 
     // CafeTag.cafe (N:1)  -> Cafe ⟷ Tag 다대다 중간 엔티티
     @OneToMany(mappedBy = "cafe")
-    private List<CafeTag> cafeTags = new ArrayList<>();
+    private List<Keyword> cafeKeyword;
 
 }
