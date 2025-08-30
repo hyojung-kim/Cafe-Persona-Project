@@ -96,7 +96,7 @@ public class Cafe {
 
     @ManyToMany
     @JoinTable(
-            name = "cafe_like",
+            name = "likedUsers",
             joinColumns = @JoinColumn(name = "cafe_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )

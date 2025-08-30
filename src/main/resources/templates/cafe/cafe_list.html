@@ -1,5 +1,15 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
+
+    <div sec:authorize="isAuthenticated()">
+        안녕하세요, <b sec:authentication="principal.username">사용자</b> 님!
+    </div>
+
+    <div sec:authorize="isAnonymous()">
+        로그인하지 않은 상태입니다.
+    </div>
+
+
     <h2>카페 목록</h2>
 
     <!-- 검색 + 정렬 폼 -->
