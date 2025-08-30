@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -28,7 +27,6 @@ public class SiteUserController {
      * ex) /dummy/login/1 → userId=1 유저로 로그인
      */
     @GetMapping("/login/{id}")
-    @ResponseBody
     public String devLogin(@PathVariable Integer id,
                            HttpServletRequest request,
                            HttpServletResponse response) {
@@ -49,7 +47,7 @@ public class SiteUserController {
 
         new HttpSessionSecurityContextRepository().saveContext(context, request, response);
 
-        return "DEV 로그인 완료: " + user.getUsername() + " (ROLE_USER)";
+        return "redirect:/";
     }
 
     /**
@@ -57,10 +55,9 @@ public class SiteUserController {
      * ex) /dummy/logout
      */
     @GetMapping("/logout")
-    @ResponseBody
     public String devLogout(HttpServletRequest request, HttpServletResponse response) {
         SecurityContextHolder.clearContext();
         request.getSession().invalidate();
-        return "dummy 로그아웃 완료";
+        return "redirect:/";
     }
 }
