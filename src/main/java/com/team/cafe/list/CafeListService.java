@@ -1,26 +1,24 @@
 package com.team.cafe.list;
 
-import com.team.cafe.user.SiteUser;
-import com.team.cafe.user.SiteUserRepository;
-
+import com.team.cafe.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class CafeListService {
-    private final CafeRepository cafeRepository;
+    private final CafeListRepository cafeListRepository;
 
     public List<Cafe> getAllCafes() {
-        return cafeRepository.findAll();
+        return cafeListRepository.findAll();
     }
 
     public Page<Cafe> getCafes(String kw, int page, int size, String sort, String dir,
@@ -35,7 +33,7 @@ public class CafeListService {
             now = LocalTime.now(java.time.ZoneId.of("Asia/Seoul"));
         }
 
-        return cafeRepository.searchWithFilters(kwTrim, parking, now, pageable);
+        return cafeListRepository.searchWithFilters(kwTrim, parking, now, pageable);
     }
 
 
@@ -52,6 +50,15 @@ public class CafeListService {
             case "createdAt" -> Sort.by(direction, "createdAt");   // 최신순
             default          -> Sort.by(Sort.Direction.DESC, "createdAt");
         };
+    }
+
+    public Cafe getById(Integer id) {
+        Optional<Cafe> cafe = this.cafeListRepository.findById(id);
+        if (cafe.isPresent()) {
+            return cafe.get();
+        } else {
+            throw new DataNotFoundException("article not found");
+        }
     }
 
 //    public Cafe getCafe(Integer id) {

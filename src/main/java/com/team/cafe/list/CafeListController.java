@@ -2,20 +2,11 @@ package com.team.cafe.list;
 
 import com.team.cafe.like.LikeService;
 import com.team.cafe.user.SiteUser;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -47,6 +38,36 @@ public class CafeListController {
         return "cafe/cafe_list";
     }
 
+
+    @GetMapping("detail/{id}")
+    public String detail(@PathVariable Integer id,
+                         @AuthenticationPrincipal SiteUser user,
+                         Model model) {
+        Cafe cafe = cafeListService.getById(id);
+
+        boolean liked = false;
+        if (user != null) {
+            // 빠른 체크: existsBy... 좋아요가 눌러져있는지 확인
+            liked = likeService.isLiked(id, user.getId());
+            // (위 메서드 안 쓰려면) liked = cafe.getLikedUsers().contains(user);
+        }
+        long likeCount = likeService.getLikeCount(id); // 좋아요 수
+
+
+        model.addAttribute("cafe", cafe);
+        model.addAttribute("liked", liked);
+        model.addAttribute("likeCount", likeCount);
+        return "cafe/cafe_detail";
+    }
+
+    //@PreAuthorize("isAuthenticated()") 써야할까 고민 중
+    @PostMapping("/detail/{id}/like")
+    public String toggleLike(@PathVariable Integer id,
+                             @AuthenticationPrincipal SiteUser user) {
+        if (user == null) return "redirect:/dummy/login/1?next=/cafe/" + id; // 로컬 편의
+        likeService.toggle(id, user.getId());
+        return "redirect:/cafe/detail/" + id; // 상세로 복귀
+    }
 
 
 

@@ -7,13 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 @Repository
-public interface CafeRepository extends JpaRepository<Cafe, Integer> {
+public interface CafeListRepository extends JpaRepository<Cafe, Integer> {
     // 기본 전체 조회 페이징
     Page<Cafe> findAll(Pageable pageable);
 
@@ -45,4 +40,11 @@ public interface CafeRepository extends JpaRepository<Cafe, Integer> {
                                  @Param("parking") Boolean parking,
                                  @Param("now") java.time.LocalTime now,
                                  Pageable pageable);
+
+    // 이 카페를 좋아요한 유저 수
+    @Query("select count(u) from Cafe c join c.likedUsers u where c.id = :cafeId")
+    long countLikes(@Param("cafeId") Integer cafeId);
+
+    // (선택) 해당 유저가 이 카페를 좋아요 했는지 빠르게 체크하고 싶을 때
+    boolean existsByIdAndLikedUsers_Id(Integer cafeId, Integer userId);
 }

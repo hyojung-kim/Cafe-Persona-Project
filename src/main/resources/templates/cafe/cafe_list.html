@@ -64,7 +64,10 @@
         <!-- 리스트 출력 -->
         <tr th:each="cafeList : ${paging}">
             <td th:text="${cafeList.id}">1</td>
-            <td th:text="${cafeList.name}">카페명</td>
+            <td>
+                <a th:href="@{|/cafe/detail/${cafeList.id}|}" th:text="${cafeList.name}">카페명</a>
+            </td>
+
 
             <td>
                 <span th:text="${cafeList.address1}">주소1</span>
