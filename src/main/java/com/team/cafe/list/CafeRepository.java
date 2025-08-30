@@ -42,4 +42,11 @@ public interface CafeRepository extends JpaRepository<Cafe, Integer> {
                                  @Param("parking") Boolean parking,
                                  @Param("now") java.time.LocalTime now,
                                  Pageable pageable);
+
+    // 유저가 이 카페를 좋아요 했는지 (추후에 사용)
+    boolean existsByIdAndLikedUsers_Id(Integer cafeId, Integer userId);
+
+    // 좋아요 수
+    @Query("select count(u) from Cafe c join c.likedUsers u where c.id = :cafeId")
+    long countLikes(@Param("cafeId") Integer cafeId);
 }
