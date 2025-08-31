@@ -53,10 +53,12 @@ public class CafeListController {
         }
         long likeCount = likeService.getLikeCount(id); // 좋아요 수
 
+        boolean openNow = cafeListService.isOpenNow(cafe); //영업상태
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("liked", liked);
         model.addAttribute("likeCount", likeCount);
+        model.addAttribute("openNow", openNow);
         return "cafe/cafe_detail";
     }
 

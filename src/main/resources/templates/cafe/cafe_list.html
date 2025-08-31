@@ -53,6 +53,7 @@
             <th>주차</th>
             <th>전화</th>
             <th>웹사이트</th>
+            <th>날짜</th>
         </tr>
         </thead>
         <tbody>
@@ -96,6 +97,9 @@
                 <a th:if="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}"
                    th:href="${cafeList.siteUrl}" target="_blank" rel="noopener">바로가기</a>
                 <span th:unless="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}" class="muted">없음</span>
+            </td>
+            <td th:text="${#temporals.format(cafeList.createdAt, 'yyyy-MM-dd HH:mm')}">
+                등록일
             </td>
         </tr>
         </tbody>

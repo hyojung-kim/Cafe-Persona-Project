@@ -61,6 +61,14 @@ public class CafeListService {
         }
     }
 
+    public Boolean  isOpenNow(Cafe cafe) {
+        if (cafe.getOpenTime() == null || cafe.getCloseTime() == null) {
+            return null; // 영업시간 미등록 → 상태 판단 불가
+        }
+        LocalTime now = LocalTime.now();
+        return !now.isBefore(cafe.getOpenTime()) && !now.isAfter(cafe.getCloseTime());
+    }
+
 //    public Cafe getCafe(Integer id) {
 //        return cafeRepository.findById(id)
 //                .orElseThrow(() -> new IllegalArgumentException("카페 없음: " + id));
