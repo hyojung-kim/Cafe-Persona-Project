@@ -34,6 +34,12 @@ public class SecurityConfig {
                         .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
                         .logoutSuccessUrl("/test/list")
                         .invalidateHttpSession(true))
+                // 정적 리소스 허용
+                // 카카오 로그인 버튼 png
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/images/**", "/css/**", "/js/**", "/webjars/**").permitAll()
+//                        .anyRequest().authenticated()
+//                );
         ;
         return http.build();
     }

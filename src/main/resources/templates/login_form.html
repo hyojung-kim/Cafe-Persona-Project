@@ -14,7 +14,14 @@
             <label for="password" class="form-label">비밀번호</label>
             <input type="password" name="password" id="password" class="form-control">
         </div>
+        <div>
         <button type="submit" class="btn btn-primary">로그인</button>
+        <!-- kakao button -->
+            <a href="https://kauth.kakao.com/oauth/authorize"
+               th:href="@{https://kauth.kakao.com/oauth/authorize(client_id=${kakaoApiKey}, redirect_uri=${redirectUri}, response_type='code')}">
+                <img th:src="@{/images/kakao_login_medium.png}" alt="카카오 로그인 버튼">
+            </a>
+        </div>
         <div>
             <button type="submit" class="btn btn-primary">아이디 찾기</button>
             <button type="submit" class="btn btn-primary">비밀번호 찾기</button>
