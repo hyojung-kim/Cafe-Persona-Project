@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 @RequestMapping("/cafes")
 public class CafeController {
+
     private final CafeService cafeService;
     private final ReviewService reviewService;
 

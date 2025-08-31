@@ -1,6 +1,7 @@
 package com.team.cafe.service;
 
-import com.team.cafe.cafe.CafeRepository;
+
+import com.team.cafe.repository.CafeRepository;
 import com.team.cafe.domain.Cafe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

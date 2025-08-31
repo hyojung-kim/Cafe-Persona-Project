@@ -32,7 +32,7 @@ dependencies {
 	// JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	// ✅ MariaDB 드라이버
+	// MariaDB 드라이버
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
 
 	// Validation
@@ -58,6 +58,9 @@ dependencies {
 
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'io.projectreactor.netty:reactor-netty:1.1.19'
 }
 
 

@@ -1,14 +1,11 @@
 package com.team.cafe.service;
 
 
-import com.team.cafe.cafe.CafeRepository;
+import com.team.cafe.repository.CafeRepository;
 import com.team.cafe.domain.*;
-import com.team.cafe.repository.ReviewImageRepository;
-import com.team.cafe.repository.ReviewLikeRepository;
-import com.team.cafe.repository.ReviewReportRepository;
-import com.team.cafe.repository.ReviewRepository;
+import com.team.cafe.repository.*;
 import com.team.cafe.review.ReviewStorage;
-import com.team.cafe.user.SiteUserRepository;
+import com.team.cafe.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -151,5 +148,59 @@ public class ReviewService {
         long count = reviewRepository.countActiveByCafeId(cafeId);
         cafe.setAvgRating(Math.round((avgHalf / 2.0) * 10.0) / 10.0); // 소수1
         cafe.setReviewCount((int) count);
+    }
+    @Transactional
+    public long toggleLike(String username, Long reviewId) {
+        SiteUser user = siteUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+
+        if (review.getAuthor().getId().equals(user.getId())) {
+            throw new IllegalStateException("본인 리뷰에는 좋아요를 누를 수 없습니다.");
+        }
+        if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
+            reviewLikeRepository.deleteByReviewAndUser(review, user);
+        } else {
+            reviewLikeRepository.save(ReviewLike.builder().review(review).user(user).build());
+        }
+        return reviewLikeRepository.countByReview(review);
+    }
+    @Transactional
+    public Review getAndIncreaseView(Long reviewId) {
+        reviewRepository.incrementView(reviewId);
+        return reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+    }
+    public long getLikeCount(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+        return reviewLikeRepository.countByReview(review);
+    }
+    @Transactional
+    public Review updateReview(String username, Long reviewId, String content, Double rating) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+
+        if (!review.getAuthor().getUsername().equals(username)) {
+            throw new IllegalStateException("작성자만 수정할 수 있습니다.");
+        }
+        validateRating(rating);
+        if (content == null || content.trim().length() < 50) {
+            throw new IllegalArgumentException("리뷰는 50자 이상이어야 합니다.");
+        }
+        review.setContent(content);
+        review.setRating(rating);
+        review.setModifiedAt(java.time.LocalDateTime.now());
+        return review;
+    }
+    @Transactional
+    public void deleteReview(String username, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+        if (!review.getAuthor().getUsername().equals(username)) {
+            throw new IllegalStateException("작성자만 삭제할 수 있습니다.");
+        }
+        reviewRepository.delete(review);
     }
 }
