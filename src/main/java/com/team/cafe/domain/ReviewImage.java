@@ -18,11 +18,14 @@ public class ReviewImage {
     private Review review;
 
     //uploads/reviews/{reviewId}/{uuid}.ext
-    @Column(nullable = false, length = 225)
+    @Column(nullable = false, length = 500)
     private String urlPath;
 
-    @Column(length = 255)
     private String originalFilename;
-
     private Long sizeBytes;
+
+    // ✅ 정렬용 필드 추가
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer sortOrder = 0;
 }

@@ -20,7 +20,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("update Review r set r.viewCount = r.viewCount + 1 where r.id = :id")
     void incrementView(@Param("id") Long id);
 
-    boolean existsByReviewAndUser(Review review, SiteUser user);
-    long deleteByReviewAndUser(Review review, SiteUser user);
-    long countByReview(Review review);
+
 }

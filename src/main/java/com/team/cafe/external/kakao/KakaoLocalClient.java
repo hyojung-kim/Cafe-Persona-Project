@@ -15,7 +15,7 @@ public class KakaoLocalClient {
 
     private final WebClient webClient; // WebClientConfig에서 주입
 
-    @Value("${app.external.kakao.rest-api-key}")
+    @Value("${app.external.kakao.rest-api-key:a2ed26f1ff8c196702de6b2f52470d05}")
     private String kakaoApiKey;
 
     public Mono<KakaoAddressResponse> searchAddress(String query) {
