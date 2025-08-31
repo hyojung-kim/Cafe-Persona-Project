@@ -14,4 +14,10 @@ public class LoginController {
     public String loginForm() {
         return ("login_form");
     }
+
+    // 사업자, 일반 회원 선택 페이지
+    @GetMapping("/user/choice")
+    public String userChoice() {
+        return ("user_choice");
+    }
 }

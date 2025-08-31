@@ -32,7 +32,7 @@ public class SecurityConfig {
                 // 로그아웃 폼 url 등록
                 .logout((logout) -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/test/list")
                         .invalidateHttpSession(true))
         ;
         return http.build();
