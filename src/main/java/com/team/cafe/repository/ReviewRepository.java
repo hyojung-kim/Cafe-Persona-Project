@@ -1,5 +1,6 @@
 package com.team.cafe.repository;
 
+import com.team.cafe.domain.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
