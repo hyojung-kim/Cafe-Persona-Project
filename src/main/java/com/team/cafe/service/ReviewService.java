@@ -1,20 +1,24 @@
 package com.team.cafe.service;
 
-
+import com.team.cafe.domain.Cafe;
+import com.team.cafe.domain.Review;
+import com.team.cafe.domain.ReviewImage;
+import com.team.cafe.domain.ReviewLike;
+import com.team.cafe.domain.SiteUser;
+import com.team.cafe.dto.ReviewCreateRequest;
 import com.team.cafe.repository.CafeRepository;
-import com.team.cafe.domain.*;
-import com.team.cafe.repository.*;
-import com.team.cafe.review.ReviewStorage;
+import com.team.cafe.repository.ReviewImageRepository;
+import com.team.cafe.repository.ReviewLikeRepository;
+import com.team.cafe.repository.ReviewRepository;
 import com.team.cafe.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,131 +29,137 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewLikeRepository reviewLikeRepository;
-    private final ReviewReportRepository reviewReportRepository;
     private final CafeRepository cafeRepository;
     private final SiteUserRepository siteUserRepository;
-    private final ReviewStorage reviewStorage; // 파일 저장(아래 클래스)
+    private final FileStorageService fileStorageService; // ✅ 업로드 서비스(우리가 제공했던 것)
 
-    public Review create(Long cafeId, Long authorId, double ratingScore, String content, List<MultipartFile> images) {
-        if (content == null || content.trim().length() < 50) {
+    private static final double MIN_RATING = 0.0;
+    private static final double MAX_RATING = 5.0;
+    private static final double STEP = 0.5;
+
+    /** ⭐ 별점 검증: 0.0~5.0 & 0.5 단위 */
+    private void validateRating(Double rating) {
+        if (rating == null || rating < MIN_RATING || rating > MAX_RATING) {
+            throw new IllegalArgumentException("별점은 0.0 ~ 5.0 범위여야 합니다.");
+        }
+        double scaled = rating / STEP;
+        if (Math.abs(scaled - Math.round(scaled)) > 1e-9) {
+            throw new IllegalArgumentException("별점은 0.5 단위여야 합니다.");
+        }
+    }
+
+    /** 카페별 리뷰 페이징 */
+    @Transactional(readOnly = true)
+    public Page<Review> getReviewsByCafe(Long cafeId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        // ✅ 메서드명 오타 수정: CreatedAt
+        return reviewRepository.findByCafe_IdOrderByCreatedAtDesc(cafeId, pageable);
+    }
+
+    /** 평균 별점 */
+    @Transactional(readOnly = true)
+    public Double getAverageRating(Long cafeId) {
+        return reviewRepository.averageRating(cafeId);
+    }
+
+    /**
+     * 이 방법도 참고만 해 두자!
+     @Transactional
+     public long likeReview(String username, Long reviewId) {
+     // 기존 toggleLike 로직 재사용
+     return toggleLike(username, reviewId);
+     }
+     **/
+
+    /** 리뷰 생성(회원만) */
+    public Review createReview(String username, ReviewCreateRequest req, List<MultipartFile> images) throws IOException {
+        // 본문/별점 검증
+        if (req.content() == null || req.content().trim().length() < 50) {
             throw new IllegalArgumentException("리뷰는 50자 이상이어야 합니다.");
         }
-        if (images != null && images.size() > 5) {
-            throw new IllegalArgumentException("이미지는 최대 5장까지 업로드할 수 있습니다.");
-        }
+        validateRating(req.rating());
 
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow();
-        SiteUser author = siteUserRepository.findById(authorId).orElseThrow();
+        // 작성자/카페 로딩
+        SiteUser author = siteUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        Cafe cafe = cafeRepository.findById(req.cafeId())
+                .orElseThrow(() -> new IllegalArgumentException("카페 없음"));
 
+        // 리뷰 저장
         Review review = Review.builder()
                 .author(author)
                 .cafe(cafe)
-                .rating(Rating.of(ratingScore))
-                .content(content.trim())
-                .status(ReviewStatus.ACTIVE)
+                .rating(req.rating())                      // ✅ Double로 저장
+                .content(req.content().trim())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
-
         reviewRepository.save(review);
 
-        // 이미지 저장
-        if (images != null) {
-            int idx = 0;
+        // 이미지 저장 (최대 5장)
+        if (images != null && !images.isEmpty()) {
+            long count = images.stream().filter(f -> !f.isEmpty()).count();
+            if (count > 5) {
+                throw new IllegalArgumentException("이미지는 최대 5장까지 업로드할 수 있습니다.");
+            }
+
+            // ✅ 우리 FileStorageService는 URL 경로 리스트를 반환(예: /uploads/reviews/{id}/{uuid}.jpg)
+            List<String> paths = fileStorageService.storeReviewImages(review.getId(), images);
+            int i = 0;
             for (MultipartFile mf : images) {
-                String path = reviewStorage.store(mf);
-                ReviewImage ri = ReviewImage.builder()
+                if (mf.isEmpty()) continue;
+                ReviewImage img = ReviewImage.builder()
                         .review(review)
-                        .imagePath(path)
-                        .sortOrder(idx++)
+                        .urlPath(paths.get(i))               // ✅ 엔티티 필드명: urlPath
+                        .originalFilename(mf.getOriginalFilename())
+                        .sizeBytes(mf.getSize())
                         .build();
-                reviewImageRepository.save(ri);
+                reviewImageRepository.save(img);
+                review.getImages().add(img);
+                i++;
             }
         }
 
-        recalcCafeStats(cafe.getId());
         return review;
     }
 
-    public Review update(Long reviewId, Long authorId, double ratingScore, String content, List<MultipartFile> newImages) {
-        Review r = reviewRepository.findById(reviewId).orElseThrow();
-        if (!r.getAuthor().getId().equals(authorId)) {
-            throw new SecurityException("작성자만 수정할 수 있습니다.");
+    /** 리뷰 수정(작성자만) */
+    public Review updateReview(String username, Long reviewId, String content, Double rating) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+
+        if (!review.getAuthor().getUsername().equals(username)) {
+            throw new IllegalStateException("작성자만 수정할 수 있습니다.");
         }
         if (content == null || content.trim().length() < 50) {
             throw new IllegalArgumentException("리뷰는 50자 이상이어야 합니다.");
         }
-        r.setContent(content.trim());
-        r.setRating(Rating.of(ratingScore));
-        // 이미지 교체 로직이 필요하면 기존 삭제 후 재저장 구현 가능(여긴 스켈레톤)
+        validateRating(rating);
 
-        recalcCafeStats(r.getCafe().getId());
-        return r;
+        review.setContent(content.trim());
+        review.setRating(rating);                            // ✅ Double로 유지
+        review.setModifiedAt(LocalDateTime.now());
+        return review;
     }
 
-    public void requestDeletion(Long reviewId, Long authorId) {
-        Review r = reviewRepository.findById(reviewId).orElseThrow();
-        if (!r.getAuthor().getId().equals(authorId)) {
-            throw new SecurityException("작성자만 삭제요청할 수 있습니다.");
+    /** 리뷰 삭제(작성자만) */
+    public void deleteReview(String username, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
+        if (!review.getAuthor().getUsername().equals(username)) {
+            throw new IllegalStateException("작성자만 삭제할 수 있습니다.");
         }
-        r.setStatus(ReviewStatus.DELETION_REQUESTED);
+        reviewRepository.delete(review);
     }
 
-    public void increaseView(Long reviewId) {
-        Review r = reviewRepository.findById(reviewId).orElseThrow();
-        r.increaseView();
+    /** 리뷰 상세 + 조회수 증가 */
+    public Review getAndIncreaseView(Long reviewId) {
+        reviewRepository.incrementView(reviewId);
+        return reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
     }
 
-    /** 좋아요 토글: 본인 리뷰면 예외, 이미 누른 경우 취소 */
-    public int toggleLike(Long reviewId, Long userId) {
-        Review r = reviewRepository.findById(reviewId).orElseThrow();
-        if (!r.canBeLikedBy(siteUserRepository.findById(userId).orElse(null))) {
-            throw new IllegalArgumentException("본인 리뷰에는 좋아요를 누를 수 없습니다.");
-        }
-        if (reviewLikeRepository.existsByReview_IdAndUser_Id(reviewId, userId)) {
-            reviewLikeRepository.deleteByReview_IdAndUser_Id(reviewId, userId);
-            r.decreaseLike();
-        } else {
-            ReviewLike like = ReviewLike.builder()
-                    .review(r)
-                    .user(siteUserRepository.findById(userId).orElseThrow())
-                    .build();
-            reviewLikeRepository.save(like);
-            r.increaseLike();
-        }
-        return r.getLikeCount();
-    }
-
-    public void report(Long reviewId, Long reporterId, String reason) {
-        if (reviewReportRepository.existsByReview_IdAndReporter_Id(reviewId, reporterId)) return;
-        Review r = reviewRepository.findById(reviewId).orElseThrow();
-        ReviewReport report = ReviewReport.builder()
-                .review(r)
-                .reporter(siteUserRepository.findById(reporterId).orElseThrow())
-                .reason(reason == null ? "기타" : reason)
-                .build();
-        reviewReportRepository.save(report);
-        r.setStatus(ReviewStatus.REPORTED);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Review> listByCafe(Long cafeId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-        return reviewRepository.findByCafe_IdAndStatus(cafeId, ReviewStatus.ACTIVE, pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public Review getDetail(Long id) { // 컨트롤러에서 조회수 증가 여부 판단
-        return reviewRepository.findById(id).orElseThrow();
-    }
-
-    /** 카페별 평균/개수 캐시 컬럼 갱신 */
-    private void recalcCafeStats(Long cafeId) {
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow();
-        double avgHalf = reviewRepository.avgHalfStarsByCafeId(cafeId); // 0~10
-        long count = reviewRepository.countActiveByCafeId(cafeId);
-        cafe.setAvgRating(Math.round((avgHalf / 2.0) * 10.0) / 10.0); // 소수1
-        cafe.setReviewCount((int) count);
-    }
-    @Transactional
+    /** 좋아요 토글(작성자 본인 금지) */
     public long toggleLike(String username, Long reviewId) {
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
@@ -159,48 +169,24 @@ public class ReviewService {
         if (review.getAuthor().getId().equals(user.getId())) {
             throw new IllegalStateException("본인 리뷰에는 좋아요를 누를 수 없습니다.");
         }
+
+        // ✅ 엔티티 기반 메서드 사용(이미 리포지토리에 구현돼 있다고 했던 것들)
         if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
             reviewLikeRepository.deleteByReviewAndUser(review, user);
         } else {
-            reviewLikeRepository.save(ReviewLike.builder().review(review).user(user).build());
+            reviewLikeRepository.save(ReviewLike.builder()
+                    .review(review)
+                    .user(user)
+                    .build());
         }
         return reviewLikeRepository.countByReview(review);
     }
-    @Transactional
-    public Review getAndIncreaseView(Long reviewId) {
-        reviewRepository.incrementView(reviewId);
-        return reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
-    }
+
+    /** 좋아요 수 조회 */
+    @Transactional(readOnly = true)
     public long getLikeCount(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
         return reviewLikeRepository.countByReview(review);
-    }
-    @Transactional
-    public Review updateReview(String username, Long reviewId, String content, Double rating) {
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
-
-        if (!review.getAuthor().getUsername().equals(username)) {
-            throw new IllegalStateException("작성자만 수정할 수 있습니다.");
-        }
-        validateRating(rating);
-        if (content == null || content.trim().length() < 50) {
-            throw new IllegalArgumentException("리뷰는 50자 이상이어야 합니다.");
-        }
-        review.setContent(content);
-        review.setRating(rating);
-        review.setModifiedAt(java.time.LocalDateTime.now());
-        return review;
-    }
-    @Transactional
-    public void deleteReview(String username, Long reviewId) {
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰 없음"));
-        if (!review.getAuthor().getUsername().equals(username)) {
-            throw new IllegalStateException("작성자만 삭제할 수 있습니다.");
-        }
-        reviewRepository.delete(review);
     }
 }

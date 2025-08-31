@@ -23,5 +23,6 @@ public class ReviewReport {
     @Column(nullable = false, length = 1000)
     private String reason;   // 신고 사유
 
+    @Builder.Default
     private boolean resolved = false;  // 처리 여부
 }

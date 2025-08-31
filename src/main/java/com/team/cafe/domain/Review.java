@@ -21,20 +21,33 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 어떤 카페 리뷰인지
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Cafe cafe;
 
+    // 리뷰 작성자
     @ManyToOne(optional = false, fetch=FetchType.LAZY)
     private SiteUser author;
 
-    @Column(nullable = false, length = 4000)
+    // 별점
+    @Column(nullable = false)
     private Double rating;
 
+    // 리뷰 내용
+    @Column
+    private String content;
+
+    // 조회수
     @Builder.Default
     private Long viewCount = 0L;
 
-    private LocalDateTime createAt;
+    // 작성일과 수정일
+    private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ReviewStatus status = ReviewStatus.ACTIVE;
 
     @OneToMany(mappedBy = "review", cascade=CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

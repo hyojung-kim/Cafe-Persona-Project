@@ -76,3 +76,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+//bootRun실행시 JVM인자로 추가
+tasks.named('bootRun') {
+	jvmArgs('--enable-native-access=ALL-UNNAMED')
+}

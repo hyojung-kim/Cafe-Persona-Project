@@ -40,12 +40,22 @@ public class ReviewController {
                        @RequestHeader(value="Referer", required=false) String referer,
                        Model model) {
         try {
-            reviewService.likeReview(principal.getName(), id);
+            reviewService.toggleLike(principal.getName(), id);
         } catch (IllegalStateException e) {
             return "redirect:" + (referer != null ? referer : "/") + "?alert=" + e.getMessage();
         }
         return "redirect:" + (referer != null ? referer : "/");
     }
+
+    /* AJAX 엔드 포인트를 쓸 경우 위를 아래를 응용해서 수정하도록 하자 */
+
+//    @PreAuthorize("isAuthenticated()")
+//    @PostMapping("/{id}/like-toggle")
+//    @ResponseBody
+//    public ResponseEntity<?> likeToggle(@PathVariable Long id, Principal principal) {
+//        long count = reviewService.toggleLike(principal.getName(), id);
+//        return ResponseEntity.ok(Map.of("likedCount", count));
+//    }
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/like-toggle")
     @ResponseBody
