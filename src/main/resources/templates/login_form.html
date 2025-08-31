@@ -18,7 +18,10 @@
         <button type="submit" class="btn btn-primary">로그인</button>
         <!-- kakao button -->
             <a href="https://kauth.kakao.com/oauth/authorize"
-               th:href="@{https://kauth.kakao.com/oauth/authorize(client_id=${kakaoApiKey}, redirect_uri=${redirectUri}, response_type='code')}">
+               th:href="@{https://kauth.kakao.com/oauth/authorize(
+               client_id=${kakaoApiKey},
+               redirect_uri=${redirectUri},
+               response_type='code')}">
                 <img th:src="@{/images/kakao_login_medium.png}" alt="카카오 로그인 버튼">
             </a>
         </div>
