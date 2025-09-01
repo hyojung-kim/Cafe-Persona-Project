@@ -26,15 +26,21 @@ public class SecurityConfig {
                 .headers((headers) -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+                // 로그인
                 .formLogin(form -> form
-                        .loginPage("/user/login")           // 일반 로그인 페이지
-                        .defaultSuccessUrl("/") // 로그인 성공 시 이동
+                        .loginPage("/user/login")          // GET: 로그인 페이지 렌더
+                        .loginProcessingUrl("/user/login") // POST: 실제 인증 처리 URL (폼 action과 동일하게!)
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/user/login?error")
                 )
+                // 로그아웃 (POST 사용)
                 .logout(logout -> logout
-                        .logoutUrl("/user/logout")           // 로그아웃 버튼 URL
-                        .logoutSuccessUrl("/user/login")     // 로그아웃 후 이동
-                        .invalidateHttpSession(true)         // 세션 초기화
+                        .logoutUrl("/user/logout")     // POST 로 받기
+                        .logoutSuccessUrl("/cafe/list")
+                        .invalidateHttpSession(true)
                 );
+
+
         ;
         return http.build();
     }
