@@ -2,7 +2,7 @@ package com.team.cafe.review;
 
 
 import com.team.cafe.list.Cafe;
-import com.team.cafe.user.sj.SiteUser;
+import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

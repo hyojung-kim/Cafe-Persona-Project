@@ -38,7 +38,7 @@ public class SignupController {
             return "/signup/signup_form"; // 오류 발생 시 다시 가입 페이지
         }
 
-        return "redirect:/signup/login"; // 정상 가입 시 로그인 페이지로
+        return "redirect:/user/login"; // 정상 가입 시 로그인 페이지로
     }
 
 

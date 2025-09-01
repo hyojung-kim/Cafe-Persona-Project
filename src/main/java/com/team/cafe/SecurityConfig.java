@@ -2,6 +2,8 @@ package com.team.cafe;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,7 +28,7 @@ public class SecurityConfig {
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 .formLogin(form -> form
                         .loginPage("/user/login")           // 일반 로그인 페이지
-                        .defaultSuccessUrl("/article/list") // 로그인 성공 시 이동
+                        .defaultSuccessUrl("/") // 로그인 성공 시 이동
                 )
                 .logout(logout -> logout
                         .logoutUrl("/user/logout")           // 로그아웃 버튼 URL
@@ -40,5 +42,9 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

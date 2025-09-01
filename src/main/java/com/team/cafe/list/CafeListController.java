@@ -1,7 +1,7 @@
 package com.team.cafe.list;
 
 import com.team.cafe.like.LikeService;
-import com.team.cafe.user.sj.SiteUser;
+import com.team.cafe.user.sjhy.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;

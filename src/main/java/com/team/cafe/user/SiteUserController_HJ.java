@@ -1,7 +1,7 @@
 package com.team.cafe.user;
 
-import com.team.cafe.user.sj.SiteUser;
-import com.team.cafe.user.sj.UserRepository;
+import com.team.cafe.user.sjhy.SiteUser;
+import com.team.cafe.user.sjhy.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

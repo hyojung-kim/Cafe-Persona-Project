@@ -1,7 +1,7 @@
 package com.team.cafe.kakaosj;
 
-import com.team.cafe.user.sj.SiteUser;
-import com.team.cafe.user.sj.UserService;
+import com.team.cafe.user.sjhy.SiteUser;
+import com.team.cafe.user.sjhy.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,6 +42,6 @@ public class KakaoController {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // 5. 메인 페이지로 리다이렉트
-        return "redirect:";
+        return "redirect:/";
     }
 }

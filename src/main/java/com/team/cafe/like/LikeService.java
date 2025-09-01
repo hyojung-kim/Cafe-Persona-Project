@@ -2,7 +2,7 @@ package com.team.cafe.like;
 
 
 import com.team.cafe.list.CafeListRepository;
-import com.team.cafe.user.sj.UserRepository;
+import com.team.cafe.user.sjhy.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package com.team.cafe.user.sj;
+package com.team.cafe.user.sjhy;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

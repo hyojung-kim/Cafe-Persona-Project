@@ -1,7 +1,7 @@
 package com.team.cafe.signup.sj;
 
-import com.team.cafe.user.sj.SiteUser;
-import com.team.cafe.user.sj.UserRepository;
+import com.team.cafe.user.sjhy.SiteUser;
+import com.team.cafe.user.sjhy.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
