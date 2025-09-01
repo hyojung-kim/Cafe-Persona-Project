@@ -1,6 +1,9 @@
 package com.team.cafe.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,74 +12,97 @@ import java.util.List;
 
 /**
  * Review 엔티티
- * - “카페에 달린 리뷰” 한 건을 표현하는 도메인 모델 + DB 테이블 매핑 클래스
- * - JPA/Hibernate가 이 클래스를 보고 테이블 스키마와 CRUD를 자동으로 처리
+ * - 카페에 달린 리뷰 한 건을 표현
+ * - 템플릿에서 rv.author.username 접근 시 LazyInitialization 방지를 위해 author만 EAGER 로딩
  */
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-@Builder // 빌더 패턴으로 가독성 있게 생성 가능 (필드 많을 때 유용)
+@Builder
 @Table(indexes = {
-        // (cafe_id, createdAt DESC) 복합 인덱스: 특정 카페의 최신 리뷰를 빠르게 페이징/정렬 조회하려고 설정
-        // ⚠ createdAt 컬럼명은 네이밍 전략에 따라 created_at로 생성될 수도 있으니, 전략/컬럼명 일치 확인 필요
-        @Index(name="idx_review_cafe_created", columnList = "cafe_id, createdAt DESC")
+        // 특정 카페의 최신 리뷰를 빠르게 페이징/정렬하기 위한 복합 인덱스
+        @Index(name = "idx_review_cafe_created", columnList = "cafe_id, createdAt DESC")
 })
 public class Review {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // MariaDB/MySQL의 AUTO_INCREMENT 사용
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // (리뷰↔카페) N:1 관계. “어떤 카페의 리뷰인지”
+    /** (리뷰↔카페) N:1 — 어떤 카페의 리뷰인지 */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    // optional=false → 반드시 카페가 있어야 저장 가능(Not null FK)
-    // LAZY → 실제로 필요할 때만 카페를 DB에서 가져옴(불필요한 조인/쿼리 방지)
     private Cafe cafe;
 
-    // (리뷰↔작성자) N:1 관계. “누가 썼는지”
-    @ManyToOne(optional = false, fetch=FetchType.LAZY)
+    /**
+     * (리뷰↔작성자) N:1 — 누가 썼는지
+     * - 템플릿에서 rv.author.username를 바로 쓰기 위해 EAGER로 전환 (Lazy 폭탄 방지)
+     * - 회원만 작성 가능하므로 optional=false
+     */
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private SiteUser author;
 
-    // 별점(0.0 ~ 5.0, 0.5 단위는 서비스/검증에서 체크 권장)
+    /** 별점: 0.0 ~ 5.0 (0.5 단위는 서비스/검증 레이어에서 별도 체크 권장) */
+    @DecimalMin("0.0")
+    @DecimalMax("5.0")
     @Column(nullable = false)
     private Double rating;
 
-    // 리뷰 본문(선택 입력 가능)
-    @Column
+    /** 리뷰 본문: 최소 50자 요구사항에 맞춘 Bean Validation (DB 제약은 nullable로만) */
+    @Size(min = 50, message = "리뷰 내용은 최소 50자 이상이어야 합니다.")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    // 조회수(기본 0으로 시작). @Builder.Default 없으면 빌더로 생성 시 null이 들어갈 수 있어 방지용
+    /** 조회수 (기본 0) */
     @Builder.Default
+    @Column(nullable = false)
     private Long viewCount = 0L;
 
-    // 생성/수정 시각(감사(Audit) 정보). @PrePersist/@PreUpdate로 자동 세팅 권장
+    /** 생성/수정 시각 */
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime modifiedAt;
 
-    // 리뷰 상태(예: ACTIVE, BLOCKED, DELETED 등). 문자열로 저장해서 가독성/이식성 확보
+    /** 리뷰 상태 (예: ACTIVE, BLOCKED, DELETED 등) */
     @Enumerated(EnumType.STRING)
     @Builder.Default
+    @Column(nullable = false, length = 20)
     private ReviewStatus status = ReviewStatus.ACTIVE;
 
-    // (리뷰↔리뷰이미지) 1:N 관계. 리뷰가 삭제되면 이미지도 같이 삭제(cascade + orphanRemoval)
-    @OneToMany(mappedBy = "review", cascade=CascadeType.ALL, orphanRemoval = true)
+    /** (리뷰↔이미지) 1:N — 리뷰 삭제 시 이미지도 함께 삭제 */
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ReviewImage> images = new ArrayList<>();
 
-    /* ---------------------------------------------------------
-       ⬇ 권장: 생성/수정 시각을 자동으로 채우는 라이프사이클 콜백
-       (스키마나 팀 컨벤션에 맞게 @Column(nullable=false)도 고려)
-       --------------------------------------------------------- */
+    /** (리뷰↔좋아요) 1:N — 리뷰 삭제 시 좋아요도 함께 삭제 */
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ReviewLike> likes = new ArrayList<>();
+
+    /* ===== 라이프사이클 콜백: 생성/수정 시각 자동 세팅 + 기본값 방어 ===== */
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.modifiedAt = this.createdAt;
-        if (this.viewCount == null) this.viewCount = 0L; // 방어코드(빌더 사용 시 안전망)
+        final LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.modifiedAt = now;
+        if (this.viewCount == null) this.viewCount = 0L;
         if (this.status == null) this.status = ReviewStatus.ACTIVE;
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.modifiedAt = LocalDateTime.now();
+    }
+
+    /* ===== 편의 메서드 ===== */
+    public void addImage(ReviewImage image) {
+        images.add(image);
+        image.setReview(this);
+    }
+
+    public void removeImage(ReviewImage image) {
+        images.remove(image);
+        image.setReview(null);
     }
 }

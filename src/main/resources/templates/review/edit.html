@@ -1,0 +1,55 @@
+<!-- templates/review/edit.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <title>리뷰 수정</title>
+  <style>
+    :root { --bd: 1px solid #e5e7eb; }
+    body{font-family:system-ui,apple-system,Segoe UI,Roboto,Pretendard,Arial,sans-serif; margin:0; padding:24px; background:#fafafa; color:#111827;}
+    .container{max-width:720px; margin:0 auto;}
+    .card{background:#fff; border:var(--bd); border-radius:14px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04); margin-bottom:16px;}
+    .form-row{display:grid; grid-template-columns:160px 1fr; gap:12px; align-items:center; margin:12px 0;}
+    textarea{width:100%; min-height:160px; padding:10px; border-radius:10px; border:var(--bd); resize:vertical;}
+    input, select{padding:8px; border-radius:10px; border:var(--bd); width:160px;}
+    .btn{border:var(--bd); background:#111827; color:#fff; padding:10px 16px; border-radius:10px; cursor:pointer;}
+    .btn.ghost{background:#fff; color:#111827;}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h2>리뷰 수정</h2>
+    <form th:action="@{|/reviews/${review.id}/edit|}" method="post" onsubmit="return validateEditForm(this)">
+      <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+
+      <div class="form-row">
+        <label for="rating">별점 (0.5 단위)</label>
+        <input id="rating" name="rating" type="number" step="0.5" min="0.0" max="5.0"
+               th:value="${review.rating}" required/>
+      </div>
+
+      <div class="form-row">
+        <label for="content">내용 (50~4000자)</label>
+        <textarea id="content" name="content" minlength="50" maxlength="4000"
+                  th:text="${review.content}" required></textarea>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn" type="submit">저장</button>
+        <a class="btn ghost" th:href="@{|/reviews/${review.id}|}">취소</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function validateEditForm(form){
+    if (form.rating.value % 0.5 !== 0) { alert('별점은 0.5 단위로만 선택할 수 있습니다.'); return false; }
+    if (form.content.value.trim().length < 50) { alert('내용은 최소 50자 이상 작성해 주세요.'); return false; }
+    return true;
+  }
+</script>
+</body>
+</html>

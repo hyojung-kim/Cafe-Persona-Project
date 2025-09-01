@@ -49,32 +49,41 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF(사이트 간 요청 위조) 보안 기능 → 기본적으로 활성화
-                // /h2-console/** 경로만 예외 처리 (개발 편의용)
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
-
-                // H2 콘솔 같은 경우 iframe으로 열리기 때문에 sameOrigin 허용 필요
-                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
-
-                // 요청 경로별 접근 권한 설정
+                .csrf(csrf -> csrf.disable()) // ✅ 개발/테스트 편의: CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        // 정적 리소스(css, js, 이미지) 및 h2-console → 누구나 접근 가능
-                        .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/uploads/**", "/h2-console/**").permitAll()
-                        // 카페 조회 페이지는 전체 허용
-                        .requestMatchers("/cafes/**").permitAll()
-                        // 리뷰 조회는 전체 허용, 단 POST 같은 민감한 작업은 @PreAuthorize로 제한
-                        .requestMatchers("/reviews/**").permitAll()
-                        // 나머지 모든 요청은 인증 필요 (로그인해야 접근 가능)
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // ✅ 모든 요청 인증/권한 없이 허용
                 )
-
-                // 기본 로그인 폼 사용 (커스터마이징 가능)
-                .formLogin(Customizer.withDefaults())
-
-                // 기본 로그아웃 기능 사용
-                .logout(Customizer.withDefaults());
+                .formLogin(login -> login.disable())   // 로그인 폼 비활성화
+                .httpBasic(basic -> basic.disable());  // HTTP Basic 인증 비활성화
 
         return http.build();
+//        http
+//                // CSRF(사이트 간 요청 위조) 보안 기능 → 기본적으로 활성화
+//                // /h2-console/** 경로만 예외 처리 (개발 편의용)
+//                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+//
+//                // H2 콘솔 같은 경우 iframe으로 열리기 때문에 sameOrigin 허용 필요
+//                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
+//
+//                // 요청 경로별 접근 권한 설정
+//                .authorizeHttpRequests(auth -> auth
+//                        // 정적 리소스(css, js, 이미지) 및 h2-console → 누구나 접근 가능
+//                        .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/uploads/**", "/h2-console/**").permitAll()
+//                        // 카페 조회 페이지는 전체 허용
+//                        .requestMatchers("/cafes/**").permitAll()
+//                        // 리뷰 조회는 전체 허용, 단 POST 같은 민감한 작업은 @PreAuthorize로 제한
+//                        .requestMatchers("/reviews/**").permitAll()
+//                        // 나머지 모든 요청은 인증 필요 (로그인해야 접근 가능)
+//                        .anyRequest().authenticated()
+//                )
+//
+//                // 기본 로그인 폼 사용 (커스터마이징 가능)
+//                .formLogin(Customizer.withDefaults())
+//
+//                // 기본 로그아웃 기능 사용
+//                .logout(Customizer.withDefaults());
+//
+//        return http.build();
     }
 
     /**
