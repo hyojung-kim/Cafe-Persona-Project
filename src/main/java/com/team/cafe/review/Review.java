@@ -2,7 +2,7 @@ package com.team.cafe.review;
 
 
 import com.team.cafe.list.Cafe;
-import com.team.cafe.user.SiteUser;
+import com.team.cafe.user.sj.SiteUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -18,7 +18,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(
-        name = "review",
+        name = "com/team/cafe/review",
         indexes = {
                 @Index(name = "idx_review_cafe", columnList = "cafe_id"),
                 @Index(name = "idx_review_user", columnList = "user_id"),

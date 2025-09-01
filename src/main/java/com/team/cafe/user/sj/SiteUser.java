@@ -1,4 +1,4 @@
-package com.team.cafe.user;
+package com.team.cafe.user.sj;
 
 import com.team.cafe.bookmark.Bookmark;
 import com.team.cafe.review.Review;
@@ -6,8 +6,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -25,13 +29,13 @@ import java.util.Set;
                 @Index(name = "idx_siteuser_email", columnList = "email")
         }
 )
-public class SiteUser {
+public class SiteUser implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", columnDefinition = "BIGINT UNSIGNED")
     @Comment("회원 PK")
-    private Integer id;
+    private Long id;
 
     @Column(name = "username", length = 50, nullable = false)
     @Comment("로그인 아이디 (unique)")
@@ -52,10 +56,6 @@ public class SiteUser {
     @Column(name = "role", length = 20, nullable = false)
     @Comment("권한(USER, ADMIN 등)")
     private String role = "USER";
-
-    @Column(name = "created_at", nullable = false)
-    @Comment("회원가입 일시")
-    private LocalDateTime createdAt;
 
     @Column(name = "last_login")
     @Comment("최근 로그인 일시")
@@ -80,4 +80,18 @@ public class SiteUser {
     private Set<Review> likedReviews;
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        //  사용자의 권한 목록을 반환
+        //  여기서는 ROLE_USER 권한 하나만 부여 (추후 수정 예정)
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+
+    //  계정 만료 여부 확인 override
+//  true : 만료되지 않음 (로그인 가능)
+//  신고기능 여부에 따라 수정 및 삭제 가능
+    @Override
+    public boolean isAccountNonLocked() { return true; }
 }
+

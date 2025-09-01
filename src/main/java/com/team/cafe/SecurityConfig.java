@@ -18,11 +18,21 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                         .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-                .csrf((csrf) -> csrf
-                        .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**", "/user/signup", "/user/kakao/**", "/signup/check-username", "/signup/check-email", "/signup/check-nickname")
+                )
                 .headers((headers) -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+                .formLogin(form -> form
+                        .loginPage("/user/login")           // 일반 로그인 페이지
+                        .defaultSuccessUrl("/article/list") // 로그인 성공 시 이동
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/user/logout")           // 로그아웃 버튼 URL
+                        .logoutSuccessUrl("/user/login")     // 로그아웃 후 이동
+                        .invalidateHttpSession(true)         // 세션 초기화
+                );
         ;
         return http.build();
     }

@@ -46,5 +46,5 @@ public interface CafeListRepository extends JpaRepository<Cafe, Integer> {
     long countLikes(@Param("cafeId") Integer cafeId);
 
     // (선택) 해당 유저가 이 카페를 좋아요 했는지 빠르게 체크하고 싶을 때
-    boolean existsByIdAndLikedUsers_Id(Integer cafeId, Integer userId);
+    boolean existsByIdAndLikedUsers_Id(Integer cafeId, Long userId);
 }

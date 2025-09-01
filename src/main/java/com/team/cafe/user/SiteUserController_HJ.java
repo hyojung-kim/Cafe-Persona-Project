@@ -1,5 +1,7 @@
 package com.team.cafe.user;
 
+import com.team.cafe.user.sj.SiteUser;
+import com.team.cafe.user.sj.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +20,16 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/dummy")
-public class SiteUserController {
+public class SiteUserController_HJ {
 
-    private final SiteUserRepository siteUserRepository;
+    private final UserRepository siteUserRepository;
 
     /**
      * 더미 로그인
      * ex) /dummy/login/1 → userId=1 유저로 로그인
      */
     @GetMapping("/login/{id}")
-    public String devLogin(@PathVariable Integer id,
+    public String devLogin(@PathVariable Long id,
                            HttpServletRequest request,
                            HttpServletResponse response) {
         SiteUser user = siteUserRepository.findById(id)

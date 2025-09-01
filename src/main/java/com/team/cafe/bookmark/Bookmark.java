@@ -1,7 +1,7 @@
 package com.team.cafe.bookmark;
 
 import com.team.cafe.list.Cafe;
-import com.team.cafe.user.SiteUser;
+import com.team.cafe.user.sj.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_bookmark_user", columnList = "user_id"),
                 @Index(name = "idx_bookmark_cafe", columnList = "cafe_id")
         })
-public class Bookmark {
 
+public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookmark_id", columnDefinition = "BIGINT UNSIGNED")

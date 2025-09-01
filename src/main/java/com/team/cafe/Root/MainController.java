@@ -1,4 +1,4 @@
-package com.team.cafe.main;
+package com.team.cafe.Root;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -3,9 +3,8 @@ package com.team.cafe.list;
 
 import com.team.cafe.bookmark.Bookmark;
 import com.team.cafe.keyword.CafeKeyword;
-import com.team.cafe.keyword.Keyword;
 import com.team.cafe.review.Review;
-import com.team.cafe.user.SiteUser;
+import com.team.cafe.user.sj.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
