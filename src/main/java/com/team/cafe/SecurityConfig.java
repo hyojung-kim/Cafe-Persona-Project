@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                         .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/user/signup", "/user/kakao/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/user/signup", "/user/kakao/**", "/signup/check-username", "/signup/check-email", "/signup/check-nickname")
                 )
                 .headers((headers) -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
