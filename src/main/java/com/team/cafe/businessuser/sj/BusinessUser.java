@@ -1,4 +1,4 @@
-package com.team.cafe.businessuser;
+package com.team.cafe.businessuser.sj;
 
 
 import jakarta.persistence.*;

@@ -1,8 +1,6 @@
-package com.team.cafe.user;
+package com.team.cafe.user.sj;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 

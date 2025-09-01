@@ -1,4 +1,4 @@
-package com.team.cafe.signup;
+package com.team.cafe.signup.sj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

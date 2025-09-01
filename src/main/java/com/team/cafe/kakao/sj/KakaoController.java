@@ -1,7 +1,7 @@
-package com.team.cafe.kakao;
+package com.team.cafe.kakao.sj;
 
-import com.team.cafe.user.SiteUser;
-import com.team.cafe.user.UserService;
+import com.team.cafe.user.sj.SiteUser;
+import com.team.cafe.user.sj.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

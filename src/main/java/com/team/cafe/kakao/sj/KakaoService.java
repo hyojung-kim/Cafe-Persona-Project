@@ -1,4 +1,4 @@
-package com.team.cafe.kakao;
+package com.team.cafe.kakao.sj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

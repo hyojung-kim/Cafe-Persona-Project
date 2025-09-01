@@ -1,4 +1,4 @@
-package com.team.cafe.user;
+package com.team.cafe.user.sj;
 
 import jakarta.persistence.*;
 import lombok.Getter;

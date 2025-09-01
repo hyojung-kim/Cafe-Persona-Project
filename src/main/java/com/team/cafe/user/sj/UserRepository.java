@@ -1,4 +1,4 @@
-package com.team.cafe.user;
+package com.team.cafe.user.sj;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
