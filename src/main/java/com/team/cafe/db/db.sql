@@ -103,14 +103,13 @@ VALUES
  '10:00:00', '23:00:00', 1, 28, NOW(), NOW());
 
 
-INSERT INTO site_user (created_at, last_login, role, nickname, username, email, password)
+INSERT INTO site_user ( last_login, role, nickname, username, email, password)
 VALUES
-  (NOW(6), NOW(6), 'USER', '효중', 'hj', 'hj@example.com', '1234'),
-  (NOW(6), NULL, 'USER', '정성', 'js', 'js@example.com', '1234'),
-  (NOW(6), NOW(6), 'ADMIN', '관리자', 'admin1', 'admin@example.com', '1234'),
-  (NOW(6), NULL, 'USER', '현영', 'hy', 'hy@example.com', '1234'),
-  (NOW(6), NOW(6), 'USER', '상진', 'sj', 'sj@example.com', '1234');
-
+  ( NOW(6), 'USER', '효중', 'hj', 'hj@example.com', '1234'),
+  ( NULL, 'USER', '정성', 'js', 'js@example.com', '1234'),
+  ( NOW(6), 'ADMIN', '관리자', 'admin1', 'admin@example.com', '1234'),
+  ( NULL, 'USER', '현영', 'hy', 'hy@example.com', '1234'),
+  ( NOW(6), 'USER', '상진', 'sj', 'sj@example.com', '1234');
 
 select * from site_user;
 desc site_user;
