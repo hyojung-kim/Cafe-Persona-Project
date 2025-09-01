@@ -1,4 +1,4 @@
-package com.team.cafe;
+package com.team.cafe.user.user_hy;
 
 import lombok.Getter;
 

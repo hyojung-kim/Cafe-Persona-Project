@@ -1,10 +1,10 @@
-package com.team.cafe;
+package com.team.cafe.user.user_hy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.team.cafe.login.LoginRepository;
+import com.team.cafe.login.login_hy.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -19,11 +19,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class UserSecurityService implements UserDetailsService {
 
-    private final LoginRepository loginRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<SiteUser> _siteUser = this.loginRepository.findByusername(username);
+        Optional<SiteUser> _siteUser = this.userRepository.findByusername(username);
         if (_siteUser.isEmpty()) {
             throw new UsernameNotFoundException("사용자를 찾을수 없습니다.");
         }
