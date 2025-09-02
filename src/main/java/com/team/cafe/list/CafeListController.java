@@ -4,6 +4,8 @@ import com.team.cafe.like.LikeService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -73,19 +75,35 @@ public class CafeListController {
     }
 
     //@PreAuthorize("isAuthenticated()") 써야할까 고민 중
-    @PostMapping("/detail/{id}/like")
-    public String toggleLike(@PathVariable Integer id,
-                             Principal principal) {
-        if (principal == null) {
-            return "redirect:/user/login";
-        }
-        // username → 사용자 ID 조회(엔티티 통째로 안 가져와도 되게 메서드 준비 권장)
-        SiteUser user = userService.getUser(principal.getName());
+//    @PostMapping("/detail/{id}/like")
+//    public String toggleLike(@PathVariable Integer id,
+//                             Principal principal) {
+//        if (principal == null) {
+//            return "redirect:/user/login";
+//        }
+//        // username → 사용자 ID 조회(엔티티 통째로 안 가져와도 되게 메서드 준비 권장)
+//        SiteUser user = userService.getUser(principal.getName());
+//
+//        likeService.toggle(id, user.getId());
+//        return "redirect:/cafe/detail/" + id; // 상세로 복귀
+//    }
 
+    // Ajax 컨트롤러
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping(value = "/like/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String toggle(@PathVariable("id") Integer id, Principal principal) {
+        SiteUser user = userService.getUser(principal.getName());
         likeService.toggle(id, user.getId());
-        return "redirect:/cafe/detail/" + id; // 상세로 복귀
+        long count = likeService.getLikeCount(id);
+        return Long.toString(count);
     }
 
-
+    @GetMapping(value = "/like/{id}/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String count(@PathVariable("id") Integer id) {
+        long count = likeService.getLikeCount(id);
+        return Long.toString(count);
+    }
 
 }

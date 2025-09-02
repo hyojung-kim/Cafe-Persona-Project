@@ -42,16 +42,18 @@
 
 
 
-
-    <div>
-        <form th:action="@{|/cafe/detail/${cafe.id}/like|}" method="post" style="display:inline;">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button type="submit" aria-label="좋아요 토글">
-                <span th:if="${liked}">♥ 좋아요 취소</span>
-                <span th:if="${!liked}">♡ 좋아요</span>
-            </button>
-        </form>
-        <span style="margin-left:8px;">좋아요 수: <b th:text="${likeCount}">0</b></span>
+    <div id="likeBox"
+         th:data-cafe-id="${cafe.id}"
+         th:data-liked="${liked}">
+        <button id="likeBtn" type="button" aria-label="좋아요 토글">
+            <span class="label-liked"  th:if="${liked}">♥ 좋아요 취소</span>
+            <span class="label-unliked" th:if="${!liked}">♡ 좋아요</span>
+        </button>
+        <span style="margin-left:8px;">
+            좋아요 수: <b id="likeCount" th:text="${likeCount}">0</b>
+        </span>
     </div>
+    <script src="/js/cafe-like.js"></script>
 </div>
+
 </html>
