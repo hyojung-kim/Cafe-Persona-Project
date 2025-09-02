@@ -91,9 +91,6 @@ public class CafeListController {
         // toggle이 true/false(현재 상태) 반환하도록 만들면 최고
         boolean liked = likeService.toggle(id, user.getId());
 
-        // 만약 toggle이 void라면:
-        // boolean liked = likeService.isLiked(id, user.getId());
-
         long count = likeService.getLikeCount(id);
 
         return ResponseEntity.ok(Map.of(
