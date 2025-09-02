@@ -87,6 +87,4 @@ public class CafeListController {
         return "redirect:/cafe/detail/" + id; // 상세로 복귀
     }
 
-
-
 }
