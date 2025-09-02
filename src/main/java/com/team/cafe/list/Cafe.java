@@ -25,7 +25,7 @@ public class Cafe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cafe_id")
     @Comment("카페 PK")
-    private Integer id;
+    private Long id;
 
     @Column(name = "cafe_name", length = 100, nullable = false)
     @Comment("카페 이름")

@@ -1,5 +1,6 @@
 package com.team.cafe.list;
 
+import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
@@ -13,7 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class CafeListController {
     private final CafeListService cafeListService;
     private final UserService userService;
     private final LikeService likeService;
+    private final CafeImageService cafeImageService;
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
@@ -36,6 +40,16 @@ public class CafeListController {
                        ) {
         var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
 
+        // 이번 페이지의 카페 ID들만 모아서
+        List<Long> ids = paging.getContent().stream()
+                .map(Cafe::getId)
+                .collect(Collectors.toList());
+
+        // 대표 이미지 URL 맵 생성
+        Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
+
+
+
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
         model.addAttribute("size", size);
@@ -43,6 +57,8 @@ public class CafeListController {
         model.addAttribute("dir", dir);
         model.addAttribute("parking", parking);
         model.addAttribute("openNow", openNow);
+        model.addAttribute("imageMap", imageMap);
+
         return "cafe/cafe_list";
     }
 

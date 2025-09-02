@@ -1,4 +1,4 @@
-package com.team.cafe.cafeListImg;
+package com.team.cafe.cafeListImg.hj;
 
 import com.team.cafe.list.Cafe;
 import jakarta.persistence.*;
@@ -33,14 +33,14 @@ public class CafeImage {
     )
     private Cafe cafe;                   // 카페 참조
 
-    @Column(name = "img_url", nullable = false, length = 255)
+    @Column(name = "img_url", nullable = true, length = 255)
     private String imgUrl;               // 이미지 URL/경로
 
-    @Column(name = "is_primary", nullable = false)
-    private boolean primaryImage;        // 대표 이미지 여부 (TINYINT(1) ↔ boolean)
+//    @Column(name = "is_primary", nullable = false)
+//    private boolean primaryImage;        // 대표 이미지 여부 (TINYINT(1) ↔ boolean)
 
-    @Column(name = "sort_order", nullable = false)
-    private int sortOrder;               // 정렬 우선순위 (낮을수록 먼저)
+//    @Column(name = "sort_order", nullable = false)
+//    private int sortOrder;               // 정렬 우선순위 (낮을수록 먼저)
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

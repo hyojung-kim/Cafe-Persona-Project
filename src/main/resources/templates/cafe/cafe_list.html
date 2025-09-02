@@ -55,6 +55,7 @@
             <th>웹사이트</th>
             <th>날짜</th>
             <th>조회수</th>
+            <th style="width:120px;">이미지</th>
         </tr>
         </thead>
         <tbody>
@@ -104,6 +105,12 @@
             </td>
             <td th:text="${cafeList.hitCount}">
                 0
+            </td>
+            <td class="thumb">
+                <a th:href="@{|/cafe/detail/${cafeList.id}|}">
+                    <img th:src="${imageMap[cafeList.id]} ?: '/images/DBimg.PNG'"
+                         alt="noImg" loading="lazy" class="thumb-img">
+                </a>
             </td>
         </tr>
         </tbody>
