@@ -1,0 +1,53 @@
+<!-- templates/fragments/alerts.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<!-- 사용법: <div th:replace="fragments/alerts :: toast"></div> -->
+
+<th:block th:fragment="toast">
+    <style>
+        .alert-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: grid; gap: 8px; }
+        .alert { min-width: 260px; max-width: 420px; padding: 12px 14px; border-radius: 12px; border: 1px solid #e5e7eb;
+                 background: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,.08); display:flex; align-items:flex-start; gap:10px; }
+        .alert--ok { border-color:#d1fae5; background:#ecfdf5; }
+        .alert--err { border-color:#fee2e2; background:#fef2f2; }
+        .alert-icon { font-size:18px; line-height:18px; }
+        .alert-text { color:#111827; }
+        .alert-close { background:transparent; border:none; cursor:pointer; margin-left:auto; font-size:16px; }
+    </style>
+
+    <div class="alert-container" aria-live="polite" aria-atomic="true">
+        <!-- 성공/정보 메시지 -->
+        <div class="alert alert--ok" th:if="${message}" role="status">
+            <div class="alert-icon">✅</div>
+            <div class="alert-text" th:text="${message}">완료되었습니다.</div>
+            <button class="alert-close" type="button" onclick="this.parentElement.remove()">✕</button>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div class="alert alert--err" th:if="${error}" role="alert">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-text" th:text="${error}">문제가 발생했습니다.</div>
+            <button class="alert-close" type="button" onclick="this.parentElement.remove()">✕</button>
+        </div>
+    </div>
+
+    <script>
+        // 3.2초 후 자동 사라짐
+        (function(){
+          setTimeout(function(){
+            document.querySelectorAll('.alert').forEach(function(a){
+              a.style.transition='opacity .25s ease, transform .25s ease';
+              a.style.opacity='0'; a.style.transform='translateY(-6px)';
+              setTimeout(function(){ a.remove(); }, 260);
+            });
+          }, 3200);
+        })();
+    </script>
+</th:block>
+
+</body>
+</html>

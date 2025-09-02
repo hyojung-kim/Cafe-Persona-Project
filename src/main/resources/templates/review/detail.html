@@ -6,95 +6,128 @@
   <meta charset="UTF-8"/>
   <title>리뷰 상세</title>
 
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <!-- CSRF (향후 AJAX 좋아요/삭제 시 사용) -->
+  <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+  <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
   <style>
-    :root { --gap: 12px; --bd: 1px solid #e5e7eb; }
-    body{font-family:system-ui,apple-system,Segoe UI,Roboto,Pretendard,Arial,sans-serif; margin:0; padding:24px; background:#fafafa; color:#111827;}
-    .container{max-width:840px; margin:0 auto;}
-    .card{background:#fff; border:var(--bd); border-radius:14px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04); margin-bottom:16px;}
-    .flex{display:flex; gap:12px; align-items:center;}
-    .between{justify-content:space-between;}
-    .pill{display:inline-block; padding:4px 10px; border-radius:999px; background:#f3f4f6; font-size:12px; color:#374151;}
-    .muted{color:#6b7280;}
-    .btn{border:var(--bd); background:#111827; color:#fff; padding:8px 14px; border-radius:10px; cursor:pointer;}
-    .btn.ghost{background:#fff; color:#111827;}
-    .btn.danger{background:#dc2626; border-color:#dc2626;}
-    .grid{display:grid; gap:12px;}
-    .grid-cols-3{grid-template-columns:repeat(3,1fr);}
-    .img{width:100%; height:240px; object-fit:cover; border-radius:10px; border:var(--bd);}
+    :root { --bd:#e5e7eb; --muted:#6b7280; --ink:#111827; --bg:#fafafa; }
+    body { font-family: system-ui, apple-system, Segoe UI, Roboto, Pretendard, Arial, sans-serif;
+           margin:0; padding:24px; background:var(--bg); color:var(--ink); }
+    .rd-container { max-width: 860px; margin: 0 auto; }
+    .rd-card { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:18px;
+               box-shadow:0 1px 2px rgba(0,0,0,.04); }
+    .rd-title { font-size:22px; font-weight:600; margin:0 0 8px 0; }
+    .rd-muted { color:var(--muted); font-size:14px; }
+    .rd-badges { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 14px; }
+    .rd-badge { padding:4px 8px; border:1px solid var(--bd); border-radius:999px; background:#fff; font-size:12px; }
+    .rd-content { line-height:1.7; margin-top:12px; white-space:pre-wrap; }
+    .rd-actions { display:flex; gap:8px; margin-top:16px; }
+    .rd-btn { padding:8px 12px; border:1px solid var(--bd); border-radius:10px; background:#fff;
+              text-decoration:none; color:inherit; display:inline-flex; align-items:center; gap:6px; }
+    .rd-gallery { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin-top:12px; }
+    .rd-thumb { width:100%; aspect-ratio:1/1; border-radius:10px; object-fit:cover; border:1px solid var(--bd); background:#f3f4f6; }
+    .rd-skeleton { display:grid; gap:10px; }
+    .rd-skel-line { height:12px; border-radius:8px; background:#eef0f3; }
+    .rd-skel-box { width:100%; aspect-ratio:16/9; border-radius:12px; background:#eef0f3; }
+    @media (max-width:640px){
+      .rd-gallery { grid-template-columns:repeat(3, 1fr); }
+    }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="card">
-    <div class="flex between">
-      <h2>리뷰 상세</h2>
-      <div class="muted">
-        조회수 <b th:text="${review.viewCount}">0</b>
-      </div>
+<div th:replace="fragments/alerts :: toast"></div>
+<div class="rd-container">
+
+  <!-- 헤더 -->
+  <header style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+    <h1 class="rd-title">리뷰 상세</h1>
+    <a class="rd-btn" href="javascript:history.back()">← 목록으로</a>
+  </header>
+
+  <!-- 데이터가 준비된 경우 (컨트롤러가 review를 모델에 넣어주는 상황) -->
+  <section class="rd-card" th:if="${review != null}">
+    <div class="rd-muted" th:text="'리뷰 ID: ' + ${review.id}">리뷰 ID</div>
+
+    <div class="rd-badges">
+      <span class="rd-badge" th:text="'★ ' + ${#numbers.formatDecimal(review.rating,1,1)}">★ 0.0</span>
+      <span class="rd-badge" th:text="'좋아요 ' + ${review.likeCount}">좋아요 0</span>
+      <span class="rd-badge" th:text="'조회 ' + ${review.viewCount}">조회 0</span>
+      <span class="rd-badge" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+      <span class="rd-badge" th:text="'작성자: ' + ${review.author != null ? review.author.username : '알수없음'}">작성자</span>
     </div>
 
-    <div class="flex between">
-      <div>
-        <span class="pill" th:text="${review.author.username}">writer</span>
-        <span class="pill">★ <b th:text="${#numbers.formatDecimal(review.rating,1,1)}">4.0</b> / 5.0</span>
-      </div>
-      <div class="muted" th:text="${#temporals.format(review.createdAt,'yyyy-MM-dd HH:mm')}">2025-09-01</div>
+    <!-- 이미지 갤러리 -->
+    <div class="rd-gallery" th:if="${review.images != null and !#lists.isEmpty(review.images)}">
+      <img class="rd-thumb" th:each="img : ${review.images}" th:src="${img.imageUrl}" alt="리뷰 이미지"/>
     </div>
 
-    <p style="white-space:pre-wrap;" th:text="${review.content}">내용</p>
+    <!-- 내용 -->
+    <article class="rd-content" th:text="${review.content}">리뷰 본문</article>
 
-    <div class="grid grid-cols-3" th:if="${review.images != null and !review.images.isEmpty()}">
-      <img th:each="img : ${review.images}" th:src="${img.urlPath}" alt="review image" class="img"/>
-    </div>
+    <!-- 액션(표시용; 추후 연결) -->
+    <!-- 액션: 좋아요/수정/삭제 -->
+    <div class="rd-actions">
 
-    <div class="flex between" style="margin-top:16px;">
-      <div class="flex" style="gap:8px; align-items:center;">
-        <button class="btn ghost" id="likeBtn" type="button" th:attr="data-id=${review.id}">좋아요</button>
-        <span>♡ <b id="likeCount" th:text="${likeCount}">0</b></span>
+      <!-- 좋아요 / 취소 (로그인 시 노출) -->
+      <form th:action="@{|/reviews/${review.id}/like|}" method="post" style="display:inline-block;"
+            xmlns:sec="http://www.thymeleaf.org/extras/spring-security" sec:authorize="isAuthenticated()">
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit" class="rd-btn">👍 좋아요</button>
+      </form>
+
+      <form th:action="@{|/reviews/${review.id}/unlike|}" method="post" style="display:inline-block;"
+            xmlns:sec="http://www.thymeleaf.org/extras/spring-security" sec:authorize="isAuthenticated()">
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit" class="rd-btn">↩ 취소</button>
+      </form>
+
+      <!-- 비로그인 안내 -->
+      <div class="rd-muted" style="margin-left:8px;"
+           xmlns:sec="http://www.thymeleaf.org/extras/spring-security" sec:authorize="isAnonymous()">
+        좋아요/수정/삭제는 로그인 후 가능합니다.
       </div>
 
-      <!-- 작성자만 수정/삭제 -->
-      <div sec:authorize="isAuthenticated() and principal?.username == #vars.review.author.username">
-        <a class="btn ghost" th:href="@{|/reviews/${review.id}/edit|}">수정</a>
-        <form th:action="@{|/reviews/${review.id}/delete|}" method="post" style="display:inline" onsubmit="return confirm('정말 삭제할까요?')">
-          <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-          <button class="btn danger" type="submit">삭제</button>
+      <!-- 수정/삭제: 작성자 또는 관리자만 노출 -->
+      <div style="margin-left:auto; display:flex; gap:8px;"
+           xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+           sec:authorize="isAuthenticated() and (hasAuthority('ROLE_ADMIN') or principal?.username == #vars.review?.author?.username)">
+
+        <!-- 수정 -->
+        <a class="rd-btn" th:href="@{|/reviews/${review.id}/edit|}">✏️ 수정</a>
+
+        <!-- 삭제 -->
+        <form th:action="@{|/reviews/${review.id}/delete|}" method="post" style="display:inline-block;">
+          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button type="submit" class="rd-btn" onclick="return confirm('정말 삭제하시겠습니까?');">🗑 삭제</button>
         </form>
       </div>
     </div>
-  </div>
+
+  </section>
+
+  <!-- 데이터가 아직 없는 경우(현재 컨트롤러 상태: reviewId만 제공) -->
+  <section class="rd-card" th:if="${review == null}">
+    <div class="rd-muted" th:text="'리뷰 ID: ' + ${reviewId}">리뷰 ID</div>
+    <div class="rd-skeleton" aria-busy="true">
+      <div class="rd-badges">
+        <span class="rd-badge">★ --.-</span>
+        <span class="rd-badge">좋아요 --</span>
+        <span class="rd-badge">조회 --</span>
+        <span class="rd-badge">작성일 --</span>
+        <span class="rd-badge">작성자 --</span>
+      </div>
+      <div class="rd-skel-box"></div>
+      <div class="rd-skel-line" style="width:60%;"></div>
+      <div class="rd-skel-line" style="width:90%;"></div>
+      <div class="rd-skel-line" style="width:80%;"></div>
+      <div class="rd-skel-line" style="width:70%;"></div>
+    </div>
+    <p class="rd-muted" style="margin-top:12px;">
+      상세 데이터는 다음 턴에서 컨트롤러/서비스에 연결할게요.
+    </p>
+  </section>
+
 </div>
-
-<script>
-  const CSRF_TOKEN = document.querySelector('meta[name="_csrf"]')?.content;
-  const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content;
-
-  document.getElementById('likeBtn')?.addEventListener('click', async (e) => {
-    const id = e.currentTarget.getAttribute('data-id');
-    try {
-      const res = await fetch(`/reviews/${id}/like-toggle`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          ...(CSRF_HEADER ? {[CSRF_HEADER]: CSRF_TOKEN} : {})
-        }
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        alert((text && text.substring(0,120)) || '요청 처리 중 오류가 발생했습니다.');
-        return;
-      }
-      const data = await res.json();
-      const el = document.getElementById('likeCount');
-      if (el) el.textContent = data.likedCount ?? '0';
-    } catch (e2) {
-      console.error(e2);
-      alert('네트워크 오류로 좋아요를 처리하지 못했습니다.');
-    }
-  });
-</script>
 </body>
 </html>

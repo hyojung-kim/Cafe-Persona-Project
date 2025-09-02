@@ -1,44 +1,151 @@
 package com.team.cafe.domain;
 
-import jakarta.persistence.*;  // JPA 관련 어노테이션들 (Entity, Id, Column 등)
-import lombok.*;              // 롬복: Getter, Setter, 생성자, Builder 등을 자동 생성
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Cafe 엔티티
- * - 카페 정보를 저장하는 데이터베이스 테이블과 매핑되는 클래스
- * - @Entity: JPA가 이 클래스를 "DB 테이블과 연결된 엔티티"로 인식
+ * 카페 기본 정보 엔티티.
+ * - BaseEntity 감사 필드 상속 (createdAt/updatedAt/createdBy/updatedBy)
+ * - 다른 팀 프로젝트와 병합 시 충돌을 줄이기 위해 컬럼 네이밍/제약을 명확히 지정
  */
 @Entity
-@Getter  // 모든 필드의 Getter 메서드 자동 생성
-@Setter  // 모든 필드의 Setter 메서드 자동 생성
-@NoArgsConstructor   // 파라미터 없는 기본 생성자 자동 생성 (JPA가 내부적으로 필요)
-@AllArgsConstructor  // 모든 필드를 파라미터로 받는 생성자 자동 생성
-@Builder             // 빌더 패턴 지원 (가독성 있게 객체 생성 가능)
-@Table(indexes = @Index(name="idx_cafe_name", columnList = "name"))
-// @Table: 이 엔티티가 어떤 테이블과 매핑될지 설정 가능
-// indexes: name 컬럼에 인덱스를 생성해서 검색 성능 향상
-public class Cafe {
+@Table(
+        name = "cafes",
+        indexes = {
+                @Index(name = "idx_cafe_name", columnList = "name")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_cafe_name_address", columnNames = {"name", "address"})
+        }
+)
+public class Cafe extends BaseEntity {
 
-    @Id // 기본키(Primary Key) 지정
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // IDENTITY 전략: DB의 Auto Increment 기능 사용 (MySQL, MariaDB 등에서 흔히 사용)
     private Long id;
 
-    @Column(nullable=false, length=120)
-    // name 컬럼은 null 불가, 최대 길이 120자로 제한
+    /** 카페명 */
+    @Column(nullable = false, length = 120)
     private String name;
 
-    @Column(length=255)
-    // address 컬럼은 최대 길이 255자 (nullable=true가 기본값 → 주소가 없어도 저장 가능)
+    /** 주소(도로명/지번 혼용 가능) */
+    @Column(length = 255)
     private String address;
 
-    // 위도(latitude)
-    private Double lat;
+    /** 위도 (WGS84) */
+    @Column(precision = 10, scale = 7)
+    private BigDecimal latitude;
 
-    // 경도(longitude)
-    private Double lng;
+    /** 경도 (WGS84) */
+    @Column(precision = 10, scale = 7)
+    private BigDecimal longitude;
 
-    // 카페 카테고리(예: "커피전문점", "디저트카페")
-    // 단일 문자열로 저장하지만, 나중에 확장이 필요하다면 별도 테이블로 분리 가능
-    private String category;
+    /** 연락처(선택) */
+    @Column(length = 30)
+    private String phone;
+
+    /**
+     * 카테고리 코드(예: CAFE, BAKERY, DESSERT ...)
+     * - 병합 이후 Enum 도입 예정: CafeCategory
+     */
+    @Column(name = "category_code", length = 50)
+    private String categoryCode;
+
+    /**
+     * 리뷰 통계(선택적 사용)
+     * - 다른 팀의 리뷰/별점 구조와 병합 용이성을 위해 비즈니스 필드로 마련
+     */
+    @Column(name = "avg_rating", nullable = false)
+    private double avgRating = 0.0;
+
+    @Column(name = "review_count", nullable = false)
+    private int reviewCount = 0;
+
+    /**
+     * 서비스 활성화 여부
+     * - soft delete / 노출 제어 등에 활용 가능
+     */
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
+    /**
+     * 리뷰 연관관계(양방향)
+     * - Review.cafe 에 의해 관리됨
+     * - 컬렉션 초기화만 해두고 지연로딩 기본값 유지
+     * - 여기서는 매핑만 두고 비즈니스 로직은 서비스 계층에서 다룸
+     */
+    @OneToMany(mappedBy = "cafe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    // ---- 기본 생성자 ----
+    protected Cafe() { }
+
+    // ---- 편의 생성자 ----
+    public Cafe(String name, String address) {
+        this.name = name;
+        this.address = address;
+    }
+
+    // ---- Getter/Setter ----
+    public Long getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public BigDecimal getLatitude() { return latitude; }
+    public void setLatitude(BigDecimal latitude) { this.latitude = latitude; }
+
+    public BigDecimal getLongitude() { return longitude; }
+    public void setLongitude(BigDecimal longitude) { this.longitude = longitude; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getCategoryCode() { return categoryCode; }
+    public void setCategoryCode(String categoryCode) { this.categoryCode = categoryCode; }
+
+    public double getAvgRating() { return avgRating; }
+    public int getReviewCount() { return reviewCount; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
+    public List<Review> getReviews() { return reviews; }
+
+    // ---- 통계 업데이트 보조 메서드(선택적 사용) ----
+    /**
+     * 리뷰 추가 시 통계 업데이트
+     * @param newRating 새 리뷰의 별점(1.0~5.0)
+     */
+    public void applyReviewAdded(double newRating) {
+        double total = this.avgRating * this.reviewCount + newRating;
+        this.reviewCount += 1;
+        this.avgRating = (this.reviewCount == 0) ? 0.0 : total / this.reviewCount;
+    }
+
+    /**
+     * 리뷰 수정 시 통계 업데이트
+     * @param oldRating 수정 전 별점
+     * @param newRating 수정 후 별점
+     */
+    public void applyReviewUpdated(double oldRating, double newRating) {
+        double total = this.avgRating * this.reviewCount - oldRating + newRating;
+        this.avgRating = (this.reviewCount == 0) ? 0.0 : total / this.reviewCount;
+    }
+
+    /**
+     * 리뷰 삭제 시 통계 업데이트
+     * @param removedRating 삭제한 리뷰 별점
+     */
+    public void applyReviewRemoved(double removedRating) {
+        if (this.reviewCount <= 0) return;
+        double total = this.avgRating * this.reviewCount - removedRating;
+        this.reviewCount -= 1;
+        this.avgRating = (this.reviewCount == 0) ? 0.0 : total / this.reviewCount;
+    }
 }

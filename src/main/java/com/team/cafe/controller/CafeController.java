@@ -1,101 +1,135 @@
 package com.team.cafe.controller;
 
 import com.team.cafe.domain.Cafe;
-import com.team.cafe.domain.Review;
-import com.team.cafe.domain.ReviewImage;
-import com.team.cafe.repository.ReviewImageRepository;
+import com.team.cafe.repository.CafeRepository;
 import com.team.cafe.service.CafeService;
-import com.team.cafe.service.ReviewService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * 카페 상세 페이지 컨트롤러
- * - 리뷰는 페이징으로 가져오고
- * - 리뷰 이미지들은 리뷰 ID 묶음으로 배치 조회하여 Map<Long, List<ReviewImage>> 로 뷰에 전달
- *   → 템플릿에서 rv.images를 직접 접근하지 않아 LazyInitializationException 방지
- */
+import java.math.BigDecimal;
+
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/cafes")
 public class CafeController {
 
     private final CafeService cafeService;
-    private final ReviewService reviewService;
-    private final ReviewImageRepository reviewImageRepository;
+    private final CafeRepository cafeRepository;
 
-    /**
-     * 카페 상세 페이지
-     * 예: /cafes/5?page=0&size=10
-     */
-    @GetMapping("/{id}")
-    public String detail(@PathVariable Long id,
-                         @RequestParam(defaultValue = "0") int page,
-                         @RequestParam(defaultValue = "10") int size,
-                         Model model) {
+    public CafeController(CafeService cafeService,
+                          CafeRepository cafeRepository) {
+        this.cafeService = cafeService;
+        this.cafeRepository = cafeRepository;
+    }
 
-        // 1) 카페 기본 정보
-        Cafe cafe = cafeService.getCafeOrThrow(id);
+    // 목록 + (검색 시) 기존 서비스 경로 유지, 기본 목록은 통계 Projection을 컨트롤러에서 사용
+    @GetMapping
+    public String list(@RequestParam(value = "keyword", required = false) String keyword,
+                       @RequestParam(value = "category", required = false) String category,
+                       @RequestParam(value = "page", defaultValue = "0") int page,
+                       @RequestParam(value = "size", defaultValue = "10") int size,
+                       Model model) {
 
-        // 2) 리뷰 페이지 (author는 @EntityGraph 등으로 미리 로딩되어 있어야 rv.author.username 안전)
-        Page<Review> reviews = reviewService.getReviewsByCafe(id, page, size);
+        int safePage = Math.max(0, page);
+        int safeSize = Math.min(100, Math.max(1, size));
+        String kw = (keyword == null) ? "" : keyword.trim();
+        String cat = (category == null) ? "" : category.trim();
+        if (kw.length() > 100) kw = kw.substring(0, 100);
+        if (cat.length() > 100) cat = cat.substring(0, 100);
 
-        // 3) 평균 별점
-        Double avgRating = reviewService.getAverageRating(id);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // 4) 리뷰 ID 목록 추출 (페이징 결과의 content 기준)
-        List<Long> reviewIds = reviews.getContent().stream()
-                .map(Review::getId)
-                .toList();
-
-        // 5) 이미지 배치 조회 → reviewId 기준으로 그룹핑
-        //    엔티티에 sortOrder 필드가 있으면 아래 메서드 사용:
-        List<ReviewImage> allImages = reviewIds.isEmpty()
-                ? Collections.emptyList()
-                : reviewImageRepository.findAllByReviewIdsOrderByReviewIdAndSortOrder(reviewIds);
-
-        //    (대안) sortOrder가 없다면 ID 기준 정렬 메서드 사용:
-        // List<ReviewImage> allImages = reviewIds.isEmpty()
-        //        ? Collections.emptyList()
-        //        : reviewImageRepository.findAllByReviewIdsOrderByReviewIdAndId(reviewIds);
-
-        Map<Long, List<ReviewImage>> imagesByReview = allImages.stream()
-                .collect(Collectors.groupingBy(
-                        ri -> ri.getReview().getId(),
-                        Collectors.collectingAndThen(Collectors.toList(), list -> {
-                            // 필요시 불변 리스트로 감싸서 뷰에서 수정 방지
-                            return List.copyOf(list);
-                        })
-                ));
-
-        // 6) 이미지 개수 맵 (조건부 표시용) — 배치 count 프로젝션 활용
-        Map<Long, Long> imageCountMap;
-        if (reviewIds.isEmpty()) {
-            imageCountMap = Collections.emptyMap();
+        if (kw.isBlank() && cat.isBlank()) {
+            var result = cafeRepository.findActiveCafesWithStats(pageable); // Projection 페이지
+            model.addAttribute("page", result);
         } else {
-            imageCountMap = reviewImageRepository.countByReviewIds(reviewIds).stream()
-                    .collect(Collectors.toMap(
-                            ReviewImageRepository.ImageCountPerReview::getReviewId,
-                            ReviewImageRepository.ImageCountPerReview::getCnt
-                    ));
+            var result = kw.isBlank()
+                    ? cafeService.searchActiveByCategory(cat, pageable)
+                    : cafeService.searchActiveByName(kw, pageable);
+            model.addAttribute("page", result);
         }
 
-        // 7) 모델 바인딩
+        model.addAttribute("keyword", kw);
+        model.addAttribute("category", cat);
+        return "cafe/list";
+    }
+
+    // 상세
+    @GetMapping("/{id}")
+    public String detail(@PathVariable Long id, Model model) {
+        Cafe cafe = cafeService.getById(id);
+        var stats = cafeRepository.getActiveStatsByCafeId(id);
+        double avg = (stats != null && stats.getAvgRating() != null) ? stats.getAvgRating() : 0.0;
+        long count = (stats != null && stats.getReviewCount() != null) ? stats.getReviewCount() : 0L;
+
         model.addAttribute("cafe", cafe);
-        model.addAttribute("reviews", reviews);
-        model.addAttribute("avgRating", avgRating);
-
-        // rv.images 대신 사용할 안전한 자료구조
-        model.addAttribute("imagesByReview", imagesByReview); // Map<Long, List<ReviewImage>>
-        model.addAttribute("imageCountMap", imageCountMap);   // Map<Long, Long>
-
+        model.addAttribute("avgRating", avg);
+        model.addAttribute("reviewCount", count);
         return "cafe/detail";
     }
+
+    // 생성 폼 (예시 – 템플릿에서 name/address/lat/lng/phone/categoryCode를 입력받는다고 가정)
+    @GetMapping("/new")
+    public String createForm(Model model) {
+        return "cafe/edit"; // 필요 시 템플릿 구성
+    }
+
+    // 생성 처리
+    @PostMapping
+    public String create(@RequestParam String name,
+                         @RequestParam String address,
+                         @RequestParam(required = false) BigDecimal lat,
+                         @RequestParam(required = false) BigDecimal lng,
+                         @RequestParam(required = false) String phone,
+                         @RequestParam(required = false, name = "categoryCode") String categoryCode,
+                         RedirectAttributes ra) {
+
+        Cafe saved = cafeService.createCafe(
+                name, address, lat, lng, phone, categoryCode
+        );
+
+        ra.addFlashAttribute("message", "카페가 등록되었습니다.");
+        return "redirect:/cafes/" + saved.getId();
+    }
+
+    // 속성 수정(예시 라우트 — SecurityConfig에서 POST 보호)
+    @PostMapping("/{id}/phone")
+    public String updatePhone(@PathVariable Long id,
+                              @RequestParam String phone,
+                              RedirectAttributes ra) {
+        cafeService.updatePhone(id, phone);
+        ra.addFlashAttribute("message", "전화번호가 변경되었습니다.");
+        return "redirect:/cafes/" + id;
+    }
+
+    @PostMapping("/{id}/location")
+    public String updateLocation(@PathVariable Long id,
+                                 @RequestParam String address,
+                                 RedirectAttributes ra) {
+        cafeService.updateAddress(id, address);
+        ra.addFlashAttribute("message", "주소가 변경되었습니다.");
+        return "redirect:/cafes/" + id;
+    }
+
+    @PostMapping("/{id}/category")
+    public String updateCategory(@PathVariable Long id,
+                                 @RequestParam String categoryCode,
+                                 RedirectAttributes ra) {
+        cafeService.updateCategory(id, categoryCode);
+        ra.addFlashAttribute("message", "카테고리가 변경되었습니다.");
+        return "redirect:/cafes/" + id;
+    }
+
+    @PostMapping("/{id}/active")
+    public String updateActive(@PathVariable Long id,
+                               @RequestParam boolean active,
+                               RedirectAttributes ra) {
+        cafeService.updateActive(id, active);
+        ra.addFlashAttribute("message", "활성 상태가 변경되었습니다.");
+        return "redirect:/cafes/" + id;
+    }
 }
+

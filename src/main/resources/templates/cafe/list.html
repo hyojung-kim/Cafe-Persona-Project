@@ -1,0 +1,108 @@
+<!-- templates/cafe/list.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <title>카페 목록</title>
+
+  <style>
+    :root { --bd:#e5e7eb; --ink:#111827; --muted:#6b7280; --bg:#fafafa; }
+    body { font-family: system-ui, apple-system, Segoe UI, Roboto, Pretendard, Arial, sans-serif;
+           margin:0; padding:24px; background:var(--bg); color:var(--ink); }
+    .cafe-container { max-width: 960px; margin: 0 auto; }
+
+    .cafe-header { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:16px;
+                   box-shadow:0 1px 2px rgba(0,0,0,.04); margin-bottom:16px; }
+    .cafe-title { font-size:22px; font-weight:600; margin:0 0 10px 0; }
+    .cafe-search-row { display:grid; grid-template-columns:1fr 1fr auto; gap:8px; }
+    .cafe-input, .cafe-select { padding:10px 12px; border:1px solid var(--bd); border-radius:10px; }
+    .cafe-btn { padding:10px 14px; border:1px solid var(--bd); border-radius:10px; background:#fff; cursor:pointer; }
+    .cafe-btn-link { text-decoration:none; color:inherit; border:1px solid var(--bd); border-radius:10px; padding:8px 12px; background:#fff; }
+
+    .cafe-grid { display:grid; gap:14px; }
+    .cafe-card { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:16px;
+                 box-shadow:0 1px 2px rgba(0,0,0,.04); display:grid; grid-template-columns: 1fr auto; gap:10px; }
+    .cafe-name { font-size:18px; font-weight:600; margin:0 0 6px 0; }
+    .cafe-meta { font-size:14px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
+    .cafe-badges { display:flex; gap:8px; margin-top:8px; }
+    .cafe-badge { padding:4px 8px; border:1px solid var(--bd); border-radius:999px; font-size:12px; background:#fff; }
+    .cafe-actions { display:flex; align-items:center; gap:8px; }
+
+    .cafe-empty { text-align:center; color:var(--muted); padding:40px 0; background:#fff; border:1px solid var(--bd); border-radius:14px; }
+
+    .cafe-pagination { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; }
+    .cafe-page-btn { padding:8px 12px; border:1px solid var(--bd); border-radius:10px; background:#fff; text-decoration:none; color:inherit; }
+    .cafe-page-btn[aria-disabled="true"] { opacity:.5; pointer-events:none; }
+
+    @media (max-width:640px) {
+      .cafe-search-row { grid-template-columns:1fr; }
+      .cafe-card { grid-template-columns: 1fr; }
+      .cafe-actions { justify-content:flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div th:replace="fragments/alerts :: toast"></div>
+<div class="cafe-container">
+
+  <!-- 헤더/검색 -->
+  <section class="cafe-header">
+    <h1 class="cafe-title">카페 목록</h1>
+    <form th:action="@{/cafes}" method="get" class="cafe-search-row">
+      <!-- 이름 검색 -->
+      <input class="cafe-input" type="text" name="keyword" placeholder="카페명으로 검색"
+             th:value="${keyword}">
+      <!-- 카테고리 코드(부분검색) -->
+      <input class="cafe-input" type="text" name="category" placeholder="카테고리 코드(예: CAFE/BAKERY)"
+             th:value="${category}">
+      <button class="cafe-btn" type="submit">검색</button>
+    </form>
+  </section>
+
+  <!-- 리스트 -->
+  <section th:if="${page != null and page.totalElements > 0}" class="cafe-grid">
+    <article class="cafe-card" th:each="c : ${page.content}">
+      <div>
+        <h2 class="cafe-name" th:text="${c.name}">카페명</h2>
+        <div class="cafe-meta">
+          <span th:text="${c.address}">주소</span>
+          <span th:if="${c.phone}" th:text="'전화: ' + ${c.phone}">전화</span>
+        </div>
+        <div class="cafe-badges">
+          <span class="cafe-badge" th:text="'평균 ★ ' + ${#numbers.formatDecimal(c.avgRating,1,2)}">평균 ★ 0.00</span>
+          <span class="cafe-badge" th:text="'리뷰 ' + ${c.reviewCount} + '개'">리뷰 0개</span>
+          <span class="cafe-badge" th:if="${c.categoryCode}" th:text="${c.categoryCode}">CATEGORY</span>
+          <span class="cafe-badge" th:text="${c.active} ? '활성' : '비활성'">상태</span>
+        </div>
+      </div>
+
+      <div class="cafe-actions">
+        <a class="cafe-btn-link" th:href="@{|/cafes/${c.id}|}">상세</a>
+        <a class="cafe-btn-link" th:href="@{|/cafes/${c.id}/reviews|}">리뷰 보기</a>
+      </div>
+    </article>
+
+    <!-- 페이지네이션 -->
+    <nav class="cafe-pagination">
+      <a class="cafe-page-btn"
+         th:href="@{|/cafes?page=${page.number - 1}&size=${page.size}&keyword=${keyword}&category=${category}|}"
+         th:attr="aria-disabled=${page.first}" th:if="${!page.first}">이전</a>
+
+      <span class="cafe-page-btn" aria-disabled="true"
+            th:text="${page.number + 1} + ' / ' + ${page.totalPages}">1 / 1</span>
+
+      <a class="cafe-page-btn"
+         th:href="@{|/cafes?page=${page.number + 1}&size=${page.size}&keyword=${keyword}&category=${category}|}"
+         th:attr="aria-disabled=${page.last}" th:if="${!page.last}">다음</a>
+    </nav>
+  </section>
+
+  <!-- 빈 상태 -->
+  <section th:if="${page == null or page.totalElements == 0}" class="cafe-empty">
+    조건에 맞는 카페가 없습니다.
+  </section>
+
+</div>
+</body>
+</html>

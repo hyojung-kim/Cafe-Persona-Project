@@ -6,205 +6,138 @@
     <meta charset="UTF-8"/>
     <title th:text="${cafe.name} + ' - 상세'">카페 상세</title>
 
-    <!-- CSRF 메타 (CSRF가 켜져 있을 때만 출력) -->
+    <!-- CSRF 메타 (AJAX/폼 제출 시 사용) -->
     <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
     <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <style>
-        :root { --gap: 12px; --bd: 1px solid #e5e7eb; --muted:#6b7280; }
-        body{font-family:system-ui,apple-system,Segoe UI,Roboto,Pretendard,Arial,sans-serif; margin:0; padding:24px; background:#fafafa; color:#111827;}
-        .container{max-width:960px; margin:0 auto;}
-        .card{background:#fff; border:var(--bd); border-radius:14px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04); margin-bottom:16px;}
-        .flex{display:flex; gap:var(--gap); align-items:center;}
-        .between{justify-content:space-between;}
-        .muted{color:var(--muted);}
-        .pill{display:inline-block; padding:4px 10px; border-radius:999px; background:#f3f4f6; font-size:12px; color:#374151;}
-        .btn{border:var(--bd); background:#111827; color:#fff; padding:8px 14px; border-radius:10px; cursor:pointer;}
-        .btn.ghost{background:#fff; color:#111827;}
-        .btn.danger{background:#dc2626; border-color:#dc2626;}
-        .grid{display:grid; gap:var(--gap);}
-        .grid-cols-3{grid-template-columns:repeat(3,1fr);}
-        .img-thumb{width:100%; height:140px; object-fit:cover; border-radius:10px; border:var(--bd);}
-        .review-item h4{margin:0;}
-        .pagination{display:flex; gap:8px; align-items:center; justify-content:center; margin-top:12px;}
-        .pagination a, .pagination span{padding:6px 10px; border-radius:8px; border:var(--bd); background:#fff; text-decoration:none; color:#111827;}
-        .pagination .active{background:#111827; color:#fff; border-color:#111827;}
-        .rating-badge{font-weight:700;}
-        /* 작성 폼 */
-        textarea{width:100%; min-height:120px; padding:10px; border-radius:10px; border:var(--bd); resize:vertical;}
-        input[type="file"]{display:block; margin-top:8px;}
-        .form-row{display:grid; grid-template-columns:140px 1fr; gap:10px; align-items:center; margin:10px 0;}
-        select, input[type="number"]{padding:8px; border-radius:10px; border:var(--bd); width:160px;}
-        .stars{color:#f59e0b; font-size:14px;}
+        :root { --bd:#e5e7eb; --ink:#111827; --muted:#6b7280; --bg:#fafafa; }
+        body { font-family: system-ui, apple-system, Segoe UI, Roboto, Pretendard, Arial, sans-serif;
+               margin:0; padding:24px; background:var(--bg); color:var(--ink); }
+        .cafe-container { max-width: 960px; margin: 0 auto; }
+
+        .cafe-card { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:16px;
+                     box-shadow:0 1px 2px rgba(0,0,0,.04); }
+        .cafe-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+        .cafe-title { font-size:22px; font-weight:600; margin:0; }
+        .cafe-muted { color:var(--muted); font-size:14px; }
+        .cafe-badges { display:flex; flex-wrap:wrap; gap:8px; }
+        .cafe-badge { padding:4px 8px; border:1px solid var(--bd); border-radius:999px; font-size:12px; background:#fff; }
+
+        .cafe-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:16px; margin-top:16px; }
+        .cafe-section { display:grid; gap:12px; }
+        .cafe-field { display:grid; gap:6px; }
+        .cafe-label { font-weight:600; }
+        .cafe-value { color:#1f2937; }
+        .cafe-actions { display:flex; gap:8px; }
+
+        .cafe-form { display:grid; gap:8px; background:#fff; border:1px solid var(--bd); border-radius:12px; padding:12px; }
+        .cafe-input { padding:10px 12px; border:1px solid var(--bd); border-radius:10px; width:100%; }
+        .cafe-btn { padding:10px 14px; border:1px solid var(--bd); border-radius:10px; background:#fff; cursor:pointer; }
+        .cafe-link { text-decoration:none; color:inherit; border:1px solid var(--bd); border-radius:10px; padding:8px 12px; background:#fff; }
+
+        @media (max-width: 820px) {
+          .cafe-grid { grid-template-columns:1fr; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
+<div th:replace="fragments/alerts :: toast"></div>
+<div class="cafe-container">
 
-    <!-- 상단: 카페 정보 -->
-    <div class="card">
-        <div class="flex between">
-            <div>
-                <h2 th:text="${cafe.name}">카페 이름</h2>
-                <div class="muted" th:text="${cafe.address} ?: '주소 정보 없음'">주소</div>
-                <div class="muted"><span class="pill" th:text="${cafe.category} ?: '분류 없음'">카테고리</span></div>
-            </div>
-            <div style="text-align:right">
-                <div class="rating-badge">
-                    평균 ★
-                    <span th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,1) : '0.0'}">0.0</span>
-                    / 5.0
-                </div>
+    <!-- 상단 카드 -->
+    <section class="cafe-card">
+        <div class="cafe-header">
+            <h1 class="cafe-title" th:text="${cafe.name}">카페명</h1>
+            <div class="cafe-badges">
+                <span class="cafe-badge" th:text="'평균 ★ ' + ${#numbers.formatDecimal(avgRating,1,2)}">평균 ★ 0.00</span>
+                <span class="cafe-badge" th:text="'리뷰 ' + ${reviewCount} + '개'">리뷰 0개</span>
+                <span class="cafe-badge" th:if="${cafe.categoryCode}" th:text="${cafe.categoryCode}">CATEGORY</span>
+                <span class="cafe-badge" th:text="${cafe.active} ? '활성' : '비활성'">상태</span>
             </div>
         </div>
-    </div>
+        <div class="cafe-muted" th:text="${cafe.address}">주소</div>
+        <div class="cafe-muted" th:if="${cafe.phone}" th:text="'전화: ' + ${cafe.phone}">전화</div>
 
-    <!-- 로그인한 사용자만: 리뷰 작성 폼 -->
-    <div class="card" sec:authorize="isAuthenticated()">
-        <h3>리뷰 작성</h3>
-        <form th:action="@{/reviews}" method="post" enctype="multipart/form-data" onsubmit="return validateReviewForm(this)">
-            <input th:if="${_csrf}" type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-            <input type="hidden" name="cafeId" th:value="${cafe.id}"/>
-
-            <div class="form-row">
-                <label for="rating">별점 (0.5 단위)</label>
-                <input id="rating" name="rating" type="number" step="0.5" min="0.0" max="5.0" value="4.0" required/>
-            </div>
-
-            <div class="form-row">
-                <label for="content">내용 (50~4000자)</label>
-                <textarea id="content" name="content" minlength="50" maxlength="4000" placeholder="카페 이용 경험을 구체적으로 작성해 주세요." required></textarea>
-            </div>
-
-            <div class="form-row">
-                <label for="images">이미지 (최대 5장)</label>
-                <input id="images" name="images" type="file" accept="image/*" multiple/>
-            </div>
-
-            <div style="margin-top:10px;">
-                <button class="btn" type="submit">등록</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- 리뷰 리스트 -->
-    <div class="card">
-        <div class="flex between">
-            <h3>리뷰</h3>
-            <div class="muted">
-                페이지 <span th:text="${reviews.number + 1}">1</span> / <span th:text="${reviews.totalPages}">1</span>
-            </div>
+        <div class="cafe-actions" style="margin-top:12px;">
+            <a class="cafe-link" th:href="@{|/cafes/${cafe.id}/reviews|}">리뷰 보기</a>
+            <a class="cafe-link" th:href="@{/cafes}">목록으로</a>
         </div>
+    </section>
 
-        <div class="grid" th:if="${reviews.totalElements > 0}">
-            <!-- Page가 아닌 content를 순회 -->
-            <div th:each="rv : ${reviews.content}" class="review-item" style="border-top:var(--bd); padding-top:16px; margin-top:16px;">
-                <div class="flex between">
-                    <h4>
-                        <!-- 작성자 null/Lazy 안전 -->
-                        <!-- Thymeleaf 3.1+면 rv.author?.username 로 한 줄 가능 -->
-                        <span class="pill" th:if="${rv.author != null}" th:text="${rv.author.username}">writer</span>
-                        <span class="pill" th:unless="${rv.author != null}">알 수 없음</span>
+    <!-- 상세/수정 그리드 -->
+    <section class="cafe-grid">
 
-                        <span class="stars">★</span>
-                        <span th:text="${#numbers.formatDecimal(rv.rating,1,1)}">4.0</span>
-                    </h4>
-                    <div class="muted" th:text="${#temporals.format(rv.createdAt,'yyyy-MM-dd HH:mm')}">2025-09-01</div>
+        <!-- 왼쪽: 정보 -->
+        <div class="cafe-section">
+            <div class="cafe-card">
+                <div class="cafe-field">
+                    <div class="cafe-label">카테고리 코드</div>
+                    <div class="cafe-value" th:text="${cafe.categoryCode != null ? cafe.categoryCode : '-'}">-</div>
                 </div>
-
-                <p th:text="${rv.content}">리뷰 내용</p>
-
-                <!-- 이미지 썸네일: 컬렉션 직접 접근 대신 컨트롤러에서 내려준 Map 사용 -->
-                <div class="grid grid-cols-3" th:if="${(imageCountMap[rv.id] ?: 0) > 0}">
-                    <img th:each="img : ${imagesByReview[rv.id]}"
-                         th:src="${img.urlPath}"
-                         alt="review image"
-                         class="img-thumb"/>
+                <div class="cafe-field">
+                    <div class="cafe-label">위치 (위도/경도)</div>
+                    <div class="cafe-value"
+                         th:text="${(cafe.latitude != null ? cafe.latitude : '-')} + ' / ' + (cafe.longitude != null ? cafe.longitude : '-')">- / -</div>
                 </div>
-
-                <!-- 좋아요 & 상세보기 -->
-                <div class="flex between" style="margin-top:8px;">
-                    <div class="flex" style="gap:8px; align-items:center;">
-                        <button class="btn ghost like-btn"
-                                th:attr="data-review-id=${rv.id}"
-                                type="button">좋아요</button>
-                        <span>♡ <b class="like-count" th:id="'like-count-' + ${rv.id}">0</b></span>
-                    </div>
-                    <div>
-                        <a class="btn ghost" th:href="@{|/reviews/${rv.id}|}">상세보기</a>
-                    </div>
+                <div class="cafe-field">
+                    <div class="cafe-label">생성일</div>
+                    <div class="cafe-value" th:text="${#temporals.format(cafe.createdAt, 'yyyy-MM-dd HH:mm')}">-</div>
+                </div>
+                <div class="cafe-field">
+                    <div class="cafe-label">수정일</div>
+                    <div class="cafe-value" th:text="${#temporals.format(cafe.updatedAt, 'yyyy-MM-dd HH:mm')}">-</div>
                 </div>
             </div>
         </div>
 
-        <div th:if="${reviews.totalElements == 0}" class="muted">아직 작성된 리뷰가 없어요.</div>
+        <!-- 오른쪽: 수정 폼 -->
+        <div class="cafe-section">
 
-        <!-- 페이징 -->
-        <div class="pagination" th:if="${reviews.totalPages > 1}">
-            <a th:if="${reviews.hasPrevious()}"
-               th:href="@{|/cafes/${cafe.id}?page=${reviews.number-1}&size=${reviews.size}|}">&laquo; 이전</a>
-            <span th:each="p : ${#numbers.sequence(0, reviews.totalPages - 1)}"
-                  th:classappend="${p} == ${reviews.number} ? 'active'">
-                <a th:if="${p} != ${reviews.number}"
-                   th:href="@{|/cafes/${cafe.id}?page=${p}&size=${reviews.size}|}"
-                   th:text="${p+1}">1</a>
-                <span th:if="${p} == ${reviews.number}" th:text="${p+1}">1</span>
-            </span>
-            <a th:if="${reviews.hasNext()}"
-               th:href="@{|/cafes/${cafe.id}?page=${reviews.number+1}&size=${reviews.size}|}">다음 &raquo;</a>
+            <!-- 전화번호 수정 -->
+            <form class="cafe-form" th:action="@{|/cafes/${cafe.id}/phone|}" method="post">
+                <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="cafe-label">전화번호 수정</div>
+                <input class="cafe-input" type="text" name="phone" placeholder="예: 02-123-4567" th:value="${cafe.phone}">
+                <button class="cafe-btn" type="submit">저장</button>
+            </form>
+
+            <!-- 좌표 수정 -->
+            <form class="cafe-form" th:action="@{|/cafes/${cafe.id}/location|}" method="post">
+                <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="cafe-label">위치 좌표 수정</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <input class="cafe-input" type="number" step="0.0000001" name="latitude" placeholder="위도"
+                           th:value="${cafe.latitude}">
+                    <input class="cafe-input" type="number" step="0.0000001" name="longitude" placeholder="경도"
+                           th:value="${cafe.longitude}">
+                </div>
+                <button class="cafe-btn" type="submit">저장</button>
+            </form>
+
+            <!-- 카테고리 코드 수정 -->
+            <form class="cafe-form" th:action="@{|/cafes/${cafe.id}/category|}" method="post">
+                <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="cafe-label">카테고리 코드 변경</div>
+                <input class="cafe-input" type="text" name="categoryCode" placeholder="예: CAFE/BAKERY"
+                       th:value="${cafe.categoryCode}">
+                <button class="cafe-btn" type="submit">저장</button>
+            </form>
+
+            <!-- 활성/비활성 토글 -->
+            <form class="cafe-form" th:action="@{|/cafes/${cafe.id}/active|}" method="post">
+                <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="cafe-label">노출 상태</div>
+                <select class="cafe-input" name="active">
+                    <option th:value="true" th:selected="${cafe.active}">활성</option>
+                    <option th:value="false" th:selected="${!cafe.active}">비활성</option>
+                </select>
+                <button class="cafe-btn" type="submit">적용</button>
+            </form>
+
         </div>
-    </div>
+    </section>
+
 </div>
-
-<script>
-    // 파일 5장 제한 + 폼 유효성
-    function validateReviewForm(form) {
-      const files = form.images?.files;
-      if (files && files.length > 5) {
-        alert('이미지는 최대 5장까지 업로드 가능합니다.');
-        return false;
-      }
-      if (Number(form.rating.value) % 0.5 !== 0) {
-        alert('별점은 0.5 단위로만 선택할 수 있습니다.');
-        return false;
-      }
-      if (form.content.value.trim().length < 50) {
-        alert('리뷰 내용은 최소 50자 이상 작성해 주세요.');
-        return false;
-      }
-      return true;
-    }
-
-    // CSRF 토큰
-    const CSRF_TOKEN = document.querySelector('meta[name="_csrf"]')?.content;
-    const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content;
-
-    // 좋아요 토글 (AJAX)
-    document.querySelectorAll('.like-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.getAttribute('data-review-id');
-        try {
-          const res = await fetch(`/reviews/${id}/like-toggle`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              ...(CSRF_HEADER ? {[CSRF_HEADER]: CSRF_TOKEN} : {})
-            }
-          });
-          if (!res.ok) {
-            const text = await res.text();
-            alert((text && text.substring(0,120)) || '요청 처리 중 오류가 발생했습니다.');
-            return;
-          }
-          const data = await res.json();
-          const el = document.getElementById(`like-count-${id}`);
-          if (el) el.textContent = data.likedCount ?? '0';
-        } catch (e) {
-          console.error(e);
-          alert('네트워크 오류로 좋아요를 처리하지 못했습니다.');
-        }
-      });
-    });
-</script>
 </body>
 </html>

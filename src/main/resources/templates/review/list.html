@@ -1,0 +1,120 @@
+<!-- templates/review/list.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <title th:text="${cafe.name} + ' - 리뷰 목록'">리뷰 목록</title>
+
+  <!-- CSRF 메타 (AJAX 시 사용 가능) -->
+  <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+  <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <style>
+    :root { --bd:#e5e7eb; --muted:#6b7280; --ink:#111827; --bg:#fafafa; }
+    body { font-family: system-ui, apple-system, Segoe UI, Roboto, Pretendard, Arial, sans-serif;
+           margin:0; padding:24px; background:var(--bg); color:var(--ink);}
+    .review-container { max-width: 960px; margin: 0 auto; }
+    .review-card { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:16px;
+                   box-shadow:0 1px 2px rgba(0,0,0,.04); display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .review-grid { display:grid; gap:14px; }
+    .review-header { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:16px;
+                     box-shadow:0 1px 2px rgba(0,0,0,.04); margin-bottom:16px; }
+    .review-topline { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .review-muted { color: var(--muted); font-size: 14px; }
+    .review-title { font-size:20px; font-weight:600; margin:0 0 8px 0; }
+    .review-thumb { width:120px; height:120px; border-radius:10px; object-fit:cover; border:1px solid var(--bd); background:#f3f4f6; }
+    .review-meta { display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:var(--muted); margin-top:6px; }
+    .review-content { margin-top:8px; line-height:1.5; }
+    .review-badges { display:flex; gap:8px; font-size:12px; }
+    .review-badge { padding:4px 8px; border:1px solid var(--bd); border-radius:999px; background:#fff; }
+    .review-pagination { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; }
+    .review-page-btn { padding:8px 12px; border:1px solid var(--bd); border-radius:10px; background:#fff; text-decoration:none; color:inherit; }
+    .review-page-btn[aria-disabled="true"] { opacity:.5; pointer-events:none; }
+    .review-empty { text-align:center; color:var(--muted); padding:40px 0; background:#fff; border:1px solid var(--bd); border-radius:14px; }
+    @media (max-width: 640px){
+      .review-card { grid-template-columns:1fr; }
+      .review-thumb { width:100%; height:180px; }
+    }
+  </style>
+</head>
+<body>
+<div th:replace="fragments/alerts :: toast"></div>
+<div class="review-container">
+
+  <!-- 상단: 카페 정보 / 통계 -->
+  <section class="review-header">
+    <div class="review-topline">
+      <h1 class="review-title" th:text="${cafe.name}">카페명</h1>
+      <div class="review-badges">
+        <span class="review-badge" th:text="'평균 ★ ' + ${#numbers.formatDecimal(avgRating, 1, 2)}">평균 ★ 0.0</span>
+        <span class="review-badge" th:text="'리뷰 ' + ${reviewCount} + '개'">리뷰 0개</span>
+        <span class="review-badge" th:if="${cafe.categoryCode}" th:text="${cafe.categoryCode}">CATEGORY</span>
+      </div>
+    </div>
+    <div class="review-muted" th:text="${cafe.address}">주소</div>
+    <div class="review-muted" th:if="${cafe.phone}" th:text="'전화: ' + ${cafe.phone}">전화</div>
+  </section>
+
+  <!-- 리스트 -->
+  <section th:if="${page != null and page.totalElements > 0}" class="review-grid">
+    <article class="review-card" th:each="review : ${page.content}">
+      <!-- 대표 이미지(첫 장) -->
+      <a th:href="@{|/reviews/${review.id}|}" aria-label="리뷰 상세">
+        <img class="review-thumb"
+             th:if="${review.images != null and !#lists.isEmpty(review.images)}"
+             th:src="${review.images.get(0).imageUrl}"
+             alt="리뷰 이미지"/>
+        <div class="review-thumb" th:if="${review.images == null or #lists.isEmpty(review.images)}"
+             style="display:flex;align-items:center;justify-content:center;color:#9ca3af;">
+          No Image
+        </div>
+      </a>
+
+      <!-- 본문 -->
+      <div>
+        <div class="review-badges" style="margin-bottom:6px;">
+          <span class="review-badge" th:text="'★ ' + ${#numbers.formatDecimal(review.rating,1,1)}">★ 0.0</span>
+          <span class="review-badge" th:text="'좋아요 ' + ${review.likeCount}">좋아요 0</span>
+          <span class="review-badge" th:text="'조회 ' + ${review.viewCount}">조회 0</span>
+        </div>
+
+        <div class="review-meta">
+          <span th:text="'작성자: ' + ${review.author != null ? review.author.username : '알수없음'}">작성자</span>
+          <span th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+        </div>
+
+        <div class="review-content"
+             th:text="${#strings.abbreviate(review.content, 140)}">
+          리뷰 내용 미리보기...
+        </div>
+
+        <div style="margin-top:10px;">
+          <a class="review-page-btn" th:href="@{|/reviews/${review.id}|}">자세히 보기</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 페이지네이션 -->
+    <nav class="review-pagination">
+      <a class="review-page-btn"
+         th:href="@{|/cafes/${cafe.id}/reviews?page=${page.number - 1}&size=${page.size}|}"
+         th:attr="aria-disabled=${page.first}" th:if="${!page.first}">이전</a>
+
+      <span class="review-muted"
+            th:text="${page.number + 1} + ' / ' + ${page.totalPages}">1 / 1</span>
+
+      <a class="review-page-btn"
+         th:href="@{|/cafes/${cafe.id}/reviews?page=${page.number + 1}&size=${page.size}|}"
+         th:attr="aria-disabled=${page.last}" th:if="${!page.last}">다음</a>
+    </nav>
+  </section>
+
+  <!-- 빈 상태 -->
+  <section th:if="${page == null or page.totalElements == 0}" class="review-empty">
+    이 카페의 리뷰가 아직 없습니다.
+  </section>
+
+</div>
+</body>
+</html>

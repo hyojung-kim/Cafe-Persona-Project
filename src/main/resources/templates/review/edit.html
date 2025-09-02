@@ -4,52 +4,174 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8"/>
-  <title>리뷰 수정</title>
+  <title th:text="${(mode=='edit' ? '리뷰 수정 - ' : '리뷰 작성 - ') + (cafe != null ? cafe.name : (review != null ? review.cafe.name : ''))}">
+    리뷰 작성/수정
+  </title>
+
+  <!-- CSRF (폼 제출용) -->
+  <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+  <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
   <style>
-    :root { --bd: 1px solid #e5e7eb; }
-    body{font-family:system-ui,apple-system,Segoe UI,Roboto,Pretendard,Arial,sans-serif; margin:0; padding:24px; background:#fafafa; color:#111827;}
-    .container{max-width:720px; margin:0 auto;}
-    .card{background:#fff; border:var(--bd); border-radius:14px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04); margin-bottom:16px;}
-    .form-row{display:grid; grid-template-columns:160px 1fr; gap:12px; align-items:center; margin:12px 0;}
-    textarea{width:100%; min-height:160px; padding:10px; border-radius:10px; border:var(--bd); resize:vertical;}
-    input, select{padding:8px; border-radius:10px; border:var(--bd); width:160px;}
-    .btn{border:var(--bd); background:#111827; color:#fff; padding:10px 16px; border-radius:10px; cursor:pointer;}
-    .btn.ghost{background:#fff; color:#111827;}
+    :root { --bd:#e5e7eb; --ink:#111827; --muted:#6b7280; --bg:#fafafa; --danger:#b91c1c; }
+    body { font-family: system-ui, apple-system, Segoe UI, Roboto, Pretendard, Arial, sans-serif;
+           margin:0; padding:24px; background:var(--bg); color:var(--ink); }
+    .rev-container { max-width: 720px; margin: 0 auto; }
+    .rev-card { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:16px;
+                box-shadow:0 1px 2px rgba(0,0,0,.04); }
+    .rev-title { font-size:22px; font-weight:600; margin:0 0 12px 0; }
+    .rev-muted { color:var(--muted); font-size:14px; }
+    .rev-form { display:grid; gap:12px; }
+    .rev-row { display:grid; gap:6px; }
+    .rev-label { font-weight:600; }
+    .rev-input, .rev-textarea { width:100%; border:1px solid var(--bd); border-radius:10px; padding:10px 12px; }
+    .rev-textarea { min-height:160px; line-height:1.6; resize:vertical; }
+    .rev-error { color:#b91c1c; font-size:13px; }
+    .rev-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .rev-btn { padding:10px 14px; border:1px solid var(--bd); border-radius:10px; background:#fff; cursor:pointer; }
+    .rev-link { text-decoration:none; color:inherit; border:1px solid var(--bd); border-radius:10px; padding:10px 14px; background:#fff; }
+    .rev-btn-danger { border-color: var(--danger); color: var(--danger); }
+    .rev-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .rev-thumb { width:100%; aspect-ratio:1/1; border:1px solid var(--bd); border-radius:10px; object-fit:cover; background:#f3f4f6; }
+    .rev-img-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; }
+    @media (max-width:600px){ .rev-img-grid{ grid-template-columns:repeat(3, 1fr);} }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="card">
-    <h2>리뷰 수정</h2>
-    <form th:action="@{|/reviews/${review.id}/edit|}" method="post" onsubmit="return validateEditForm(this)">
-      <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+<div th:replace="fragments/alerts :: toast"></div>
+<div class="rev-container">
 
-      <div class="form-row">
-        <label for="rating">별점 (0.5 단위)</label>
-        <input id="rating" name="rating" type="number" step="0.5" min="0.0" max="5.0"
-               th:value="${review.rating}" required/>
+  <header style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+    <h1 class="rev-title"
+        th:text="${mode == 'edit' ? '리뷰 수정' : '리뷰 작성'}">리뷰 작성</h1>
+
+    <!-- 뒤로가기 링크: create→카페 리뷰 목록, edit→리뷰 상세 -->
+    <a class="rev-link"
+       th:href="${mode=='edit'} ? @{|/reviews/${review.id}|} : @{|/cafes/${cafe.id}/reviews|}">
+      돌아가기
+    </a>
+  </header>
+
+  <section class="rev-card">
+    <!--
+      액션 URL 자동 전환:
+      - create : POST /cafes/{cafeId}/reviews
+      - edit   : POST /reviews/{reviewId}
+    -->
+    <form class="rev-form"
+          th:action="${mode=='edit'} ? @{|/reviews/${review.id}|} : @{|/cafes/${cafe.id}/reviews|}"
+          method="post" th:object="${form}">
+      <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+      <!-- 별점 -->
+      <div class="rev-row">
+        <label class="rev-label" for="rating">별점 (1.0 ~ 5.0)</label>
+        <input id="rating" class="rev-input" type="number" step="0.1" min="1.0" max="5.0"
+               th:field="*{rating}" placeholder="예: 4.5"/>
+        <div class="rev-error" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}">별점 오류</div>
       </div>
 
-      <div class="form-row">
-        <label for="content">내용 (50~4000자)</label>
-        <textarea id="content" name="content" minlength="50" maxlength="4000"
-                  th:text="${review.content}" required></textarea>
+      <!-- 내용 -->
+      <div class="rev-row">
+        <label class="rev-label" for="content">내용 (최소 50자)</label>
+        <textarea id="content" class="rev-textarea" th:field="*{content}"
+                  placeholder="카페에 대한 자세한 후기(최소 50자)"></textarea>
+        <div class="rev-error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">내용 오류</div>
+        <div class="rev-muted" id="contentCounter">0자 / 최소 50자</div>
       </div>
 
-      <div style="margin-top:12px;">
-        <button class="btn" type="submit">저장</button>
-        <a class="btn ghost" th:href="@{|/reviews/${review.id}|}">취소</a>
+      <!-- 이미지 URL (최대 5개) -->
+      <div class="rev-row">
+        <div class="rev-label">이미지 URL (최대 5개)</div>
+        <div class="rev-grid-2">
+          <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                 th:value="${form.imageUrl != null and form.imageUrl.size() > 0 ? form.imageUrl[0] : ''}">
+          <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                 th:value="${form.imageUrl != null and form.imageUrl.size() > 1 ? form.imageUrl[1] : ''}">
+          <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                 th:value="${form.imageUrl != null and form.imageUrl.size() > 2 ? form.imageUrl[2] : ''}">
+          <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                 th:value="${form.imageUrl != null and form.imageUrl.size() > 3 ? form.imageUrl[3] : ''}">
+          <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                 th:value="${form.imageUrl != null and form.imageUrl.size() > 4 ? form.imageUrl[4] : ''}">
+        </div>
+        <div class="rev-error" th:if="${#fields.hasGlobalErrors()}" th:errors="*{imageUrl}">이미지 오류</div>
+
+        <!-- 간단 미리보기 -->
+        <div class="rev-img-grid" id="previewGrid" style="margin-top:8px;"></div>
+        <div class="rev-muted">URL만 받도록 구성(파일 업로드는 병합 후 확장).</div>
+      </div>
+
+      <div class="rev-actions">
+        <button class="rev-btn" type="submit"
+                th:text="${mode=='edit' ? '수정' : '등록'}">등록</button>
+
+        <!-- 취소 링크: create→카페 리뷰 목록, edit→리뷰 상세 -->
+        <a class="rev-link"
+           th:href="${mode=='edit'} ? @{|/reviews/${review.id}|} : @{|/cafes/${cafe.id}/reviews|}">
+          취소
+        </a>
+
+        <!-- 삭제 버튼(편의): edit일 때만 노출, POST /reviews/{id}/delete -->
+        <form th:if="${mode=='edit'}" th:action="@{|/reviews/${review.id}/delete|}" method="post"
+              style="display:inline-block; margin-left:auto;">
+          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button type="submit" class="rev-btn rev-btn-danger"
+                  onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+        </form>
       </div>
     </form>
-  </div>
+  </section>
 </div>
 
+<!-- 보조 스크립트 -->
 <script>
-  function validateEditForm(form){
-    if (form.rating.value % 0.5 !== 0) { alert('별점은 0.5 단위로만 선택할 수 있습니다.'); return false; }
-    if (form.content.value.trim().length < 50) { alert('내용은 최소 50자 이상 작성해 주세요.'); return false; }
-    return true;
-  }
+  (function(){
+    // 내용 글자수 카운터
+    var content = document.getElementById('content');
+    var counter = document.getElementById('contentCounter');
+    if (content && counter) {
+      var update = function(){
+        var len = (content.value || '').trim().length;
+        counter.textContent = len + '자 / 최소 50자';
+        counter.style.color = (len >= 50) ? '#10b981' : '#6b7280';
+      };
+      content.addEventListener('input', update);
+      update();
+    }
+
+    // 이미지 URL 미리보기
+    var grid = document.getElementById('previewGrid');
+    if (grid) {
+      var inputs = document.querySelectorAll('input[name="imageUrl"]');
+      var render = function(){
+        grid.innerHTML = '';
+        inputs.forEach(function(inp){
+          var url = (inp.value || '').trim();
+          var box = document.createElement('div');
+          if (url) {
+            var img = document.createElement('img');
+            img.className = 'rev-thumb';
+            img.src = url;
+            img.alt = 'preview';
+            box.appendChild(img);
+          } else {
+            var empty = document.createElement('div');
+            empty.className = 'rev-thumb';
+            empty.style.display = 'flex';
+            empty.style.alignItems = 'center';
+            empty.style.justifyContent = 'center';
+            empty.style.color = '#9ca3af';
+            empty.textContent = 'No Image';
+            box.appendChild(empty);
+          }
+          grid.appendChild(box);
+        });
+      };
+      inputs.forEach(function(inp){ inp.addEventListener('input', render); });
+      render();
+    }
+  })();
 </script>
 </body>
 </html>

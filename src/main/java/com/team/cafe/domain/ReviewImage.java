@@ -1,45 +1,60 @@
 package com.team.cafe.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+
+import java.util.Objects;
 
 /**
- * ReviewImage 엔티티
- * - 리뷰에 업로드된 이미지 한 장을 표현하는 도메인 모델
- * - DB 테이블과 매핑되어 각 이미지의 경로/원본 이름/크기/정렬순서 등을 관리
+ * 리뷰 이미지 엔티티.
+ * - Review 와 N:1
+ * - 리뷰당 정렬 순서(sortOrder) 보장
  */
 @Entity
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
-public class ReviewImage {
+@Table(
+        name = "review_images",
+        indexes = {
+                @Index(name = "idx_review_image_review_id_sort", columnList = "review_id, sort_order")
+        }
+)
+public class ReviewImage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // PK (Auto Increment). 각 이미지마다 고유 ID를 자동 생성
     private Long id;
 
-    // (이미지 ↔ 리뷰) N:1 관계
-    // 여러 이미지가 하나의 리뷰에 속함
-    @ManyToOne(optional = false, fetch=FetchType.LAZY)
-    // optional=false → 반드시 리뷰에 속해야 함 (고아 이미지 불가)
-    // LAZY → 실제로 필요할 때만 Review 엔티티를 가져옴 (성능 최적화)
+    /** 소속 리뷰 (지연 로딩) */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "review_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_review_image_review"))
     private Review review;
 
-    // 파일 저장 경로 (예: uploads/reviews/{reviewId}/{uuid}.jpg)
-    // - uuid를 붙여서 파일명이 중복되지 않도록 설계
-    @Column(nullable = false, length = 500)
-    private String urlPath;
+    /** 이미지 접근 경로(또는 파일명) — 선택값 */
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
 
-    // 원본 파일명 (사용자가 업로드한 실제 이름)
-    private String originalFilename;
+    /** 정렬 순서 (0..N-1) */
+    @Column(name = "sort_order", nullable = false)
+    private int sortOrder = 0;
 
-    // 파일 크기(바이트 단위)
-    private Long sizeBytes;
+    // ---- 기본 생성자 ----
+    public ReviewImage() { }  // ✅ protected → public (new ReviewImage() 사용 가능)
 
-    // 이미지 정렬 순서 (0부터 시작 → 첫 번째 이미지, 두 번째 이미지...)
-    // UI에서 대표 이미지/슬라이드 순서 등을 표시할 때 사용
-    @Column(nullable = false)
-    @Builder.Default
-    private Integer sortOrder = 0;
+    // ---- 편의 생성자 ----
+    public ReviewImage(Review review, String imageUrl, int sortOrder) {
+        this.review = Objects.requireNonNull(review, "review는 null일 수 없습니다.");
+        this.imageUrl = imageUrl;
+        this.sortOrder = Math.max(0, sortOrder);
+    }
+
+    // ---- Getter/Setter ----
+    public Long getId() { return id; }
+
+    public Review getReview() { return review; }
+    public void setReview(Review review) { this.review = review; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public int getSortOrder() { return sortOrder; }
+    public void setSortOrder(int sortOrder) { this.sortOrder = Math.max(0, sortOrder); }
 }
