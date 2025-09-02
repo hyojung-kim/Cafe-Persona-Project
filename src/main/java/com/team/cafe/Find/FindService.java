@@ -18,14 +18,14 @@ public class FindService {
     private final UserRepository userRepository;
     private final JavaMailSender mailSender;
 
-    // 인증번호 저장 (간단하게 Map 사용, 실제로는 Redis 등 권장)
+    // 인증번호 저장
     private final Map<String, String> verificationCodes = new HashMap<>();
 
     // 인증번호 생성 & 이메일 발송
     public void sendVerificationCode(String email) {
         // 사용자 존재 여부 확인
         SiteUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("가입된 이메일이 없습니다."));
+                .orElseThrow(() -> new RuntimeException("입력하신 정보와 일치하는 회원 정보가 없습니다. 다시 한 번 입력해주세요."));
 
         // 6자리 랜덤 코드 생성
         String code = String.valueOf((int)(Math.random() * 900000) + 100000);
@@ -51,7 +51,7 @@ public class FindService {
         // 인증 성공 → 아이디 반환
         SiteUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("가입된 이메일이 없습니다."));
-        return user.getUsername(); // SiteUser 엔티티의 username 값
+        return user.getUsername();
     }
 
 }

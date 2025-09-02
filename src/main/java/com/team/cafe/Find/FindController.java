@@ -27,20 +27,30 @@ public class FindController {
     @PostMapping("/user/findId")
     public String searchId( Model model, @RequestParam String email) {
 
-        findService.sendVerificationCode(email);
+        try {
+            findService.sendVerificationCode(email);
         model.addAttribute("email", email);
         // 인증번호 입력창 보여줄지 여부
         model.addAttribute("showVerification", true);
+        } catch (RuntimeException e) {
+            model.addAttribute("errorMessage",
+                    e.getMessage());
+        }
         return "login/find_form";
     }
 
     // 인증번호 확인 및 아이디 출력
     @PostMapping("/user/verifyCode")
-    public String confirmCode(@RequestParam String email,
+    public String verifyCode(@RequestParam String email,
                              @RequestParam String code,
                              Model model) {
-        String username = findService.verifyCodeAndFindId(email, code);
+        try {
+            String username = findService.verifyCodeAndFindId(email, code);
         model.addAttribute("username", username);
+        } catch (RuntimeException e) {
+            model.addAttribute("errorMessage",
+                    e.getMessage());
+        }
         return "login/show_id";
     }
 }
