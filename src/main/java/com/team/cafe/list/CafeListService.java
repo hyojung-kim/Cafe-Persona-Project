@@ -57,7 +57,7 @@ public class CafeListService {
         if (cafe.isPresent()) {
             return cafe.get();
         } else {
-            throw new DataNotFoundException("article not found");
+            throw new DataNotFoundException("cafe not found");
         }
     }
 

@@ -2,11 +2,13 @@ package com.team.cafe.list;
 
 import com.team.cafe.like.LikeService;
 import com.team.cafe.user.sjhy.SiteUser;
+import com.team.cafe.user.sjhy.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class CafeListController {
     //더미용으로 개발한 @AuthenticationPrincipal SiteUser user 사용 추후에 제거해야 합니다 !!!
     private final CafeListService cafeListService;
+    private final UserService userService;
     private final LikeService likeService;
 
     @GetMapping("/list")
@@ -24,8 +27,8 @@ public class CafeListController {
                        @RequestParam(defaultValue = "desc") String dir,
                        @RequestParam(required = false) Boolean parking,  // true면 가능만
                        @RequestParam(required = false) Boolean openNow,  // true면 영업중만
-                       Model model,
-                       @AuthenticationPrincipal SiteUser user) {
+                       Model model
+    ) {
         var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
 
         model.addAttribute("paging", paging);
@@ -41,18 +44,25 @@ public class CafeListController {
 
     @GetMapping("detail/{id}")
     public String detail(@PathVariable Integer id,
-                         @AuthenticationPrincipal SiteUser user,
+                         Principal principal,
                          Model model) {
         Cafe cafe = cafeListService.getById(id);
 
-        boolean liked = false;
-        if (user != null) {
-            // 빠른 체크: existsBy... 좋아요가 눌러져있는지 확인
-            liked = likeService.isLiked(id, user.getId());
-            // (위 메서드 안 쓰려면) liked = cafe.getLikedUsers().contains(user);
-        }
-        long likeCount = likeService.getLikeCount(id); // 좋아요 수
+        // 로그인 사용자 조회
+        SiteUser loginUser = null;
+        if (principal != null) {
+            String username = principal.getName();
+            loginUser = userService.getUser(username);
 
+        }
+        boolean liked = false;
+
+        if (loginUser != null) {
+            // 성능/안정성: 엔티티 equals/hashCode에 의존하지 말고 ID로 체크
+            liked = likeService.isLiked(id, loginUser.getId());
+        }
+
+        long likeCount = likeService.getLikeCount(id); // 좋아요 수
         boolean openNow = cafeListService.isOpenNow(cafe); //영업상태
 
         model.addAttribute("cafe", cafe);
@@ -65,9 +75,15 @@ public class CafeListController {
     //@PreAuthorize("isAuthenticated()") 써야할까 고민 중
     @PostMapping("/detail/{id}/like")
     public String toggleLike(@PathVariable Integer id,
-                             @AuthenticationPrincipal SiteUser user) {
-        if (user == null) return "redirect:/dummy/login/1?next=/cafe/" + id; // 로컬 편의
+                             Principal principal) {
+        if (principal == null) {
+            return "redirect:/user/login";
+        }
+        // username → 사용자 ID 조회(엔티티 통째로 안 가져와도 되게 메서드 준비 권장)
+        SiteUser user = userService.getUser(principal.getName());
+
         likeService.toggle(id, user.getId());
+
         return "redirect:/cafe/detail/" + id; // 상세로 복귀
     }
 

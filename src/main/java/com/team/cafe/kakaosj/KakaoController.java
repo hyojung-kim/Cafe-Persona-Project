@@ -1,10 +1,13 @@
 package com.team.cafe.kakaosj;
 
 import com.team.cafe.user.sjhy.SiteUser;
+import com.team.cafe.user.sjhy.UserSecurityService;
 import com.team.cafe.user.sjhy.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +22,7 @@ public class KakaoController {
 
     private final KakaoService kakaoService;
     private final UserService userService;
+    private final UserSecurityService userSecurityService;
 
     @GetMapping("/callback")
     public String kakaoCallback(@RequestParam String code) {
@@ -33,8 +37,17 @@ public class KakaoController {
         String email = (String) kakaoAccount.get("email");
         String nickname = (String)((Map<String, Object>)kakaoAccount.get("profile")).get("nickname");
 
+        // 이메일이 없을 경우 임시 이메일 생성
+        if (email == null || email.isBlank()) {
+            email = "kakao_" + kakaoId + "@noemail.com";
+        }
+
         // 3. DB 회원 조회/등록
-        SiteUser user = userService.registerOrGetKakaoUser(kakaoId, email, nickname);
+        SiteUser siteUser = userService.registerOrGetKakaoUser(kakaoId, email, nickname);
+
+        // SiteUser(Entity)가 아닌 userDetails(security)기반으로 인증 여부를 판단하게 하기 위함.
+        User user = (User) userSecurityService.loadUserByUsername(siteUser.getUsername());
+
 
         // 4. Spring Security 로그인 처리
         UsernamePasswordAuthenticationToken auth =
