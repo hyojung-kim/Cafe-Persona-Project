@@ -3,6 +3,7 @@ package com.team.cafe.list;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,7 +50,11 @@ public class CafeListController {
     @GetMapping("detail/{id}")
     public String detail(@PathVariable Integer id,
                          Principal principal,
+                         HttpSession session,
                          Model model) {
+
+        // 조회수 세션당 1회 증가(원하면 increaseViewEveryHit)
+        cafeListService.increaseViewOncePerSession(id, session);
         Cafe cafe = cafeListService.getById(id);
 
         // 로그인 사용자 조회

@@ -39,6 +39,7 @@
         <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
         <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
     </p>
+    <span class="muted">조회수: <strong th:text="${cafe.hitCount}">0</strong></span>
 
 
 

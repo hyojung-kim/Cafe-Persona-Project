@@ -54,6 +54,7 @@
             <th>전화</th>
             <th>웹사이트</th>
             <th>날짜</th>
+            <th>조회수</th>
         </tr>
         </thead>
         <tbody>
@@ -100,6 +101,9 @@
             </td>
             <td th:text="${#temporals.format(cafeList.createdAt, 'yyyy-MM-dd HH:mm')}">
                 등록일
+            </td>
+            <td th:text="${cafeList.hitCount}">
+                0
             </td>
         </tr>
         </tbody>

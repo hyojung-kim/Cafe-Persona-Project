@@ -3,9 +3,11 @@ package com.team.cafe.list;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface CafeListRepository extends JpaRepository<Cafe, Integer> {
@@ -47,4 +49,9 @@ public interface CafeListRepository extends JpaRepository<Cafe, Integer> {
 
     // (선택) 해당 유저가 이 카페를 좋아요 했는지 빠르게 체크하고 싶을 때
     boolean existsByIdAndLikedUsers_Id(Integer cafeId, Long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("update Cafe c set c.hitCount = c.hitCount + 1 where c.id = :id")
+    int incrementHitCount(@Param("id") Integer id);
 }

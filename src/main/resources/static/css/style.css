@@ -38,3 +38,83 @@ a:hover {
 .reset-btn:hover {
  background:#e1ebff;
 }
+
+
+/* 테이블 기본 */
+.cafe-table, table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #1f2430;
+  table-layout: fixed;            /* 칼럼 너비 고정 + 말줄임 처리 가능 */
+}
+
+/* 헤더 */
+.cafe-table thead th,
+table thead th {
+  text-align: left;
+  background: #f7f9fc;
+  color: #3a4152;
+  font-weight: 700;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e8edf5;
+  position: sticky;               /* 스크롤 시 헤더 고정 (table-wrap 안에서) */
+  top: 0;
+  z-index: 1;
+}
+
+/* 본문 셀 */
+.cafe-table tbody td,
+table tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #f1f3f7;
+}
+
+/* 지브라(줄무늬) + 행 호버 */
+.cafe-table tbody tr:nth-child(even),
+table tbody tr:nth-child(even)   { background: #fbfcfe; }
+.cafe-table tbody tr:hover,
+table tbody tr:hover             { background: #f2f6ff; }
+
+/* 링크 색상 */
+.cafe-table a, table a {
+  color: #2b67ff; text-decoration: none;
+}
+.cafe-table a:hover, table a:hover {
+  text-decoration: underline;
+}
+/* 각 칼럼 너비/정렬 (열 순서: ID, 이름, 주소, 도시/구, 영업시간, 주차, 전화, 웹사이트, 날짜, 조회수) */
+.cafe-table thead th:nth-child(1),
+table thead th:nth-child(1)  { width: 64px; }
+.cafe-table thead th:nth-child(6),
+table thead th:nth-child(6)  { width: 80px; text-align: center; }
+.cafe-table thead th:nth-child(7),
+table thead th:nth-child(7)  { width: 120px; text-align: center; }
+.cafe-table thead th:nth-child(8),
+table thead th:nth-child(8)  { width: 110px; text-align: center; }
+.cafe-table thead th:nth-child(9),
+table thead th:nth-child(9)  { width: 150px; }
+.cafe-table thead th:nth-child(10),
+table thead th:nth-child(10) { width: 90px; text-align: right; }
+
+/* 숫자/짧은 값 정렬 */
+.cafe-table tbody td:nth-child(1),
+table tbody td:nth-child(1)  { text-align: right; color: #343b4a; }
+.cafe-table tbody td:nth-child(6),
+table tbody td:nth-child(6),
+.cafe-table tbody td:nth-child(7),
+table tbody td:nth-child(7),
+.cafe-table tbody td:nth-child(8),
+table tbody td:nth-child(8)  { text-align: center; }
+.cafe-table tbody td:nth-child(10),
+table tbody td:nth-child(10) { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* 긴 텍스트 말줄임 (주소/웹사이트) */
+.cafe-table td:nth-child(3),
+table td:nth-child(3),
+.cafe-table td:nth-child(8),
+table td:nth-child(8) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
