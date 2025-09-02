@@ -16,20 +16,31 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequiredArgsConstructor
 public class FindController {
 
-    private final UserRepository userRepository;
-    private final UserService userService;
+    private final FindService findService;
 
     @GetMapping("/user/findId")
     public String findId() {
         return "/login/find_form";
     }
 
+    //인증메일 발송
     @PostMapping("/user/findId")
     @ResponseBody
-    public String searchId(HttpServletRequest request, Model model,
-                           @RequestParam String email) {
-//    String result = String.valueOf(userRepository.findByEmail(email));
-//
-            return "redirect:/";// 임시임
+    public String searchId( Model model, @RequestParam String email) {
+
+        findService.sendVerificationCode(email);
+        model.addAttribute("email", email);
+        return "login/find_form";
+    }
+
+    // 인증번호 확인 및 아이디 출력
+    @PostMapping("/user/confirmCode")
+    public String confirmCode(@RequestParam String email,
+                             @RequestParam String code,
+                             Model model) {
+        String username = findService.verifyCodeAndFindId(email, code);
+        model.addAttribute("username", username);
+        return "login/show_id"; // 아이디 보여주는 페이지
     }
 }
+
