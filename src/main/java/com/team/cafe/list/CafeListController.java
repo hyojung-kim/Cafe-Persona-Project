@@ -4,13 +4,15 @@ import com.team.cafe.like.LikeService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -74,36 +76,29 @@ public class CafeListController {
         return "cafe/cafe_detail";
     }
 
-    //@PreAuthorize("isAuthenticated()") 써야할까 고민 중
-//    @PostMapping("/detail/{id}/like")
-//    public String toggleLike(@PathVariable Integer id,
-//                             Principal principal) {
-//        if (principal == null) {
-//            return "redirect:/user/login";
-//        }
-//        // username → 사용자 ID 조회(엔티티 통째로 안 가져와도 되게 메서드 준비 권장)
-//        SiteUser user = userService.getUser(principal.getName());
-//
-//        likeService.toggle(id, user.getId());
-//        return "redirect:/cafe/detail/" + id; // 상세로 복귀
-//    }
-
     // Ajax 컨트롤러
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping(value = "/like/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String toggle(@PathVariable("id") Integer id, Principal principal) {
+    // @PreAuthorize("isAuthenticated()")
+    // 상태 변경은 POST로
+    @PostMapping(value = "/like/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> toggle(@PathVariable Integer id, Principal principal) {
+        if (principal == null) {
+            // 비로그인 → 401
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         SiteUser user = userService.getUser(principal.getName());
-        likeService.toggle(id, user.getId());
-        long count = likeService.getLikeCount(id);
-        return Long.toString(count);
-    }
 
-    @GetMapping(value = "/like/{id}/count", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String count(@PathVariable("id") Integer id) {
-        long count = likeService.getLikeCount(id);
-        return Long.toString(count);
-    }
+        // toggle이 true/false(현재 상태) 반환하도록 만들면 최고
+        boolean liked = likeService.toggle(id, user.getId());
 
+        // 만약 toggle이 void라면:
+        // boolean liked = likeService.isLiked(id, user.getId());
+
+        long count = likeService.getLikeCount(id);
+
+        return ResponseEntity.ok(Map.of(
+                "count", count,
+                "liked", liked
+        ));
+    }
 }
