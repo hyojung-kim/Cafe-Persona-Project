@@ -70,6 +70,12 @@ dependencies {
 	// WebFlux의 네트워크 통신엔진인데 API 쓰려고 넣음
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'io.projectreactor.netty:reactor-netty:1.1.19'
+
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+
 }
 
 // 테스트 프레임워크 인데 주피터노트북이나 주피터랩 방식이라고 생각하면 됨
