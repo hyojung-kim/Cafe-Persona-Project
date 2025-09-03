@@ -1,0 +1,19 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+    <table>
+        <thead>
+        <tr>
+            <th>기본키</th>
+            <th>DB</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="testList : ${testList}">
+            <td th:text="${testList.id}"></td>
+            <td th:text="${testList.db}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>사업자 회원가입</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        /* 라벨: 왼쪽 끝 정렬, 고정 너비 */
+        .form-row label {
+            width: 120px;
+            text-align: right;
+            margin-right: 80px;
+        }
+
+        /* 입력폼: 고정 너비 250px */
+        .form-row input {
+            width: 250px;
+        }
+
+        /* 메시지: 입력폼 오른쪽 바깥 */
+        .validation-message {
+            margin-left: 10px;
+            font-size: 0.875rem;
+        }
+        .text-danger { color: #dc3545; }
+        .text-success { color: #28a745; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="container py-5">
+
+<h2 class="mb-4 text-center">사업자 회원가입</h2>
+
+<form th:action="@{/business/signup}" method="post" onsubmit="return validateForm(event)">
+
+    <!-- 아이디 -->
+    <div class="form-row">
+        <label for="username">아이디</label>
+        <input type="text" class="form-control" id="username" name="username" required>
+        <span class="validation-message text-danger hidden" id="usernameError">이미 사용 중</span>
+        <span class="validation-message text-success hidden" id="usernameSuccess">사용 가능</span>
+    </div>
+
+    <!-- 이메일 -->
+    <div class="form-row">
+        <label for="email">이메일</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+        <span class="validation-message text-danger hidden" id="emailError">이미 사용 중</span>
+        <span class="validation-message text-success hidden" id="emailSuccess">사용 가능</span>
+    </div>
+
+    <!-- 사업자명 -->
+    <div class="form-row">
+        <label for="companyName">사업자명</label>
+        <input type="text" class="form-control" id="companyName" name="companyName" required>
+    </div>
+
+    <!-- 사업자등록번호 -->
+    <div class="form-row">
+        <label for="businessNumber">사업자등록번호</label>
+        <input type="text" class="form-control" id="businessNumber" name="businessNumber" placeholder="예: 123-45-67890" required>
+        <span class="validation-message text-danger hidden" id="businessNumberError">잘못된 번호 형식</span>
+        <span class="validation-message text-success hidden" id="businessNumberSuccess">확인 완료</span>
+    </div>
+
+    <!-- 대표자명 -->
+    <div class="form-row">
+        <label for="ceoName">대표자명</label>
+        <input type="text" class="form-control" id="ceoName" name="ceoName" required>
+    </div>
+
+    <!-- 사업장 주소 -->
+    <div class="form-row">
+        <label for="address">사업장 주소</label>
+        <input type="text" class="form-control" id="address" name="address" required>
+    </div>
+
+    <!-- 연락처 -->
+    <div class="form-row">
+        <label for="phone">연락처</label>
+        <input type="tel" class="form-control" id="phone" name="phone" placeholder="예: 010-1234-5678" required>
+    </div>
+
+    <!-- 비밀번호 -->
+    <div class="form-row">
+        <label for="password">비밀번호</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+        <span class="validation-message text-danger" id="passwordError">8자 이상, 특수문자 포함</span>
+    </div>
+
+    <!-- 비밀번호 확인 -->
+    <div class="form-row">
+        <label for="passwordConfirm">비밀번호 확인</label>
+        <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" required>
+        <span class="validation-message text-danger hidden" id="passwordConfirmError">비밀번호 불일치</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">회원가입</button>
+</form>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">알림</h5></div>
+            <div class="modal-body"><p id="alertMessage"></p></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/business-signup.js" defer></script>
+
+</body>
+</html>
