@@ -33,7 +33,7 @@ public class FindController {
             // 인증번호 입력창 보여줄지 여부
             model.addAttribute("showVerification", true);
         } catch (RuntimeException e) {
-            model.addAttribute("errorMessage",
+            model.addAttribute("emailError",
                     e.getMessage());
         }
         return "login/find_form";
@@ -49,7 +49,7 @@ public class FindController {
             model.addAttribute("username", username);
             return "login/show_id";
         } catch (RuntimeException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("codeError", e.getMessage());
             model.addAttribute("email", email);
             model.addAttribute("showVerification", true); // 다시 인증번호 입력 폼 표시
             return "login/find_form";
