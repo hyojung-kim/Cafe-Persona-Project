@@ -237,13 +237,31 @@ public class ReviewController {
     public static class CreateReviewForm {
         @DecimalMin(value = "1.0", message = "별점은 1.0 이상이어야 합니다.")
         @DecimalMax(value = "5.0", message = "별점은 5.0 이하여야 합니다.")
-        public Double rating;
+        private Double rating;
 
         @NotBlank(message = "내용을 입력하세요.")
         @Size(min = 50, message = "리뷰 내용은 50자 이상이어야 합니다.")
-        public String content;
+        private String content;
 
-        /** 이미지 URL 배열(name="imageUrl")로 받음 (최대 5장) */
-        public List<String> imageUrl = new ArrayList<>();
+        private List<String> imageUrl = new ArrayList<>();
+
+        public CreateReviewForm() {}
+
+        public Double getRating() { return rating; }
+        public void setRating(Double rating) { this.rating = rating; }
+
+        public String getContent() { return content; }
+        public void setContent(String content) { this.content = content; }
+
+        public List<String> getImageUrl() { return imageUrl; }
+        public void setImageUrl(List<String> imageUrl) { this.imageUrl = imageUrl; }
     }
+
+    // ReviewController 내부에 추가
+    // 폼업 객체 보장
+    @ModelAttribute("form")
+    public CreateReviewForm formBacking() {
+        return new CreateReviewForm();
+    }
+
 }
