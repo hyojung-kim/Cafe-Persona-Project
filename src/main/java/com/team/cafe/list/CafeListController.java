@@ -28,7 +28,7 @@ public class CafeListController {
                        @RequestParam(required = false) Boolean parking,  // true면 가능만
                        @RequestParam(required = false) Boolean openNow,  // true면 영업중만
                        Model model
-    ) {
+                       ) {
         var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
 
         model.addAttribute("paging", paging);
