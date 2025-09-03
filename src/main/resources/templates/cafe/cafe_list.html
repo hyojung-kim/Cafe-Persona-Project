@@ -1,0 +1,129 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+
+    <div sec:authorize="isAuthenticated()">
+        안녕하세요, <b sec:authentication="principal.username">사용자</b> 님!
+    </div>
+
+    <div sec:authorize="isAnonymous()">
+        로그인하지 않은 상태입니다.
+    </div>
+
+
+    <h2>카페 목록</h2>
+
+    <!-- 검색 + 정렬 폼 -->
+    <form th:action="@{/cafe/list}" method="get" style="margin-bottom:12px; display:flex; gap:8px; justify-content:flex-end;">
+        <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}">
+        <select name="sort" th:value="${sort}">
+            <option value="createdAt">최신순</option>
+            <option value="name">이름순</option>
+            <option value="hit">인기순</option>
+        </select>
+        <select name="dir" th:value="${dir}">
+            <option value="desc">내림차순</option>
+            <option value="asc">오름차순</option>
+        </select>
+        <input type="hidden" name="size" th:value="${size}">
+        <button type="submit">적용</button>
+
+        <div style="display:flex; gap:12px; align-items:center;">
+            <label>
+                <input type="checkbox" name="parking" value="true"
+                       th:checked="${parking != null and parking}"
+                       onchange="this.form.submit()"> 주차 가능만
+            </label>
+
+            <label>
+                <input type="checkbox" name="openNow" value="true"
+                       th:checked="${openNow != null and openNow}"
+                       onchange="this.form.submit()"> 지금 영업중만
+            </label>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>이름</th>
+            <th>주소</th>
+            <th>도시/구</th>
+            <th>영업시간</th>
+            <th>주차</th>
+            <th>전화</th>
+            <th>웹사이트</th>
+            <th>날짜</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 빈 목록 처리 -->
+        <tr th:if="${#lists.isEmpty(paging)}">
+            <td colspan="8" class="muted">등록된 카페가 없습니다.</td>
+        </tr>
+
+        <!-- 리스트 출력 -->
+        <tr th:each="cafeList : ${paging}">
+            <td th:text="${cafeList.id}">1</td>
+            <td>
+                <a th:href="@{|/cafe/detail/${cafeList.id}|}" th:text="${cafeList.name}">카페명</a>
+            </td>
+
+
+            <td>
+                <span th:text="${cafeList.address1}">주소1</span>
+                <span th:if="${cafeList.address2 != null and !#strings.isEmpty(cafeList.address2)}"
+                      th:text="' ' + ${cafeList.address2}"></span>
+            </td>
+
+            <td>
+                <span th:text="${cafeList.city}">도시</span> /
+                <span th:text="${cafeList.district}">구</span>
+            </td>
+
+            <td>
+                <!-- 둘 다 있을 때만 시간 표시 -->
+                <span th:if="${cafeList.openTime != null and cafeList.closeTime != null}"
+                      th:text="|${#temporals.format(cafeList.openTime,'HH:mm')} ~ ${#temporals.format(cafeList.closeTime,'HH:mm')}|">
+          09:00 ~ 22:00
+        </span>
+                <span th:unless="${cafeList.openTime != null and cafeList.closeTime != null}" class="muted">미등록</span>
+            </td>
+
+            <td th:text="${cafeList.parkingYn} ? '가능' : '불가'">가능</td>
+            <td th:text="${cafeList.phoneNum}">010-0000-0000</td>
+
+            <td>
+                <a th:if="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}"
+                   th:href="${cafeList.siteUrl}" target="_blank" rel="noopener">바로가기</a>
+                <span th:unless="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}" class="muted">없음</span>
+            </td>
+            <td th:text="${#temporals.format(cafeList.createdAt, 'yyyy-MM-dd HH:mm')}">
+                등록일
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이징: 모든 파라미터 유지 -->
+    <div style="margin-top:20px; text-align:center" th:if="${!paging.isEmpty()}">
+        <a th:if="${!paging.first}"
+           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">이전</a>
+
+        <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
+              th:if="${p >= paging.number-5 and p <= paging.number+5}">
+            <a th:if="${p != paging.number}"
+                th:text="${p+1}"
+                th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}"></a>
+            <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
+        </span>
+
+        <a th:if="${!paging.last}"
+           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">다음</a>
+    </div>
+
+
+
+
+</div>
+</html>
