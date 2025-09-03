@@ -269,6 +269,31 @@ function validatePasswordConfirm() {
     }
 }
 
+/* ================= 주소 검색 팝업 ================= */
+function openAddressPopup() {
+    // 기존 팝업 열기 방식 유지
+    window.open('/jusoPopup', '주소검색', 'width=500,height=600,scrollbars=yes');
+}
+
+/* 팝업에서 선택 후 부모 창에 값 넣기 */
+function jusoCallBack(selectedAddress) {
+    const addressInput = document.getElementById("address");
+    const detailInput = document.getElementById("addressDetail");
+
+    if (addressInput) {
+        addressInput.value = selectedAddress.roadAddr || selectedAddress.jibunAddr || '';
+        detailInput.focus();
+    }
+}
+
+
+
+
+
+
+
+
+
 /* ================== 메인 실행 ================== */
 const checkUsername = attachUsernameCheck();
 const checkEmail = attachEmailCheck();
@@ -296,53 +321,11 @@ async function validateForm(e) {
 
     return true;
 
-    async function validateForm(e) {
-        const address = document.getElementById("address").value;
-        if (!address) {
-            showAlert("주소를 검색해주세요.");
-            e.preventDefault();
-            return false;
-        }
+
 
 }
 
 
-const API_KEY = "devU01TX0FVVEgyMDI1MDkwMjE4MzA0MDExNjEzOTI=";
 
-async function searchAddress() {
-    const query = prompt("검색할 주소를 입력하세요."); // 간단히 prompt 사용, 필요하면 input으로 대체
-    if (!query) return;
 
-    try {
-        const response = await fetch(`https://api.odcloud.kr/api/nts-address/v1/search?serviceKey=${API_KEY}&keyword=${encodeURIComponent(query)}&type=json`);
-        const data = await response.json();
-
-        const resultsContainer = document.getElementById("addressResults");
-        resultsContainer.innerHTML = "";
-        resultsContainer.classList.remove("hidden");
-
-        if (data.results && data.results.length > 0) {
-            data.results.forEach(item => {
-                const div = document.createElement("div");
-                div.style.padding = "5px";
-                div.style.cursor = "pointer";
-                div.innerText = item.roadAddr; // API 문서에 맞게 필드 변경
-                div.onclick = () => selectAddress(item);
-                resultsContainer.appendChild(div);
-            });
-        } else {
-            resultsContainer.innerHTML = "<div style='padding:5px;'>검색 결과가 없습니다.</div>";
-        }
-
-    } catch (err) {
-        console.error("주소 검색 오류:", err);
-        alert("주소 검색 중 오류가 발생했습니다.");
-    }
-}
-
-function selectAddress(item) {
-    document.getElementById("address").value = item.roadAddr; // API 문서 필드 확인 필요
-    document.getElementById("addressResults").classList.add("hidden");
-    document.getElementById("addressDetail").focus();
-}
 

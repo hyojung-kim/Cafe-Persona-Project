@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>주소 검색</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 10px; }
+        #results { border:1px solid #ddd; max-height: 400px; overflow-y:auto; margin-top:10px; }
+        .address-item { padding:5px; cursor:pointer; border-bottom:1px solid #eee; }
+        .address-item:hover { background-color:#f0f0f0; }
+    </style>
+</head>
+<body>
+<h3>도로명 주소 검색</h3>
+
+<input type="text" id="query" placeholder="주소를 입력하세요" style="width:70%;">
+<button type="button" onclick="searchAddress()">검색</button>
+
+<div id="results"></div>
+
+<script>
+    async function searchAddress() {
+        const query = document.getElementById("query").value.trim();
+        if (!query) return alert("검색어를 입력해주세요.");
+
+        try {
+            // 우리 서버에서 검색 API 호출
+            const res = await fetch(`/businessuser/address/search?keyword=${encodeURIComponent(query)}`);
+            const data = await res.json();
+
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";
+
+            if (data.results && data.results.length > 0) {
+                data.results.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "address-item";
+                    div.innerText = item.roadAddr;
+                    div.onclick = () => selectAddress(item.roadAddr);
+                    resultsDiv.appendChild(div);
+                });
+            } else {
+                resultsDiv.innerHTML = "<p>검색 결과가 없습니다.</p>";
+            }
+        } catch (err) {
+            console.error(err);
+            alert("주소 검색 중 오류가 발생했습니다.");
+        }
+    }
+
+    function selectAddress(roadAddr) {
+        if (window.opener && !window.opener.closed) {
+            window.opener.document.getElementById("address").value = roadAddr;
+            window.opener.document.getElementById("addressDetail").focus();
+            window.close();
+        }
+    }
+</script>
+</body>
+</html>
