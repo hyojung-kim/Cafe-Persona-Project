@@ -1,4 +1,4 @@
 package com.team.cafe.businessuser.sj;
 
-public class BusinessUserCreateForm {
+public class BusinessNumverRequest {
 }

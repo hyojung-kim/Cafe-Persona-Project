@@ -244,7 +244,7 @@ public class ReviewController {
 
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
-        Long cafeId = (review.getCafe() != null) ? review.getCafe().getId().longValue() : null;
+        Long cafeId = (review.getCafe() != null) ? review.getCafe().getId() : null;
 
         reviewService.deleteReview(id, me);
 

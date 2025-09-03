@@ -119,7 +119,7 @@ public class Review extends BaseEntity {
 
     /**
      * 이미지 추가(편의 메서드)
-     * - 기본적으로 다음 순번(sortOrder = 현재 크기)으로 삽입
+     * - 기본적으로 다음 순번(sortOrder = 현재 크기)으로 삽입R
      * - 리뷰당 최대 5장 가드(초과 시 IllegalStateException) — 서비스에서 사전 검증 권장
      */
     public void addImage(ReviewImage image) {

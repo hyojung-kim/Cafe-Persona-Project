@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
         name = "cafe_image",
         indexes = {
                 @Index(name = "idx_cafe_image_cafe", columnList = "cafe_id"),
-                @Index(name = "idx_cafe_image_primary_sort", columnList = "is_primary, sort_order")
+//                @Index(name = "idx_cafe_image_primary_sort", columnList = "is_primary, sort_order")
         }
 )
 public class CafeImage {

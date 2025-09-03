@@ -1,6 +1,7 @@
 package com.team.cafe.user.sjhy;
 
 import com.team.cafe.bookmark.Bookmark;
+import com.team.cafe.businessuser.sj.BusinessUser;
 import com.team.cafe.review.Review;
 import com.team.cafe.review.ReviewLike;
 import jakarta.persistence.*;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -67,14 +69,13 @@ public class SiteUser implements UserDetails {
 //    private boolean active = true;
 
     // --- 관계 매핑 ---
-    // ✅ Review 쪽 필드명이 'author' 이므로 mappedBy도 'author'로 맞춘다.
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     @Comment("작성한 리뷰 목록")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Comment("북마크 목록")
-    private List<Bookmark> bookmarks;
+    private List<Bookmark> bookmark;
 
     // ✅ ReviewLike 중간 엔티티를 통한 좋아요 목록
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -97,12 +98,15 @@ public class SiteUser implements UserDetails {
     public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
-
-    @Override
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
     public boolean isEnabled() { return true; }
+
+
+
+    // 일반 회원과 비즈니스 회원 1:1 연결
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private BusinessUser businessUser;
 }
 

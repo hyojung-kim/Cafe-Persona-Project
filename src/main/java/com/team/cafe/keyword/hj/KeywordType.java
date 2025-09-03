@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 public class KeywordType {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name="type_name", length=30, nullable=false)
     private String typeName; // persona / space / menu 등
