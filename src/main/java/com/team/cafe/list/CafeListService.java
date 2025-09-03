@@ -2,15 +2,19 @@ package com.team.cafe.list;
 
 import com.team.cafe.DataNotFoundException;
 import com.team.cafe.review.ReviewRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -97,10 +101,19 @@ public class CafeListService {
         return !now.isBefore(cafe.getOpenTime()) && !now.isAfter(cafe.getCloseTime());
     }
 
+    /** 같은 세션에서 같은 카페 상세는 1회만 카운트 */
+    @Transactional
+    public void increaseViewOncePerSession(Integer cafeId, HttpSession session) {
+        @SuppressWarnings("unchecked")
+        Set<Integer> viewed = (Set<Integer>) session.getAttribute("viewed_cafes");
+        if (viewed == null) {
+            viewed = new HashSet<>();
+            session.setAttribute("viewed_cafes", viewed);
+        }
+        if (viewed.add(cafeId)) {
+            cafeListRepository.incrementHitCount(cafeId);
+        }
+    }
 
-//    public Cafe getCafe(Integer id) {
-//        return cafeRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("카페 없음: " + id));
-//    }
 
 }

@@ -111,9 +111,37 @@ VALUES
   ( NULL, 'USER', '현영', 'hy', 'hy@example.com', '1234'),
   ( NOW(6), 'USER', '상진', 'sj', 'sj@example.com', '1234');
 
+
+INSERT INTO cafe_image (cafe_id, img_url, created_at)
+VALUES
+(2,  '/images/DBimg.png', now()),
+(1,  '/images/DBimg.png', now()),
+(3,  '/images/DBimg.png', now()),
+(4,  '/images/DBimg.png', now()),
+(5,  '/images/DBimg.png', now()),
+(6,  '/images/DBimg.png', now()),
+(7,  '/images/DBimg.png', now()),
+(8,  '/images/DBimg.png', now()),
+(9,  '/images/DBimg.png', now()),
+(10, '/images/DBimg.png', now()),
+(11, '/images/DBimg.png', now()),
+(12, '/images/DBimg.png', now()),
+(13, '/images/DBimg.png', now()),
+(14, '/images/DBimg.png', now()),
+(15, '/images/DBimg.PNG', now()),
+(16, '/images/DBimg.PNG', now()),
+(17, '/images/DBimg.PNG', now()),
+(18, '/images/DBimg.PNG', now()),
+(19, '/images/DBimg.PNG', now()),
+(20, '/images/DBimg.PNG', now());
+
+
+
+
+select * from cafe_image;
 select * from site_user;
 desc site_user;
 
 select * from cafe;
--- DELETE FROM site_user;
+-- DELETE FROM cafe_image;
 -- DELETE FROM cafe;

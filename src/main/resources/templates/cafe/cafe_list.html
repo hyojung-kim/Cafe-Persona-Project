@@ -54,6 +54,8 @@
             <th>전화</th>
             <th>웹사이트</th>
             <th>날짜</th>
+            <th>조회수</th>
+            <th style="width:120px;">이미지</th>
         </tr>
         </thead>
         <tbody>
@@ -101,6 +103,15 @@
             <td th:text="${#temporals.format(cafeList.createdAt, 'yyyy-MM-dd HH:mm')}">
                 등록일
             </td>
+            <td th:text="${cafeList.hitCount}">
+                0
+            </td>
+            <td class="thumb">
+                <a th:href="@{|/cafe/detail/${cafeList.id}|}">
+                    <img th:src="${imageMap[cafeList.id]} ?: '/images/DBimg.PNG'"
+                         alt="noImg" loading="lazy" class="thumb-img">
+                </a>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -113,8 +124,8 @@
         <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
               th:if="${p >= paging.number-5 and p <= paging.number+5}">
             <a th:if="${p != paging.number}"
-                th:text="${p+1}"
-                th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}"></a>
+               th:text="${p+1}"
+               th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}"></a>
             <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
         </span>
 
@@ -122,8 +133,63 @@
            th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">다음</a>
     </div>
 
+    <!-- 결과 요약 + 활성 필터 칩 -->
+    <div class="results-bar">
+        <div class="left">
+            <strong th:text="|총 ${paging.totalElements}개 결과|">총 0개 결과</strong>
+        </div>
 
+        <div class="right active-filters">
+            <!-- 검색어 -->
+            <span class="chip" th:if="${kw}">검색:<strong th:text="${kw}">키워드</strong>
+                <button type="button" class="chip__x" onclick="removeFilter('kw')">×</button>
+            </span>
 
+            <!-- 지역 -->
+            <span class="chip" th:if="${city}">도시:
+                <strong th:text="${city}">대전</strong>
+                <button type="button" class="chip__x" onclick="removeFilter('city')">×</button>
+            </span>
+            <span class="chip" th:if="${district}">구:
+                <strong th:text="${district}">서구</strong>
+                <button type="button" class="chip__x" onclick="removeFilter('district')">×</button>
+            </span>
 
+            <!-- 정렬 -->
+            <span class="chip" th:if="${sort}">정렬:
+                <strong th:text="${sort}">최신순</strong>
+                <button type="button" class="chip__x" onclick="removeFilter('sort')">×</button>
+            </span>
+            <span class="chip" th:if="${dir}">방향:
+                <strong th:text="${dir}">내림차순</strong>
+                <button type="button" class="chip__x" onclick="removeFilter('dir')">×</button>
+            </span>
+
+            <!-- 체크박스 필터 (Boolean) -->
+            <span class="chip" th:if="${parking}">주차 가능
+                <button type="button" class="chip__x" onclick="removeFilter('parking')">×</button>
+            </span>
+            <span class="chip" th:if="${openNow}">영업중
+                <button type="button" class="chip__x" onclick="removeFilter('openNow')">×</button>
+            </span>
+
+            <!-- 전체 초기화 -->
+            <button type="button" class="reset-btn" onclick="resetFilters()">필터 초기화</button>
+        </div>
+    </div>
+
+    <form th:action="@{/cafe/list}" method="get" id="searchForm">
+        <input type="hidden" id="page" name="page" th:value="${paging.number}">
+        <input type="hidden" id="kw" name="kw" th:value="${kw}">
+        <input type="hidden" id="city" name="city" th:value="${city}">
+        <input type="hidden" id="district" name="district" th:value="${district}">
+        <input type="hidden" id="sort" name="sort" th:value="${sort}">
+        <input type="hidden" id="dir" name="dir" th:value="${dir}">
+        <!-- Boolean 필터는 값이 'true'거나 비어있는 방식 중 하나를 선택해 사용하세요 -->
+        <input type="hidden" id="parking" name="parking" th:value="${parking}">
+        <input type="hidden" id="openNow" name="openNow" th:value="${openNow}">
+    </form>
+
+    <script src="/js/filter-chip.js"></script>
 </div>
 </html>
