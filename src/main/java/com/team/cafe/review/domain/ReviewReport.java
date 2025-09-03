@@ -1,4 +1,4 @@
-package com.team.cafe.review;
+package com.team.cafe.review.domain;
 
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;

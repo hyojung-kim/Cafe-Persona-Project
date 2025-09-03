@@ -3,7 +3,7 @@ package com.team.cafe.list;
 
 import com.team.cafe.bookmark.Bookmark;
 import com.team.cafe.keyword.CafeKeyword;
-import com.team.cafe.review.Review;
+import com.team.cafe.review.domain.Review;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,19 +1,22 @@
-package com.team.cafe.review;
+package com.team.cafe.review.service;
 
 import com.team.cafe.list.Cafe;
 import com.team.cafe.list.CafeListRepository;
+import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.domain.ReviewImage;
+import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.user.sjhy.SiteUser;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Service
-@Transactional
+@Transactional // 기본: write 트랜잭션. 읽기 전용 메서드에만 readOnly=true 지정
 public class ReviewService {
 
     private final CafeListRepository cafeListRepository;
@@ -28,21 +31,21 @@ public class ReviewService {
     // ========================= 조회 =========================
 
     /** 카페별 활성 리뷰 페이징 */
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<Review> getActiveReviewsByCafe(Long cafeId, Pageable pageable) {
         Objects.requireNonNull(cafeId, "cafeId is required");
         return reviewRepository.findByCafe_IdAndActiveTrue(cafeId, pageable);
     }
 
     /** 카페별 활성 리뷰 페이징 + author/images 동시 로딩(N+1 방지) */
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<Review> getActiveReviewsByCafeWithAuthorImages(Long cafeId, Pageable pageable) {
         Objects.requireNonNull(cafeId, "cafeId is required");
         return reviewRepository.findByCafe_IdAndActiveTrueFetchAuthorImages(cafeId, pageable);
     }
 
     /** 작성자별 활성 리뷰 페이징 */
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<Review> getActiveReviewsByAuthor(Long authorId, Pageable pageable) {
         Objects.requireNonNull(authorId, "authorId is required");
         return reviewRepository.findByAuthor_IdAndActiveTrue(authorId, pageable);
@@ -52,7 +55,7 @@ public class ReviewService {
 
     /**
      * 리뷰 생성 + 이미지 최대 5장 저장
-     * - 양방향 연관관계 일관성 보장: review.addImage(...) 사용
+     * - 빈/공백 URL 제거 후 최대 5개만 반영
      * - 부모(review)만 save (cascade = ALL, orphanRemoval = true)
      */
     public Review createReview(Long cafeId,
@@ -60,20 +63,16 @@ public class ReviewService {
                                Double rating,
                                String content,
                                List<String> imageUrls) {
+
         Objects.requireNonNull(author, "author is required");
+        Objects.requireNonNull(cafeId, "cafeId is required");
 
         Cafe cafe = cafeListRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("카페를 찾을 수 없습니다. id=" + cafeId));
 
-        if (rating == null || rating < 1.0 || rating > 5.0) {
-            throw new IllegalArgumentException("별점은 1.0 ~ 5.0 사이여야 합니다.");
-        }
-        if (content == null || content.trim().length() < 50) {
-            throw new IllegalArgumentException("리뷰 내용은 50자 이상이어야 합니다.");
-        }
-        if (imageUrls != null && imageUrls.size() > 5) {
-            throw new IllegalArgumentException("이미지는 최대 5장까지만 가능합니다.");
-        }
+        validateRatingAndContent(rating, content);
+
+        List<String> urls = sanitizeAndLimitImageUrls(imageUrls); // 최대 5개, 공백 제거
 
         // 부모 엔티티 생성
         Review review = new Review();
@@ -82,16 +81,13 @@ public class ReviewService {
         review.setRating(rating);
         review.setContent(content.trim());
 
-        // 자식(이미지) 추가: 도메인 메서드로 컬렉션 & FK 동시 설정
-        if (imageUrls != null) {
-            int order = 0;
-            for (String url : imageUrls) {
-                if (url == null || url.isBlank()) continue;
-                ReviewImage img = new ReviewImage(); // 기본 생성자 public이어야 함
-                img.setImageUrl(url.trim());
-                img.setSortOrder(order++);
-                review.addImage(img); // img.setReview(this) + 컬렉션 add + sort 보정
-            }
+        // 자식(이미지) 추가
+        int order = 0;
+        for (String url : urls) {
+            ReviewImage img = new ReviewImage();
+            img.setImageUrl(url);
+            img.setSortOrder(order++);
+            review.addImage(img); // 양방향 연관관계 일관성 보장
         }
 
         // 부모만 저장하면 cascade로 자식도 저장
@@ -109,6 +105,10 @@ public class ReviewService {
                                Double newRating,
                                String newContent,
                                List<String> newImageUrls) {
+
+        Objects.requireNonNull(editor, "editor is required");
+        Objects.requireNonNull(reviewId, "reviewId is required");
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
@@ -119,15 +119,9 @@ public class ReviewService {
             throw new SecurityException("작성자 또는 관리자만 수정할 수 있습니다.");
         }
 
-        if (newRating == null || newRating < 1.0 || newRating > 5.0) {
-            throw new IllegalArgumentException("별점은 1.0 ~ 5.0 사이여야 합니다.");
-        }
-        if (newContent == null || newContent.trim().length() < 50) {
-            throw new IllegalArgumentException("리뷰 내용은 50자 이상이어야 합니다.");
-        }
-        if (newImageUrls != null && newImageUrls.size() > 5) {
-            throw new IllegalArgumentException("이미지는 최대 5장까지만 가능합니다.");
-        }
+        validateRatingAndContent(newRating, newContent);
+
+        List<String> urls = sanitizeAndLimitImageUrls(newImageUrls);
 
         // 본문/별점 교체
         review.setRating(newRating);
@@ -137,23 +131,19 @@ public class ReviewService {
         if (review.getImages() != null && !review.getImages().isEmpty()) {
             List<ReviewImage> copy = new ArrayList<>(review.getImages());
             for (ReviewImage img : copy) {
-                review.removeImage(img); // 컬렉션 제거 + img.review = null + sort 재정렬
+                review.removeImage(img); // 컬렉션 제거 + img.review = null + sort 재정렬(도메인 로직에 따름)
             }
         }
 
         // 새 이미지 추가
-        if (newImageUrls != null) {
-            int order = 0;
-            for (String url : newImageUrls) {
-                if (url == null || url.isBlank()) continue;
-                ReviewImage imgNew = new ReviewImage();
-                imgNew.setImageUrl(url.trim());
-                imgNew.setSortOrder(order++);
-                review.addImage(imgNew);
-            }
+        int order = 0;
+        for (String url : urls) {
+            ReviewImage imgNew = new ReviewImage();
+            imgNew.setImageUrl(url);
+            imgNew.setSortOrder(order++);
+            review.addImage(imgNew);
         }
 
-        // 부모만 save (자식들은 cascade)
         return reviewRepository.save(review);
     }
 
@@ -164,6 +154,9 @@ public class ReviewService {
      * - Review 삭제 시, 자식 이미지들(orphanRemoval)도 함께 제거됨
      */
     public void deleteReview(Long reviewId, SiteUser requester) {
+        Objects.requireNonNull(requester, "requester is required");
+        Objects.requireNonNull(reviewId, "reviewId is required");
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
@@ -179,34 +172,71 @@ public class ReviewService {
 
     // ========================= 좋아요 / 조회수 =========================
 
-    /** 좋아요 추가 */
+    /** 좋아요 추가 (본인 리뷰 금지) */
     public void likeReview(Long reviewId, SiteUser liker) {
+        Objects.requireNonNull(liker, "liker is required");
+        Objects.requireNonNull(reviewId, "reviewId is required");
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        // 본인 리뷰 좋아요 금지
         if (review.getAuthor() != null && review.getAuthor().getId().equals(liker.getId())) {
             throw new IllegalArgumentException("자신의 리뷰에는 좋아요를 누를 수 없습니다.");
         }
 
-        review.addLike();              // 엔티티 도메인 메서드
+        review.addLike();              // 엔티티가 하한/중복 등 자체 규칙을 보장
         reviewRepository.save(review);
     }
 
     /** 좋아요 취소(하한 0) */
     public void unlikeReview(Long reviewId, SiteUser liker) {
+        Objects.requireNonNull(liker, "liker is required");
+        Objects.requireNonNull(reviewId, "reviewId is required");
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        review.removeLike();
+        review.removeLike();           // 엔티티에서 0 미만 방지
         reviewRepository.save(review);
     }
 
     /** 조회수 증가 */
     public void increaseViewCount(Long reviewId) {
+        Objects.requireNonNull(reviewId, "reviewId is required");
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
         review.increaseViewCount();
         reviewRepository.save(review);
+    }
+
+    // ========================= 내부 유틸 =========================
+
+    private void validateRatingAndContent(Double rating, String content) {
+        if (rating == null || rating < 1.0 || rating > 5.0) {
+            throw new IllegalArgumentException("별점은 1.0 ~ 5.0 사이여야 합니다.");
+        }
+        if (content == null || content.trim().length() < 50) {
+            throw new IllegalArgumentException("리뷰 내용은 50자 이상이어야 합니다.");
+        }
+    }
+
+    /**
+     * - null 안전
+     * - trim 후 빈 문자열 제거
+     * - 최대 5개로 제한
+     */
+    private List<String> sanitizeAndLimitImageUrls(List<String> imageUrls) {
+        List<String> urls = new ArrayList<>();
+        if (imageUrls == null) return urls;
+
+        for (String u : imageUrls) {
+            if (u == null) continue;
+            String t = u.trim();
+            if (t.isEmpty()) continue;
+            urls.add(t);
+            if (urls.size() == 5) break; // 최대 5개
+        }
+        return urls;
     }
 }

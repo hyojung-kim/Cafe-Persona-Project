@@ -1,4 +1,4 @@
-package com.team.cafe.review;
+package com.team.cafe.review.service;
 
 
 import com.team.cafe.user.sjhy.SiteUser;

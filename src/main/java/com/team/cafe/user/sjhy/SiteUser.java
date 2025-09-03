@@ -1,8 +1,8 @@
 package com.team.cafe.user.sjhy;
 
 import com.team.cafe.bookmark.Bookmark;
-import com.team.cafe.review.Review;
-import com.team.cafe.review.ReviewLike;
+import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.domain.ReviewLike;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

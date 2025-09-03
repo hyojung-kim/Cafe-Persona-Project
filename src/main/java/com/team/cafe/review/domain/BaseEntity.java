@@ -1,4 +1,4 @@
-package com.team.cafe.review;
+package com.team.cafe.review.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

@@ -1,6 +1,7 @@
-package com.team.cafe.review;
+package com.team.cafe.review.repository;
 
 
+import com.team.cafe.review.domain.ReviewImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

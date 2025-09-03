@@ -1,4 +1,4 @@
-package com.team.cafe.review;
+package com.team.cafe.review.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

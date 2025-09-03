@@ -1,7 +1,7 @@
 package com.team.cafe.list;
 
 import com.team.cafe.DataNotFoundException;
-import com.team.cafe.review.ReviewRepository;
+import com.team.cafe.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

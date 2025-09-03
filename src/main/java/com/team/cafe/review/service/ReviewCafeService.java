@@ -1,7 +1,9 @@
-package com.team.cafe.review;
+package com.team.cafe.review.service;
 
 import com.team.cafe.list.Cafe;
 import com.team.cafe.list.CafeListRepository;
+import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
