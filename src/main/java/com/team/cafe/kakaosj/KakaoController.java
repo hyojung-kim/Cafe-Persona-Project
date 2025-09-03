@@ -58,14 +58,14 @@ public class KakaoController {
         SiteUser siteUser = userService.registerOrGetKakaoUser(kakaoId, email, nickname);
 
         // SiteUser(Entity)가 아닌 userDetails(security)기반으로 인증 여부를 판단하게 하기 위함.
-         User user = (User) userSecurityService.loadUserByUsername(siteUser.getUsername());
+         UserDetails userDetails = userSecurityService.loadUserByUsername(siteUser.getUsername());
 
          //카카오 로그인 상태 콘솔 확인용
          //logger.info("kakaoCallback 1 - {} : {}", user.getUsername(), user.getAuthorities().toString());
 
         // 4. Spring Security 로그인 처리
         UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         // 카카오 로그인 상태 콘솔 확인용
@@ -73,5 +73,7 @@ public class KakaoController {
 
         // 5. 메인 페이지로 리다이렉트
         return "redirect:/";
+//        return "redirect:/login/login_form";
     }
+
 }

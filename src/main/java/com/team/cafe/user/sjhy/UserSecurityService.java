@@ -32,6 +32,19 @@ public class UserSecurityService implements UserDetailsService {
         } else {
             authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
         }
-        return new User(siteUser.getUsername(), siteUser.getPassword(), authorities);
+        // 카카오 로그인 위한 임시 데이터
+//        return User.builder()
+//                .username(siteUser.getUsername())
+//                .password(siteUser.getPassword() != null ? siteUser.getPassword() : "{noop}kakao_user")
+//                .authorities(authorities)
+//                .accountExpired(false)       // 계정 만료 여부
+//                .accountLocked(false)        // 계정 잠금 여부
+//                .credentialsExpired(false)   // 비밀번호 만료 여부
+//                .disabled(false)             // 활성화 여부
+//                .build();
+
+        // 카카오 api는 비밀번호 null상태로 데이터를 받아오기 때문에
+        // null 값일때 임시 데이터를 넣어주기로,
+        return new User(siteUser.getUsername(),siteUser.getPassword() != null ? siteUser.getPassword() : "{noop}kakao_user", authorities);
     }
 }

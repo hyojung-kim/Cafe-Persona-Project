@@ -1,5 +1,5 @@
 <html layout:decorate="~{layout}">
-<div layout:fragment="content">
+<div layout:fragment="content" class="container my-3">
 
     <div sec:authorize="isAuthenticated()">
         안녕하세요, <b sec:authentication="principal.username">사용자</b> 님!
