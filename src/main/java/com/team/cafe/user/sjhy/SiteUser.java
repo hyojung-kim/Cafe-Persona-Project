@@ -2,6 +2,7 @@ package com.team.cafe.user.sjhy;
 
 import com.team.cafe.bookmark.Bookmark;
 import com.team.cafe.review.Review;
+import com.team.cafe.review.ReviewLike;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +12,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -66,7 +67,8 @@ public class SiteUser implements UserDetails {
 //    private boolean active = true;
 
     // --- 관계 매핑 ---
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // ✅ Review 쪽 필드명이 'author' 이므로 mappedBy도 'author'로 맞춘다.
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     @Comment("작성한 리뷰 목록")
     private List<Review> reviews;
 
@@ -74,10 +76,10 @@ public class SiteUser implements UserDetails {
     @Comment("북마크 목록")
     private List<Bookmark> bookmarks;
 
-    // 좋아요(추천)한 리뷰 (Review 쪽의 voters와 연결)
-    @ManyToMany(mappedBy = "voters")
-    @Comment("좋아요 누른 리뷰들")
-    private Set<Review> likedReviews;
+    // ✅ ReviewLike 중간 엔티티를 통한 좋아요 목록
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Comment("내가 좋아요한 리뷰(ReviewLike 중간 엔티티)")
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
 
 
     @Override
@@ -92,6 +94,15 @@ public class SiteUser implements UserDetails {
 //  true : 만료되지 않음 (로그인 가능)
 //  신고기능 여부에 따라 수정 및 삭제 가능
     @Override
+    public boolean isAccountNonExpired() { return true; }
+
+    @Override
     public boolean isAccountNonLocked() { return true; }
+
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+
+    @Override
+    public boolean isEnabled() { return true; }
 }
 

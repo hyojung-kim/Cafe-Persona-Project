@@ -13,6 +13,7 @@ import org.hibernate.annotations.Comment;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -102,15 +103,97 @@ public class Cafe {
     private Set<SiteUser> likedUsers;
 
     // Review.cafe (N:1)
-    @OneToMany(mappedBy = "cafe")
-    private List<Review> reviews;
 
     // Bookmark.cafe (N:1)
-    @OneToMany(mappedBy = "cafe")
-    private List<Bookmark> bookmarks;
 
     // CafeTag.cafe (N:1)  -> Cafe ⟷ Tag 다대다 중간 엔티티
     @OneToMany(mappedBy = "cafe")
     private List<CafeKeyword> cafeKeyword;
 
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Comment("리뷰 목록")
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Comment("북마크 목록")
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Comment("카페 키워드 목록")
+    private List<CafeKeyword> cafeKeywords = new ArrayList<>();
+
+    /* =========================
+       생성자
+       ========================= */
+    protected Cafe() { }
+
+    public Cafe(String name, String address1) {
+        this.name = name;
+        this.address1 = address1;
+    }
+
+    /* =========================
+       편의 메서드
+       ========================= */
+    public void increaseHit() {
+        this.hitCount += 1;
+    }
+
+    public boolean addLike(SiteUser user) {
+        return this.likedUsers.add(user);
+    }
+
+    public boolean removeLike(SiteUser user) {
+        return this.likedUsers.remove(user);
+    }
+
+    /* =========================
+       Getter / Setter
+       ========================= */
+    public Integer getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getPhoneNum() { return phoneNum; }
+    public void setPhoneNum(String phoneNum) { this.phoneNum = phoneNum; }
+
+    public String getSiteUrl() { return siteUrl; }
+    public void setSiteUrl(String siteUrl) { this.siteUrl = siteUrl; }
+
+    public String getAddress1() { return address1; }
+    public void setAddress1(String address1) { this.address1 = address1; }
+
+    public String getAddress2() { return address2; }
+    public void setAddress2(String address2) { this.address2 = address2; }
+
+    public String getDistrict() { return district; }
+    public void setDistrict(String district) { this.district = district; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public BigDecimal getLat() { return lat; }
+    public void setLat(BigDecimal lat) { this.lat = lat; }
+
+    public BigDecimal getLng() { return lng; }
+    public void setLng(BigDecimal lng) { this.lng = lng; }
+
+    public LocalTime getOpenTime() { return openTime; }
+    public void setOpenTime(LocalTime openTime) { this.openTime = openTime; }
+
+    public LocalTime getCloseTime() { return closeTime; }
+    public void setCloseTime(LocalTime closeTime) { this.closeTime = closeTime; }
+
+    public boolean isParkingYn() { return parkingYn; }
+    public void setParkingYn(boolean parkingYn) { this.parkingYn = parkingYn; }
+
+    public int getHitCount() { return hitCount; }
+    public void setHitCount(int hitCount) { this.hitCount = hitCount; }
+
+    public Set<SiteUser> getLikedUsers() { return likedUsers; }
+    public List<Review> getReviews() { return reviews; }
+    public List<Bookmark> getBookmarks() { return bookmarks; }
+    public List<CafeKeyword> getCafeKeywords() { return cafeKeywords; }
 }
+
