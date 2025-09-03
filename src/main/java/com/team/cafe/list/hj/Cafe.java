@@ -1,8 +1,8 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 
 import com.team.cafe.bookmark.Bookmark;
-import com.team.cafe.keyword.CafeKeyword;
+import com.team.cafe.keyword.hj.CafeKeyword;
 import com.team.cafe.review.Review;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
@@ -121,9 +121,6 @@ public class Cafe {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Comment("카페 키워드 목록")
     private List<CafeKeyword> cafeKeywords = new ArrayList<>();
-
-
-
 
 }
 

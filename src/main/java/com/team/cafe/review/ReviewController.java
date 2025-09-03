@@ -1,6 +1,6 @@
 package com.team.cafe.review;
 
-import com.team.cafe.list.CafeListService;
+import com.team.cafe.list.hj.CafeListService;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;

@@ -1,6 +1,6 @@
 package com.team.cafe.cafeListImg.hj;
 
-import com.team.cafe.list.CafeListRepository;
+import com.team.cafe.list.hj.CafeListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

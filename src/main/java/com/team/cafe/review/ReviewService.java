@@ -1,7 +1,7 @@
 package com.team.cafe.review;
 
-import com.team.cafe.list.Cafe;
-import com.team.cafe.list.CafeListRepository;
+import com.team.cafe.list.hj.Cafe;
+import com.team.cafe.list.hj.CafeListRepository;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;

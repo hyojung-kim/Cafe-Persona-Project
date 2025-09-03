@@ -1,6 +1,6 @@
 package com.team.cafe.cafeListImg.hj;
 
-import com.team.cafe.list.Cafe;
+import com.team.cafe.list.hj.Cafe;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

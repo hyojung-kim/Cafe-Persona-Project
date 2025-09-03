@@ -1,4 +1,4 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,24 +50,22 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
     // 해당 유저가 이 카페를 좋아요 했는지 여부
     boolean existsByIdAndLikedUsers_Id(Long cafeId, Long userId); // ⬅️ Integer → Long
 
-    // (선택) 해당 유저가 이 카페를 좋아요 했는지 빠르게 체크하고 싶을 때
-    boolean existsByIdAndLikedUsers_Id(Integer cafeId, Long userId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     @Query("update Cafe c set c.hitCount = c.hitCount + 1 where c.id = :id")
-    int incrementHitCount(@Param("id") Integer id);
+    int incrementHitCount(@Param("id") Long id);
 
-
-    interface CafeListProjection {
-        Long getId();
-        String getName();
-        String getAddress();
-        String getPhone();
-        String getCategoryCode();
-        Boolean getActive();
-        java.time.OffsetDateTime getCreatedAt();
-        Double getAvgRating();
-        Long getReviewCount();
-    }
+// hyo : long타입 수정 했음. 이코드도 이제 필요없을 겁니다
+//    interface CafeListProjection {
+//        Long getId();
+//        String getName();
+//        String getAddress();
+//        String getPhone();
+//        String getCategoryCode();
+//        Boolean getActive();
+//        java.time.OffsetDateTime getCreatedAt();
+//        Double getAvgRating();
+//        Long getReviewCount();
+//    }
 }

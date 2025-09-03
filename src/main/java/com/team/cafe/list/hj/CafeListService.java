@@ -1,4 +1,4 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 import com.team.cafe.DataNotFoundException;
 import com.team.cafe.review.ReviewRepository;
@@ -66,14 +66,14 @@ public class CafeListService {
     }
 
     /**
-     * 기존 Integer 호출부 호환용
+     * 기존 Integer 호출부 호환용   // hyo : 호환 수정했으니 이제 필요 없을 거에요 주석처리함
      */
-    public Cafe getById(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("id is null");
-        }
-        return getById(id.longValue());
-    }
+//    public Cafe getById(Integer id) {
+//        if (id == null) {
+//            throw new IllegalArgumentException("id is null");
+//        }
+//        return getById(id.longValue());
+//    }
 
     /**
      * 카페 평균 평점
@@ -103,9 +103,9 @@ public class CafeListService {
 
     /** 같은 세션에서 같은 카페 상세는 1회만 카운트 */
     @Transactional
-    public void increaseViewOncePerSession(Integer cafeId, HttpSession session) {
+    public void increaseViewOncePerSession(Long cafeId, HttpSession session) {
         @SuppressWarnings("unchecked")
-        Set<Integer> viewed = (Set<Integer>) session.getAttribute("viewed_cafes");
+        Set<Long> viewed = (Set<Long>) session.getAttribute("viewed_cafes");
         if (viewed == null) {
             viewed = new HashSet<>();
             session.setAttribute("viewed_cafes", viewed);
