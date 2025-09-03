@@ -10,20 +10,14 @@
             align-items: center;
             margin-bottom: 1rem;
         }
-
-        /* 라벨: 왼쪽 끝 정렬, 고정 너비 */
         .form-row label {
             width: 120px;
             text-align: right;
             margin-right: 80px;
         }
-
-        /* 입력폼: 고정 너비 250px */
         .form-row input {
             width: 250px;
         }
-
-        /* 메시지: 입력폼 오른쪽 바깥 */
         .validation-message {
             margin-left: 10px;
             font-size: 0.875rem;
@@ -37,7 +31,7 @@
 
 <h2 class="mb-4 text-center">사업자 회원가입</h2>
 
-<form th:action="@{/business/signup}" method="post" onsubmit="return validateForm(event)">
+<form th:action="@{/businessuser/register}" method="post" onsubmit="return validateForm(event)">
 
     <!-- 아이디 -->
     <div class="form-row">
@@ -53,6 +47,13 @@
         <input type="email" class="form-control" id="email" name="email" required>
         <span class="validation-message text-danger hidden" id="emailError">이미 사용 중</span>
         <span class="validation-message text-success hidden" id="emailSuccess">사용 가능</span>
+    </div>
+
+    <!-- 닉네임 -->
+    <div class="form-row">
+        <label for="nickname">닉네임</label>
+        <input type="text" class="form-control" id="nickname" name="nickname" required>
+        <span class="validation-message text-danger" id="nicknameMessage">2~10자, 특수문자 제외</span>
     </div>
 
     <!-- 사업자명 -->
@@ -75,17 +76,30 @@
         <input type="text" class="form-control" id="ceoName" name="ceoName" required>
     </div>
 
-    <!-- 사업장 주소 -->
-    <div class="form-row">
-        <label for="address">사업장 주소</label>
-        <input type="text" class="form-control" id="address" name="address" required>
-    </div>
-
     <!-- 연락처 -->
     <div class="form-row">
         <label for="phone">연락처</label>
         <input type="tel" class="form-control" id="phone" name="phone" placeholder="예: 010-1234-5678" required>
     </div>
+
+    <!-- 주소 검색 -->
+    <div class="form-row">
+        <label for="address">사업장 주소</label>
+        <div style="display: flex; gap: 5px; align-items: center;">
+            <input type="text" class="form-control" id="address" name="address" placeholder="주소 검색 후 자동 입력" readonly required>
+            <button type="button" class="btn btn-secondary" onclick="searchAddress()">주소 검색</button>
+        </div>
+    </div>
+
+    <!-- 상세 주소 -->
+    <div class="form-row">
+        <label for="addressDetail">상세 주소</label>
+        <input type="text" class="form-control" id="addressDetail" name="addressDetail" placeholder="예: 건물명, 층수 등">
+    </div>
+
+    <!-- 검색 결과 목록 (팝업 대신 페이지 내) -->
+    <div id="addressResults" class="hidden" style="border: 1px solid #ccc; margin-top: 5px; max-height: 200px; overflow-y: auto;"></div>
+
 
     <!-- 비밀번호 -->
     <div class="form-row">
@@ -102,6 +116,13 @@
     </div>
 
     <button type="submit" class="btn btn-primary mt-3">회원가입</button>
+
+
+    <!-- 카카오 로그인 버튼 -->
+    <a class="btn btn-warning w-100 mt-2"
+       href="https://kauth.kakao.com/oauth/authorize?client_id=a2ed26f1ff8c196702de6b2f52470d05&redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code">
+        카카오 1초 회원가입/로그인
+    </a>
 </form>
 
 <!-- 공통 알림 모달 -->

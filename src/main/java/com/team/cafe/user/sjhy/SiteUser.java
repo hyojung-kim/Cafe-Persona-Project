@@ -1,6 +1,7 @@
 package com.team.cafe.user.sjhy;
 
 import com.team.cafe.bookmark.Bookmark;
+import com.team.cafe.businessuser.sj.BusinessUser;
 import com.team.cafe.review.Review;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -93,5 +94,10 @@ public class SiteUser implements UserDetails {
 //  신고기능 여부에 따라 수정 및 삭제 가능
     @Override
     public boolean isAccountNonLocked() { return true; }
+
+
+    // 일반 회원과 비즈니스 회원 1:1 연결
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private BusinessUser businessUser;
 }
 
