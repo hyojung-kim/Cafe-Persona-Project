@@ -25,13 +25,13 @@ public class FindController {
 
     //인증메일 발송
     @PostMapping("/user/findId")
-    public String searchId( Model model, @RequestParam String email) {
+    public String searchId(Model model, @RequestParam String email) {
 
         try {
             findService.sendVerificationCode(email);
-        model.addAttribute("email", email);
-        // 인증번호 입력창 보여줄지 여부
-        model.addAttribute("showVerification", true);
+            model.addAttribute("email", email);
+            // 인증번호 입력창 보여줄지 여부
+            model.addAttribute("showVerification", true);
         } catch (RuntimeException e) {
             model.addAttribute("errorMessage",
                     e.getMessage());
@@ -46,12 +46,14 @@ public class FindController {
                              Model model) {
         try {
             String username = findService.verifyCodeAndFindId(email, code);
-        model.addAttribute("username", username);
+            model.addAttribute("username", username);
+            return "login/show_id";
         } catch (RuntimeException e) {
-            model.addAttribute("errorMessage",
-                    e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("email", email);
+            model.addAttribute("showVerification", true); // 다시 인증번호 입력 폼 표시
+            return "login/find_form";
         }
-        return "login/show_id";
     }
 }
 
