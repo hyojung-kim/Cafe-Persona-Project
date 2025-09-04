@@ -1,7 +1,7 @@
 package com.team.cafe.review.service;
 
-import com.team.cafe.list.Cafe;
-import com.team.cafe.list.CafeListRepository;
+import com.team.cafe.list.hj.Cafe;
+import com.team.cafe.list.hj.CafeListRepository;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.domain.ReviewImage;
 import com.team.cafe.review.repository.ReviewRepository;

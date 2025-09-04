@@ -1,6 +1,6 @@
 package com.team.cafe.review.controller;
 
-import com.team.cafe.list.CafeListService;
+import com.team.cafe.list.hj.CafeListService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.review.service.CurrentUserService;

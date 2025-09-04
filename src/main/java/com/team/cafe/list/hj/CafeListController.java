@@ -1,4 +1,4 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;

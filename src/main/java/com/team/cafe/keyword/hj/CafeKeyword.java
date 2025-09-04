@@ -1,6 +1,6 @@
-package com.team.cafe.keyword;
+package com.team.cafe.keyword.hj;
 
-import com.team.cafe.list.Cafe;
+import com.team.cafe.list.hj.Cafe;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
