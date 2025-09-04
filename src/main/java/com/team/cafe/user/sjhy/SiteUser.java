@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -107,5 +108,10 @@ public class SiteUser implements UserDetails {
     // 일반 회원과 비즈니스 회원 1:1 연결
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private BusinessUser businessUser;
+    // 계정 잠금 검사 (true = 항상 잠기지 않음)
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 }
 
