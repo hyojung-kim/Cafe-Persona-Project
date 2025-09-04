@@ -1,4 +1,4 @@
-package com.team.cafe.keyword;
+package com.team.cafe.keyword.hj;
 
 import jakarta.persistence.*;
 import lombok.Getter;

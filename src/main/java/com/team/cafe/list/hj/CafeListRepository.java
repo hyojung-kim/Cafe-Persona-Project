@@ -1,4 +1,4 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

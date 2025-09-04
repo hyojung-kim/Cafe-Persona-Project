@@ -1,6 +1,6 @@
 package com.team.cafe.like;
 
-import com.team.cafe.list.CafeListRepository;
+import com.team.cafe.list.hj.CafeListRepository;
 import com.team.cafe.user.sjhy.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
