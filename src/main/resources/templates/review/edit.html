@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<th:block layout:fragment="headExtra">
+  <meta charset="UTF-8"/>
+  <title th:text="${(mode=='edit' ? '리뷰 수정 - ' : '리뷰 작성 - ') + (cafe != null ? cafe.name : (review != null ? review.cafe.name : ''))}">
+    리뷰 작성/수정
+  </title>
+  <link rel="stylesheet" th:href="@{/css/review-edit.css}"/>
+</th:block>
+
+<div layout:fragment="content">
+  <div class="rev-container">
+
+    <header class="rev-header">
+      <h1 class="rev-title" th:text="${mode == 'edit' ? '리뷰 수정' : '리뷰 작성'}">리뷰 작성</h1>
+      <a class="rev-link"
+         th:href="${mode=='edit'} ? @{|/reviews/${review.id}|} : @{|/cafe/detail/${cafe.id}|}">
+        돌아가기
+      </a>
+    </header>
+
+    <section class="rev-card">
+      <form class="rev-form"
+            th:action="${mode=='edit'} ? @{/reviews/{id}(id=${review.id})} : @{/cafes/{id}/reviews(id=${cafe.id})}"
+            method="post"
+            th:object="${form}">
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <!-- 별점 -->
+        <div class="rev-row">
+          <label class="rev-label" for="rating">별점 (1.0 ~ 5.0)</label>
+          <input id="rating" class="rev-input" type="number" step="0.1" min="1.0" max="5.0"
+                 th:field="*{rating}" placeholder="예: 4.5" required/>
+          <div class="rev-error" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}">별점 오류</div>
+        </div>
+
+        <!-- 내용 -->
+        <div class="rev-row">
+          <label class="rev-label" for="content">내용 (최소 50자)</label>
+          <textarea id="content" class="rev-textarea" th:field="*{content}"
+                    placeholder="카페에 대한 자세한 후기(최소 50자)" required></textarea>
+          <div class="rev-error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">내용 오류</div>
+          <div class="rev-muted" id="contentCounter">0자 / 최소 50자</div>
+        </div>
+
+        <!-- 이미지 URL (최대 5개) -->
+        <div class="rev-row">
+          <div class="rev-label">이미지 URL (최대 5개)</div>
+          <div class="rev-grid-2">
+            <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                   th:value="${form.imageUrl != null and form.imageUrl.size() > 0 ? form.imageUrl[0] : ''}">
+            <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                   th:value="${form.imageUrl != null and form.imageUrl.size() > 1 ? form.imageUrl[1] : ''}">
+            <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                   th:value="${form.imageUrl != null and form.imageUrl.size() > 2 ? form.imageUrl[2] : ''}">
+            <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                   th:value="${form.imageUrl != null and form.imageUrl.size() > 3 ? form.imageUrl[3] : ''}">
+            <input class="rev-input" type="url" name="imageUrl" placeholder="https://..."
+                   th:value="${form.imageUrl != null and form.imageUrl.size() > 4 ? form.imageUrl[4] : ''}">
+          </div>
+
+          <div class="rev-img-grid" id="previewGrid" style="margin-top:8px;"></div>
+          <div class="rev-muted">URL만 입력(파일 업로드는 별도 기능에서 처리).</div>
+        </div>
+
+        <div class="rev-actions">
+          <button class="rev-btn" type="submit" th:text="${mode=='edit' ? '수정' : '등록'}">등록</button>
+          <a class="rev-link"
+             th:href="${mode=='edit'} ? @{|/reviews/${review.id}|} : @{|/cafe/detail/${cafe.id}|}">
+            취소
+          </a>
+
+          <!-- 삭제: edit일 때만 -->
+          <form th:if="${mode=='edit'}" th:action="@{|/reviews/${review.id}/delete|}" method="post"
+                style="display:inline-block; margin-left:auto;">
+            <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="rev-btn rev-btn-danger"
+                    onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+          </form>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<th:block layout:fragment="bodyEndExtra">
+  <script th:src="@{/js/review-edit.js}" defer></script>
+</th:block>
+</html>
