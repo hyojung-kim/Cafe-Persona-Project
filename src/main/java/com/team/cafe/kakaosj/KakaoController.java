@@ -4,12 +4,15 @@ import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserRole;
 import com.team.cafe.user.sjhy.UserSecurityService;
 import com.team.cafe.user.sjhy.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,7 +39,7 @@ public class KakaoController {
     private final UserSecurityService userSecurityService;
 
     @GetMapping("/callback")
-    public String kakaoCallback(@RequestParam String code) {
+    public String kakaoCallback(@RequestParam String code, HttpSession session) {
 
         // 1. AccessToken 발급
         String accessToken = kakaoService.getAccessToken(code);
@@ -66,7 +69,11 @@ public class KakaoController {
         // 4. Spring Security 로그인 처리
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+        SecurityContext securityContext =  SecurityContextHolder.getContext();
+        securityContext.setAuthentication(auth);
+
+        session.setAttribute("SPRING_SECURITY_CONTEXT",securityContext);
 
         // 카카오 로그인 상태 콘솔 확인용
         //logger.info("kakaoCallback 2 - {} : {}", auth.getPrincipal().toString(), auth.getAuthorities().toString());
