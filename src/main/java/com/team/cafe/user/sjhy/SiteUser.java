@@ -2,8 +2,8 @@ package com.team.cafe.user.sjhy;
 
 import com.team.cafe.bookmark.Bookmark;
 import com.team.cafe.businessuser.sj.BusinessUser;
-import com.team.cafe.review.Review;
-import com.team.cafe.review.ReviewLike;
+import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.domain.ReviewLike;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter

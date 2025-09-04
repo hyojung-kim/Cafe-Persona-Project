@@ -17,7 +17,7 @@ import lombok.Setter;
 public class CafeKeyword {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // 단일 PK로 간단히 (복합키도 가능하지만 운영/디버깅이 편함)
+    private Long id; // 단일 PK로 간단히 (복합키도 가능하지만 운영/디버깅이 편함)
 
     @ManyToOne(fetch = FetchType.LAZY, optional=false)
     @JoinColumn(name="cafe_id")
