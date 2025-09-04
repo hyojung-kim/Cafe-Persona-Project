@@ -2,7 +2,6 @@ package com.team.cafe.Find;
 
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

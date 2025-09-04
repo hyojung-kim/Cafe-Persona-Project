@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS cafe_dev;
+CREATE DATABASE cafe_dev;
+USE cafe_dev;
+
+SELECT * FROM site_user;
