@@ -89,8 +89,8 @@ public class ReviewController {
         SiteUser me = currentUserService.getCurrentUserOrThrow();
         var cafe = cafeService.getById(cafeId);
 
-        if (form.getContent() == null || form.getContent().trim().length() < 50) {
-            bindingResult.reject("content.tooShort", "리뷰 내용은 50자 이상이어야 합니다.");
+        if (form.getContent() == null || form.getContent().trim().length() < 10) {
+            bindingResult.reject("content.tooShort", "리뷰 내용은 10자 이상이어야 합니다.");
         }
         if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
             bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
@@ -175,8 +175,8 @@ public class ReviewController {
                          Model model) {
         SiteUser me = currentUserService.getCurrentUserOrThrow();
 
-        if (form.getContent() == null || form.getContent().trim().length() < 50) {
-            bindingResult.reject("content.tooShort", "리뷰 내용은 50자 이상이어야 합니다.");
+        if (form.getContent() == null || form.getContent().trim().length() < 10) {
+            bindingResult.reject("content.tooShort", "리뷰 내용은 10자 이상이어야 합니다.");
         }
         if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
             bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
@@ -230,7 +230,7 @@ public class ReviewController {
         private Double rating;
 
         @NotBlank(message = "내용을 입력하세요.")
-        @Size(min = 50, message = "리뷰 내용은 50자 이상이어야 합니다.")
+        @Size(min = 10, message = "리뷰 내용은 10자 이상이어야 합니다.")
         private String content;
 
         private List<String> imageUrl = new ArrayList<>();

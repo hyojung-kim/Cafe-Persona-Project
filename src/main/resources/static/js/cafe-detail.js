@@ -13,8 +13,8 @@ function validateReviewForm(form) {
 
   // 내용
   var content = (form.content?.value || '').trim();
-  if (content.length < 50) {
-    alert('리뷰 내용은 최소 50자 이상 작성해 주세요.');
+  if (content.length < 10) {
+    alert('리뷰 내용은 최소 10자 이상 작성해 주세요.');
     return false;
   }
 

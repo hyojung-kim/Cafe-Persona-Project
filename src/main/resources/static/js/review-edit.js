@@ -5,8 +5,8 @@
   if (content && counter) {
     var update = function(){
       var len = (content.value || '').trim().length;
-      counter.textContent = len + '자 / 최소 50자';
-      counter.style.color = (len >= 50) ? '#10b981' : '#6b7280';
+      counter.textContent = len + '자 / 최소 10자';
+      counter.style.color = (len >= 10) ? '#10b981' : '#6b7280';
     };
     content.addEventListener('input', update);
     update();
