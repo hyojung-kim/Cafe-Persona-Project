@@ -100,18 +100,18 @@ public class FindController {
         }
     }
 
-//    @PostMapping("/user/modifyPassword")
-//    public String modifyPassword(@RequestParam String username,
-//                                @RequestParam String newPassword,
-//                                Model model) {
-//        try {
-//            findService.updatePassword(username, newPassword);
-//            model.addAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
-//            return "login/login_form"; // 로그인 페이지로 이동
-//        } catch (RuntimeException e) {
-//            model.addAttribute("errorMessage", e.getMessage());
-//            return "login/modify_password";
-//        }
-//    }
+    @PostMapping("/user/modifyPassword")
+    public String modifyPassword(@RequestParam String username,
+                                @RequestParam String newPassword,
+                                Model model) {
+        try {
+            findService.updatePassword(username, newPassword);
+            model.addAttribute("successMessage", "비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
+            return "login/login_form"; // 로그인 페이지로 이동
+        } catch (RuntimeException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "login/modify_password";
+        }
+    }
 }
 

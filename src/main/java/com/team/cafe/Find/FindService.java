@@ -91,12 +91,12 @@ public class FindService {
         return userRepository.findByEmail(email).get().getUsername();
     }
 
-//    // 새 비밀번호 업데이트
-//    public void updatePassword(String username, String newPassword) {
-//        SiteUser user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-//
-//        user.setPassword(passwordEncoder.encode(newPassword));
-//        userRepository.save(user);
-//    }
+    // 새 비밀번호 업데이트
+    public void updatePassword(String username, String newPassword) {
+        SiteUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }
