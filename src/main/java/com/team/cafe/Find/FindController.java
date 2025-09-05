@@ -39,7 +39,7 @@ public class FindController {
         return "login/find_form";
     }
 
-    // 인증번호 확인 및 아이디 출력
+    // 인증번호 확인 및 아이디 출력.
     @PostMapping("/user/verifyCode")
     public String verifyCode(@RequestParam String email,
                              @RequestParam String code,
