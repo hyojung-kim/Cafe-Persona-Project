@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import com.team.cafe.user.sjhy.UserService;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +18,9 @@ public class UserController {
 //    public String loginForm() {
 //        return "/login/login_form";
 //    }
+
+
+
 
 
     @GetMapping("/login")

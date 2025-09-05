@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+</head>
+<body>
+<div class="wrapper">
+    <div class="card">
+        <header>
+            <h1>마이 페이지</h1>
+            <div class="controls">
+                <span th:text="${username} + '님 안녕하세요'"></span>
+                <form th:action="@{/user/logout}" method="post">
+                    <button type="submit">로그아웃</button>
+                </form>
+            </div>
+        </header>
+
+        <main>
+            <section>
+                <a th:href="@{/mypage/verify_password}">
+                    <button type="button">계정 관리</button>
+                </a>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

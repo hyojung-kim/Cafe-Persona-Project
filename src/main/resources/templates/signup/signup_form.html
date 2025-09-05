@@ -76,6 +76,29 @@
         <span class="validation-message text-danger hidden" id="passwordConfirmError">비밀번호 불일치</span>
     </div>
 
+    <!-- 주민등록번호 -->
+    <div class="form-row">
+        <label for="rrnFront">주민등록번호</label>
+        <input type="text" class="form-control" id="rrnFront" name="rrnFront" maxlength="6" placeholder="YYMMDD" required pattern="\d{6}" title="6자리 숫자 입력">
+        <span>-</span>
+        <input type="password" class="form-control" id="rrnBack" name="rrnBack" maxlength="7" placeholder="1234567" required pattern="\d{7}" title="7자리 숫자 입력">
+    </div>
+
+
+    <!-- 실제 서버에 전송할 hidden input -->
+    <input type="hidden" id="phone" name="phone">
+
+    <!-- 휴대폰 번호 -->
+    <div class="form-row">
+        <label for="phone1">휴대폰 번호</label>
+        <div style="display: flex; gap: 5px;">
+            <input type="text" id="phone1" name="phone1" maxlength="3" pattern="\d{3}" required placeholder="010" class="form-control">
+            <input type="text" id="phone2" name="phone2" maxlength="4" pattern="\d{4}" required placeholder="1234" class="form-control">
+            <input type="text" id="phone3" name="phone3" maxlength="4" pattern="\d{4}" required placeholder="5678" class="form-control">
+        </div>
+    </div>
+
+
     <button type="submit" class="btn btn-primary mt-3">회원가입</button>
 
     <hr>

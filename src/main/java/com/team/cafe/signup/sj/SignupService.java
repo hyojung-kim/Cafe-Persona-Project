@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @Service
 public class SignupService {
@@ -14,7 +16,7 @@ public class SignupService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public String register(String username, String email, String password, String nickname) {
+    public String register(String username, String email, String password, String nickname, String phone, String rrnFront, String rrnBack) {
 
         // 아이디 중복 체크
         if (userRepository.existsByUsername(username)) {
@@ -42,6 +44,9 @@ public class SignupService {
         user.setEmail(email);
         user.setNickname(nickname);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
+        user.setRrn(rrnFront + rrnBack);
+        user.setCreateDate(LocalDateTime.now());
         userRepository.save(user);
 
         return null; // null이면 정상 가입

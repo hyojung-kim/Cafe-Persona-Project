@@ -5,6 +5,7 @@ import com.team.cafe.businessuser.sj.BusinessUser;
 import com.team.cafe.review.Review;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +17,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -62,6 +65,11 @@ public class SiteUser implements UserDetails {
     @Comment("최근 로그인 일시")
     private LocalDateTime lastLogin;
 
+    @Column(name = "create_date", nullable = false)
+    @Comment("회원 가입 일시")
+    private LocalDateTime createDate;
+
+
 //    @Column(name = "is_active", nullable = false)
 //    @Comment("계정 활성화 여부")
 //    private boolean active = true;
@@ -79,6 +87,15 @@ public class SiteUser implements UserDetails {
     @ManyToMany(mappedBy = "voters")
     @Comment("좋아요 누른 리뷰들")
     private Set<Review> likedReviews;
+
+    @Column(name = "phone", length = 20)
+    @Comment("휴대폰 번호")
+    private String phone;
+
+    @Column(name = "rrn", length = 13)
+    @Comment("주민등록번호")
+    private String rrn;
+
 
 
     @Override
