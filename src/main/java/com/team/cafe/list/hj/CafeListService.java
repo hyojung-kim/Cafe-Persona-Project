@@ -1,6 +1,7 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 import com.team.cafe.DataNotFoundException;
+import com.team.cafe.review.repository.ReviewRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
 public class CafeListService {
     private final CafeListRepository cafeListRepository;
+    private final ReviewRepository reviewRepository; // ⬅️ 리뷰 조회용
 
     public List<Cafe> getAllCafes() {
         return cafeListRepository.findAll();
@@ -40,34 +41,61 @@ public class CafeListService {
         return cafeListRepository.searchWithFilters(kwTrim, parking, now, pageable);
     }
 
-
-    // 허용된 정렬 키만 사용 (예외/보안/실수 방지)
+    // 허용된 정렬 키만 사용
     private Sort buildSort(String sort, String dir) {
-        // 기본값: 최신순 (createdAt desc)
         String key = (sort == null || sort.isBlank()) ? "createdAt" : sort;
         Sort.Direction direction = "asc".equalsIgnoreCase(dir) ? Sort.Direction.ASC : Sort.Direction.DESC;
 
-        // 화이트리스트 매핑 (엔티티 필드명 기준!)
         return switch (key) {
-            case "name"      -> Sort.by(direction, "name");        // 이름순
-            case "hit"       -> Sort.by(direction, "hitCount");    // 인기순(조회수)
-            case "createdAt" -> Sort.by(direction, "createdAt");   // 최신순
-            default          -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case "name" -> Sort.by(direction, "name");
+            case "hit" -> Sort.by(direction, "hitCount");
+            case "createdAt" -> Sort.by(direction, "createdAt");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
         };
     }
 
-    public Cafe getById(Integer id) {
-        Optional<Cafe> cafe = this.cafeListRepository.findById(id);
-        if (cafe.isPresent()) {
-            return cafe.get();
-        } else {
-            throw new DataNotFoundException("cafe not found");
+    /**
+     * PK 타입 Long 통일
+     */
+    public Cafe getById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id is null");
         }
+        return this.cafeListRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("cafe not found"));
     }
 
-    public Boolean  isOpenNow(Cafe cafe) {
+    /**
+     * 기존 Integer 호출부 호환용   // hyo : 호환 수정했으니 이제 필요 없을 거에요 주석처리함
+     */
+//    public Cafe getById(Integer id) {
+//        if (id == null) {
+//            throw new IllegalArgumentException("id is null");
+//        }
+//        return getById(id.longValue());
+//    }
+
+    /**
+     * 카페 평균 평점
+     */
+    public double getActiveAverageRating(Long cafeId) {
+        Double avg = reviewRepository.calculateAverageRating(cafeId);
+        return (avg != null) ? avg : 0.0;
+    }
+
+    /**
+     * 카페 리뷰 개수
+     */
+    public long getActiveReviewCount(Long cafeId) {
+        return reviewRepository.countByCafe_IdAndActiveTrue(cafeId);
+    }
+
+    /**
+     * 카페 현재 영업 여부
+     */
+    public Boolean isOpenNow(Cafe cafe) {
         if (cafe.getOpenTime() == null || cafe.getCloseTime() == null) {
-            return null; // 영업시간 미등록 → 상태 판단 불가
+            return null;
         }
         LocalTime now = LocalTime.now();
         return !now.isBefore(cafe.getOpenTime()) && !now.isAfter(cafe.getCloseTime());
@@ -75,9 +103,9 @@ public class CafeListService {
 
     /** 같은 세션에서 같은 카페 상세는 1회만 카운트 */
     @Transactional
-    public void increaseViewOncePerSession(Integer cafeId, HttpSession session) {
+    public void increaseViewOncePerSession(Long cafeId, HttpSession session) {
         @SuppressWarnings("unchecked")
-        Set<Integer> viewed = (Set<Integer>) session.getAttribute("viewed_cafes");
+        Set<Long> viewed = (Set<Long>) session.getAttribute("viewed_cafes");
         if (viewed == null) {
             viewed = new HashSet<>();
             session.setAttribute("viewed_cafes", viewed);
@@ -86,4 +114,6 @@ public class CafeListService {
             cafeListRepository.incrementHitCount(cafeId);
         }
     }
+
+
 }

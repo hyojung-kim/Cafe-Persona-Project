@@ -1,11 +1,16 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.like.LikeService;
+import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +32,7 @@ public class CafeListController {
     private final UserService userService;
     private final LikeService likeService;
     private final CafeImageService cafeImageService;
+    private final ReviewService reviewService;
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
@@ -37,7 +43,7 @@ public class CafeListController {
                        @RequestParam(required = false) Boolean parking,  // true면 가능만
                        @RequestParam(required = false) Boolean openNow,  // true면 영업중만
                        Model model
-                       ) {
+    ) {
         var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
 
         // 이번 페이지의 카페 ID들만 모아서
@@ -48,8 +54,6 @@ public class CafeListController {
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
 
-
-
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
         model.addAttribute("size", size);
@@ -58,50 +62,63 @@ public class CafeListController {
         model.addAttribute("parking", parking);
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
-
         return "cafe/cafe_list";
     }
 
 
-    @GetMapping("detail/{id}")
-    public String detail(@PathVariable Integer id,
+    /** 카페 상세 + 같은 페이지에서 리뷰 작성/리스트 */
+    @GetMapping("/detail/{cafeId}")
+    public String detail(@PathVariable Long cafeId,
+                         @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
+                         @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
                          Principal principal,
-                         HttpSession session,
                          Model model) {
 
-        // 조회수 세션당 1회 증가(원하면 increaseViewEveryHit)
-        cafeListService.increaseViewOncePerSession(id, session);
-        Cafe cafe = cafeListService.getById(id);
+        Cafe cafe = cafeListService.getById(cafeId);
 
-        // 로그인 사용자 조회
+        // 로그인 사용자
         SiteUser loginUser = null;
         if (principal != null) {
-            String username = principal.getName();
-            loginUser = userService.getUser(username);
-
+            loginUser = userService.getUser(principal.getName());
         }
+
         boolean liked = false;
-
         if (loginUser != null) {
-            // 성능/안정성: 엔티티 equals/hashCode에 의존하지 말고 ID로 체크
-            liked = likeService.isLiked(id, loginUser.getId());
+            liked = likeService.isLiked(cafeId, loginUser.getId());
         }
 
-        long likeCount = likeService.getLikeCount(id); // 좋아요 수
-        boolean openNow = cafeListService.isOpenNow(cafe); //영업상태
+        long likeCount = likeService.getLikeCount(cafeId);
+        boolean openNow = cafeListService.isOpenNow(cafe);
+
+        // 상단 배지용 통계
+        double avgRating = cafeListService.getActiveAverageRating(cafeId);
+        long reviewCount = cafeListService.getActiveReviewCount(cafeId);
+
+        // 리뷰 페이지 (작성자/이미지 N+1 방지 메서드 사용)
+        Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(cafeId, pageable);
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("liked", liked);
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("openNow", openNow);
+
+        model.addAttribute("avgRating", avgRating);
+        model.addAttribute("reviewCount", reviewCount);
+
+        // 템플릿에서 ${reviews}로 사용
+        model.addAttribute("reviews", reviews);
+
+        // 분리한 템플릿 경로와 일치
         return "cafe/cafe_detail";
     }
+
 
     // Ajax 컨트롤러
     // @PreAuthorize("isAuthenticated()")
     // 상태 변경은 POST로
-    @PostMapping(value = "/like/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> toggle(@PathVariable Integer id, Principal principal) {
+    @PostMapping(value = "/like/{cafeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> toggle(@PathVariable Long cafeId, Principal principal) {
         if (principal == null) {
             // 비로그인 → 401
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -110,13 +127,16 @@ public class CafeListController {
         SiteUser user = userService.getUser(principal.getName());
 
         // toggle이 true/false(현재 상태) 반환하도록 만들면 최고
-        boolean liked = likeService.toggle(id, user.getId());
+        boolean liked = likeService.toggle(cafeId, user.getId());
 
-        long count = likeService.getLikeCount(id);
+        long count = likeService.getLikeCount(cafeId);
 
         return ResponseEntity.ok(Map.of(
                 "count", count,
                 "liked", liked
         ));
     }
+
+
+
 }

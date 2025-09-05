@@ -1,7 +1,9 @@
 package com.team.cafe.user.sjhy;
 
 import com.team.cafe.bookmark.Bookmark;
-import com.team.cafe.review.Review;
+import com.team.cafe.businessuser.sj.BusinessUser;
+import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.domain.ReviewLike;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -66,18 +69,18 @@ public class SiteUser implements UserDetails {
 //    private boolean active = true;
 
     // --- 관계 매핑 ---
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Comment("작성한 리뷰 목록")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Comment("북마크 목록")
-    private List<Bookmark> bookmarks;
+    private List<Bookmark> bookmark;
 
-    // 좋아요(추천)한 리뷰 (Review 쪽의 voters와 연결)
-    @ManyToMany(mappedBy = "voters")
-    @Comment("좋아요 누른 리뷰들")
-    private Set<Review> likedReviews;
+    // ✅ ReviewLike 중간 엔티티를 통한 좋아요 목록
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Comment("내가 좋아요한 리뷰(ReviewLike 중간 엔티티)")
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
 
 
     @Override
@@ -92,6 +95,23 @@ public class SiteUser implements UserDetails {
 //  true : 만료되지 않음 (로그인 가능)
 //  신고기능 여부에 따라 수정 및 삭제 가능
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonExpired() { return true; }
+
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+
+    @Override
+    public boolean isEnabled() { return true; }
+
+
+
+    // 일반 회원과 비즈니스 회원 1:1 연결
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private BusinessUser businessUser;
+    // 계정 잠금 검사 (true = 항상 잠기지 않음)
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 }
 

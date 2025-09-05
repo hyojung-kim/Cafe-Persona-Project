@@ -124,8 +124,8 @@
         <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
               th:if="${p >= paging.number-5 and p <= paging.number+5}">
             <a th:if="${p != paging.number}"
-                th:text="${p+1}"
-                th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}"></a>
+               th:text="${p+1}"
+               th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}"></a>
             <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
         </span>
 

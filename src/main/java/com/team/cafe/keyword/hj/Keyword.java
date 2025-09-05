@@ -1,4 +1,4 @@
-package com.team.cafe.keyword;
+package com.team.cafe.keyword.hj;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class Keyword {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length=60, nullable=false)
     private String name;       // 예: "연인 데이트", "주차 편리"

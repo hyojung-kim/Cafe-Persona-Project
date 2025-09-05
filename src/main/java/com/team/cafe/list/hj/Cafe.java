@@ -1,9 +1,9 @@
-package com.team.cafe.list;
+package com.team.cafe.list.hj;
 
 
 import com.team.cafe.bookmark.Bookmark;
-import com.team.cafe.keyword.CafeKeyword;
-import com.team.cafe.review.Review;
+import com.team.cafe.keyword.hj.CafeKeyword;
+import com.team.cafe.review.domain.Review;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,6 +13,7 @@ import org.hibernate.annotations.Comment;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -102,15 +103,23 @@ public class Cafe {
     private Set<SiteUser> likedUsers;
 
     // Review.cafe (N:1)
-    @OneToMany(mappedBy = "cafe")
-    private List<Review> reviews;
 
     // Bookmark.cafe (N:1)
-    @OneToMany(mappedBy = "cafe")
-    private List<Bookmark> bookmarks;
 
     // CafeTag.cafe (N:1)  -> Cafe ⟷ Tag 다대다 중간 엔티티
-    @OneToMany(mappedBy = "cafe")
-    private List<CafeKeyword> cafeKeyword;
+//    @OneToMany(mappedBy = "cafe")
+//    private List<CafeKeyword> cafeKeyword;
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Comment("리뷰 목록")
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Comment("북마크 목록")
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Comment("카페 키워드 목록")
+    private List<CafeKeyword> cafeKeywords = new ArrayList<>();
 
 }

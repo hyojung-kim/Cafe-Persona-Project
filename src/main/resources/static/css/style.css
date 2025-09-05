@@ -15,6 +15,16 @@ a:hover {
     text-decoration: underline;
 }
 
+
+
+
+
+
+
+
+
+
+/*임시코드 시작 */
 .results-bar {
     display:flex; justify-content:space-between; align-items:center;
     gap:12px; margin:12px 0 8px;
@@ -118,3 +128,4 @@ table td:nth-child(8) {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+/*임시코드 끝 */

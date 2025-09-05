@@ -1,0 +1,56 @@
+package com.team.cafe.Find;
+
+import com.team.cafe.user.sjhy.SiteUser;
+import com.team.cafe.user.sjhy.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+public class FindService {
+
+    private final UserRepository userRepository;
+    private final JavaMailSender mailSender;
+
+    // 인증번호 저장
+    private final Map<String, String> verificationCodes = new HashMap<>();
+
+    // 인증번호 생성 & 이메일 발송
+    public void sendVerificationCode(String email) {
+        // 사용자 존재 여부 확인
+        SiteUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("입력하신 정보와 일치하는 회원 정보가 없습니다. 다시 한 번 입력해주세요."));
+
+        // 6자리 랜덤 코드 생성
+        String code = String.valueOf((int)(Math.random() * 900000) + 100000);
+        verificationCodes.put(email, code);
+
+        // 메일 작성
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("[카페 페르소나] 아이디 찾기 인증 코드");
+        message.setText("인증 코드: " + code);
+
+        mailSender.send(message);
+    }
+
+    // 인증번호 확인
+    public String verifyCodeAndFindId(String email, String code) {
+        String savedCode = verificationCodes.get(email);
+
+        if (savedCode == null || !savedCode.equals(code)) {
+            throw new RuntimeException("인증번호가 일치하지 않습니다.");
+        }
+
+        // 인증 성공 → 아이디 반환
+        SiteUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("가입된 이메일이 없습니다."));
+        return user.getUsername();
+    }
+
+}
