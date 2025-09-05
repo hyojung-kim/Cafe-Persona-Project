@@ -21,7 +21,7 @@
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <!-- 프로젝트 공통 스타일 -->
-    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 
     <title th:text="${pageTitle} ?: 'Cafe Project'">Cafe Project</title>
 </head>

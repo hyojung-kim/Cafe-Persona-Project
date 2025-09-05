@@ -128,4 +128,6 @@ table td:nth-child(8) {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.hidden { display: none; }
+
 /*임시코드 끝 */

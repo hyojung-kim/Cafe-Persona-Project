@@ -1,13 +1,12 @@
 package com.team.cafe.bookmark;
 
 import com.team.cafe.list.hj.Cafe;
+import com.team.cafe.review.domain.BaseEntity;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,12 +20,12 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_bookmark_cafe", columnList = "cafe_id")
         })
 
-public class Bookmark {
+public class Bookmark extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookmark_id", columnDefinition = "BIGINT UNSIGNED")
     @Comment("북마크 PK")
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false,
@@ -40,9 +39,9 @@ public class Bookmark {
     @Comment("북마크된 카페")
     private Cafe cafe;
 
-    @Column(name = "created_at", nullable = false)
-    @Comment("북마크 생성일시")
-    private LocalDateTime createdAt;
+//    @Column(name = "created_at", nullable = false)
+//    @Comment("북마크 생성일시")
+//    private LocalDateTime createdAt;
 
 //    @PrePersist
 //    protected void onCreate() {
