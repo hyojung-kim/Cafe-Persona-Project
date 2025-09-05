@@ -26,7 +26,7 @@ public class Bookmark {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookmark_id", columnDefinition = "BIGINT UNSIGNED")
     @Comment("북마크 PK")
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false,
