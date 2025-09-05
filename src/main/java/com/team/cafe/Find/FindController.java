@@ -20,7 +20,7 @@ public class FindController {
 
     @GetMapping("/user/findId")
     public String findId() {
-        return "login/find_form";
+        return "login/find_id";
     }
 
     //인증메일 발송
@@ -36,7 +36,7 @@ public class FindController {
             model.addAttribute("emailError",
                     e.getMessage());
         }
-        return "login/find_form";
+        return "login/find_id";
     }
 
     // 인증번호 확인 및 아이디 출력.
@@ -52,7 +52,7 @@ public class FindController {
             model.addAttribute("codeError", e.getMessage());
             model.addAttribute("email", email);
             model.addAttribute("showVerification", true); // 다시 인증번호 입력 폼 표시
-            return "login/find_form";
+            return "login/find_id";
         }
     }
 }
