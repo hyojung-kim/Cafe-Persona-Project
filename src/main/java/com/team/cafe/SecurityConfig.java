@@ -29,9 +29,9 @@ public class SecurityConfig {
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 // 카카오 로그인 후 세션 유지 (일단 실패)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//                )
                 // 로그인
                 .formLogin(form -> form
                         .loginPage("/user/login")          // GET: 로그인 페이지 렌더
