@@ -10,6 +10,9 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -89,8 +92,8 @@ public class ReviewController {
         SiteUser me = currentUserService.getCurrentUserOrThrow();
         var cafe = cafeService.getById(cafeId);
 
-        if (form.getContent() == null || form.getContent().trim().length() < 50) {
-            bindingResult.reject("content.tooShort", "리뷰 내용은 50자 이상이어야 합니다.");
+        if (form.getContent() == null || form.getContent().trim().length() < 5) {
+            bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
         }
         if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
             bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
@@ -119,6 +122,77 @@ public class ReviewController {
 
         ra.addFlashAttribute("message", "리뷰가 등록되었습니다.");
         return "redirect:/reviews/" + saved.getId();
+    }
+
+    /** ✅ AJAX 전용: 리뷰 생성 (폼 전송을 fetch로 보낼 때) */
+    @PostMapping(value = "/cafes/{cafeId}/reviews", headers = "X-Requested-With=XMLHttpRequest")
+    @ResponseBody
+    public ResponseEntity<?> createAjax(@PathVariable Long cafeId,
+                                        @ModelAttribute("form") CreateReviewForm form,
+                                        BindingResult bindingResult) {
+        // 1차 검증 (동일)
+        if (form.getContent() == null || form.getContent().trim().length() < 5) {
+            bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
+        }
+        if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
+            bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
+        }
+        if (form.getImageUrl() != null && form.getImageUrl().size() > 5) {
+            bindingResult.reject("images.tooMany", "이미지는 최대 5장까지만 가능합니다.");
+        }
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    java.util.Map.of("ok", false, "message", "유효성 오류", "errors", bindingResult.getAllErrors())
+            );
+        }
+
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+
+        // 빈/공백 URL 제거
+        List<String> urls = new ArrayList<>();
+        if (form.getImageUrl() != null) {
+            for (String u : form.getImageUrl()) {
+                if (u != null && !u.isBlank()) urls.add(u.trim());
+            }
+        }
+
+        Review saved = reviewService.createReview(
+                cafeId, me, form.getRating(), form.getContent().trim(), urls
+        );
+
+        // ✅ 프런트는 이 응답을 보고 섹션 재로딩 호출
+        return ResponseEntity.ok(java.util.Map.of(
+                "ok", true,
+                "id", saved.getId(),
+                "message", "리뷰가 등록되었습니다."
+        ));
+    }
+
+    /** ✅ 리뷰 섹션 프래그먼트: 카페 상세 하단 리스트만 다시 그릴 때 사용 */
+    @GetMapping("/cafe/detail/{id}/reviews/section")
+    public String reviewsSection(@PathVariable Long id,
+                                 @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
+                                 @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
+                                 Model model) {
+
+        var cafe = cafeService.getById(id);
+
+        // 상단 배지용 통계도 같이 갱신하고 싶으면 아래 2줄 유지
+        double avgRating = cafeService.getActiveAverageRating(id);
+        long reviewCount = cafeService.getActiveReviewCount(id);
+
+        var pageable = org.springframework.data.domain.PageRequest.of(
+                reviewPage, reviewSize, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")
+        );
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(id, pageable);
+
+        model.addAttribute("cafe", cafe);
+        model.addAttribute("avgRating", avgRating);
+        model.addAttribute("reviewCount", reviewCount);
+        model.addAttribute("reviews", reviews);
+
+        // ✅ cafe/detail.html 안의 프래그먼트 이름과 일치해야 함
+        return "cafe/detail :: reviews_section";
     }
 
     /* ===== 좋아요/취소 ===== */
@@ -175,8 +249,8 @@ public class ReviewController {
                          Model model) {
         SiteUser me = currentUserService.getCurrentUserOrThrow();
 
-        if (form.getContent() == null || form.getContent().trim().length() < 50) {
-            bindingResult.reject("content.tooShort", "리뷰 내용은 50자 이상이어야 합니다.");
+        if (form.getContent() == null || form.getContent().trim().length() < 5) {
+            bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
         }
         if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
             bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
@@ -230,7 +304,7 @@ public class ReviewController {
         private Double rating;
 
         @NotBlank(message = "내용을 입력하세요.")
-        @Size(min = 50, message = "리뷰 내용은 50자 이상이어야 합니다.")
+        @Size(min = 5, message = "리뷰 내용은 5자 이상이어야 합니다.")
         private String content;
 
         private List<String> imageUrl = new ArrayList<>();

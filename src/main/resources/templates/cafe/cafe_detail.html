@@ -5,8 +5,11 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 
-<!-- (선택) 레이아웃이 head 삽입 포인트를 제공하는 경우 -->
+<!-- 레이아웃이 head 삽입 포인트를 제공하는 경우 -->
 <th:block layout:fragment="headExtra">
+    <meta charset="UTF-8"/>
+    <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="stylesheet" th:href="@{/css/cafe-detail.css}"/>
 </th:block>
 
@@ -42,14 +45,15 @@
             </div>
         </section>
 
-        <!-- 로그인한 사용자만: 리뷰 작성 -->
+        <!-- 로그인한 사용자만: 리뷰 작성 (AJAX 제출) -->
         <section class="card" sec:authorize="isAuthenticated()">
             <h3>리뷰 작성</h3>
 
-            <!-- 서비스 규약: POST /cafes/{id}/reviews , 이미지 URL 최대 5개 -->
-            <form th:action="@{/cafes/{id}/reviews(id=${cafe.id})}"
-                  method="post"
-                  onsubmit="return validateReviewForm(this)">
+            <!-- ✅ JS에서 쉽게 참조하도록 id + data-cafe-id 부여 -->
+            <form id="reviewCreateForm"
+                  th:action="@{/cafes/{id}/reviews(id=${cafe.id})}"
+                  th:attr="data-cafe-id=${cafe.id}"
+                  method="post">
                 <input th:if="${_csrf}" type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
                 <div class="form-row">
@@ -58,8 +62,8 @@
                 </div>
 
                 <div class="form-row">
-                    <label for="content">내용 (최소 50자)</label>
-                    <textarea id="content" name="content" minlength="50" maxlength="4000"
+                    <label for="content">내용 (최소 5자)</label>
+                    <textarea id="content" name="content" minlength="5f" maxlength="4000"
                               placeholder="카페 이용 경험을 구체적으로 작성해 주세요." required></textarea>
                 </div>
 
@@ -80,8 +84,8 @@
             </form>
         </section>
 
-        <!-- 리뷰 리스트 -->
-        <section class="card">
+        <!-- 리뷰 리스트 (프래그먼트 + 교체 타겟) -->
+        <section class="card" id="reviewsSection" th:fragment="reviews_section">
             <div class="flex between">
                 <h3>리뷰</h3>
                 <div class="muted" th:if="${reviews != null}">
@@ -90,7 +94,6 @@
             </div>
 
             <div class="grid" th:if="${reviews != null and reviews.totalElements > 0}">
-                <!-- Page.content 순회 -->
                 <article th:each="rv : ${reviews.content}" class="review-item">
                     <div class="flex between">
                         <h4>
@@ -103,7 +106,6 @@
 
                     <p th:text="${rv.content}">리뷰 내용</p>
 
-                    <!-- 이미지 썸네일 -->
                     <div class="grid grid-cols-3" th:if="${rv.images != null and !rv.images.isEmpty()}">
                         <img th:each="img : ${rv.images}"
                              th:src="${img.imageUrl}"
@@ -111,7 +113,6 @@
                              class="img-thumb"/>
                     </div>
 
-                    <!-- 좋아요 & 상세보기 -->
                     <div class="flex between mt-8">
                         <div>
                             <form th:action="@{|/reviews/${rv.id}/like|}" method="post" style="display:inline;">
@@ -130,7 +131,6 @@
                     </div>
                 </article>
 
-                <!-- 페이징: 같은 상세 페이지 유지 (rpage/rsize) -->
                 <nav class="pagination" th:if="${reviews.totalPages > 1}">
                     <a th:if="${reviews.hasPrevious()}"
                        th:href="@{/cafe/detail/{id}(id=${cafe.id}, rpage=${reviews.number - 1}, rsize=${reviews.size})}">&laquo; 이전</a>
@@ -148,7 +148,7 @@
                 </nav>
             </div>
 
-            <div th:if="${reviews == null or reviews.totalElements == 0}" class="muted">
+            <div th:if="${reviews == null || reviews.totalElements == 0}" class="muted">
                 아직 작성된 리뷰가 없어요.
             </div>
         </section>
@@ -156,7 +156,7 @@
 
 </div>
 
-<!-- (선택) 레이아웃이 body-end 삽입 포인트를 제공하는 경우 -->
+<!-- 레이아웃이 body-end 삽입 포인트를 제공하는 경우 -->
 <th:block layout:fragment="bodyEndExtra">
     <script th:src="@{/js/cafe-detail.js}" defer></script>
 </th:block>

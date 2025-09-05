@@ -17,7 +17,7 @@ public record ReviewCreateRequest (
         Long cafeId,
 
         @NotNull // 내용은 필수
-        @Size(min = 50, max = 4000) // 최소 50자, 최대 4000자 → 너무 짧거나 긴 리뷰 방지
+        @Size(min = 5, max = 4000) // 최소 5자, 최대 4000자 → 너무 짧거나 긴 리뷰 방지
         String content,
 
         @NotNull // 별점은 필수

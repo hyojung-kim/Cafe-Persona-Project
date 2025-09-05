@@ -46,7 +46,7 @@ public class Review extends BaseEntity {
     @Column(name = "rating", nullable = false)
     private double rating;
 
-    /** 내용(최소 50자 권장) */
+    /** 내용(최소 5자 권장) */
     @Size(min = 50, message = "리뷰 내용은 50자 이상이어야 합니다.")
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
