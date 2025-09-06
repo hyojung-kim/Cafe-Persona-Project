@@ -75,7 +75,7 @@ public class FindService {
         // 메일 작성
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject("[카페 페르소나] 아이디 찾기 인증 코드");
+        message.setSubject("[카페 페르소나] 비밀번호 찾기 인증 코드");
         message.setText("인증 코드: " + code);
 
         mailSender.send(message);
@@ -88,6 +88,8 @@ public class FindService {
         if (savedCode == null || !savedCode.equals(code)) {
             throw new RuntimeException("인증번호가 일치하지 않습니다.");
         }
+        verificationCodes.remove(email);
+
         return userRepository.findByEmail(email).get().getUsername();
     }
 

@@ -103,13 +103,29 @@ public class FindController {
     @PostMapping("/user/modifyPassword")
     public String modifyPassword(@RequestParam String username,
                                 @RequestParam String password,
+                                 @RequestParam String passwordConfirm,
                                 Model model) {
+//        try {
+//            findService.updatePassword(username, password);
+//            model.addAttribute("successMessage", "비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
+//            return "login/login_form"; // 로그인 페이지로 이동
+//        } catch (RuntimeException e) {
+//            model.addAttribute("errorMessage", e.getMessage());
+//            return "login/modify_password";
+//        }
+        // 제미나이
         try {
+            if (!password.equals(passwordConfirm)) {
+                model.addAttribute("errorMessage", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+                model.addAttribute("username", username); // 오류 발생 시 username을 다시 추가
+                return "login/modify_password";
+            }
             findService.updatePassword(username, password);
-            model.addAttribute("successMessage", "비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
-            return "login/login_form"; // 로그인 페이지로 이동
+            model.addAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
+            return "redirect:/user/login"; // PRG 패턴 적용
         } catch (RuntimeException e) {
             model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("username", username); // 오류 발생 시 username을 다시 추가
             return "login/modify_password";
         }
     }
