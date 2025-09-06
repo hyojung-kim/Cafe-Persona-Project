@@ -8,6 +8,7 @@ import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -76,11 +77,13 @@ public class CafeListController {
                          @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
                          @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
                          Principal principal,
+                         HttpSession session,
                          Model model) {
 
         Cafe cafe = cafeListService.getById(cafeId);
         boolean bookmarked = false;
 
+        cafeListService.increaseViewOncePerSession(cafeId, session);
 
         // 로그인 사용자
         SiteUser loginUser = null;
