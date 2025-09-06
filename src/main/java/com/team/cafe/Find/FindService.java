@@ -95,10 +95,21 @@ public class FindService {
 
     // 새 비밀번호 업데이트
     public void updatePassword(String username, String newPassword) {
+
+        // 비밀번호 유효성 검사
+        if (!isValidPassword(newPassword)) {
+            throw new RuntimeException("비밀번호는 최소 8자 이상이고, 특수문자를 포함해야 합니다.");
+        }
+
         SiteUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    private boolean isValidPassword(String password) {
+        String pattern = "^(?=.*[!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/]).{8,}$";
+        return password != null && password.matches(pattern);
     }
 }
