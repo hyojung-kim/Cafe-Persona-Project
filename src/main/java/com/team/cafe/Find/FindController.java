@@ -93,7 +93,7 @@ public class FindController {
             findService.verifyCodeAndFindPW(email, code);
 //            model.addAttribute("username", username);
             session.setAttribute("verifiedUsername", username);
-            return "login/modify_password";
+            return "redirect:/user/modifyPassword";
         } catch (RuntimeException e) {
             model.addAttribute("codeError", e.getMessage());
             model.addAttribute("username", username);
@@ -115,6 +115,7 @@ public class FindController {
         return "login/modify_password";
     }
 
+
     @PostMapping("/user/modifyPassword")
     public String modifyPassword(@RequestParam String password,
                                  @RequestParam String passwordConfirm,
@@ -123,6 +124,7 @@ public class FindController {
         String username = (String) session.getAttribute("verifiedUsername");
         if (username == null) {
             // 세션에 username이 없으면, 비정상적인 접근이므로 리다이렉트
+            // 이 기능이 없으면 url접속만으로 마음대로 다른사람의 비밀번호를 바꿀 수 있음.
             return "redirect:/user/findPassword";
         }
 
@@ -144,9 +146,7 @@ public class FindController {
             findService.updatePassword(username, password);
             session.removeAttribute("verifiedUsername");
 //            model.addAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
-//            return "redirect:/user/login"; // PRG 패턴 적용
-            // 메세지를 쿼리 파라미터로 전달.
-            return "redirect:/user/login?successMessage=비밀번호가 성공적으로 변경되었습니다.";
+            return "redirect:/user/login"; // PRG 패턴 적용
         } catch (RuntimeException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("username", username); // 오류 발생 시 username을 다시 추가
