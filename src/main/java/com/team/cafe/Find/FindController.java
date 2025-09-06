@@ -4,6 +4,7 @@ import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserRepository;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +30,7 @@ public class FindController {
     public String findPassword() {
         return "login/find_password";
     }
+
     // 아이디 찾기 인증메일 발송
     @PostMapping("/user/findId")
     public String searchId(Model model, @RequestParam String email) {
@@ -63,7 +65,6 @@ public class FindController {
     }
 
 
-
     // 비밀번호 찾기 인증메일 발송
     @PostMapping("/user/findPassword")
     public String searchUser(Model model, @RequestParam String username, @RequestParam String email) {
@@ -86,10 +87,12 @@ public class FindController {
     public String verifyPasswordCode(@RequestParam String username,
                                      @RequestParam String email,
                                      @RequestParam String code,
-                                     Model model) {
+                                     Model model,
+                                     HttpSession session) {
         try {
             findService.verifyCodeAndFindPW(email, code);
-            model.addAttribute("username", username);
+//            model.addAttribute("username", username);
+            session.setAttribute("verifiedUsername", username);
             return "login/modify_password";
         } catch (RuntimeException e) {
             model.addAttribute("codeError", e.getMessage());
@@ -100,11 +103,29 @@ public class FindController {
         }
     }
 
+    // 비밀번호 재설정 페이지 (GET 요청)
+    @GetMapping("/user/modifyPassword")
+    public String modifyPasswordForm(Model model, HttpSession session) {
+        String username = (String) session.getAttribute("verifiedUsername");
+        if (username == null) {
+            // 세션에 username이 없으면, 비밀번호 찾기 페이지로 돌려보냄
+            return "redirect:/user/findPassword";
+        }
+        model.addAttribute("username", username);
+        return "login/modify_password";
+    }
+
     @PostMapping("/user/modifyPassword")
-    public String modifyPassword(@RequestParam String username,
-                                @RequestParam String password,
+    public String modifyPassword(@RequestParam String password,
                                  @RequestParam String passwordConfirm,
-                                Model model) {
+                                 Model model,
+                                 HttpSession session) {
+        String username = (String) session.getAttribute("verifiedUsername");
+        if (username == null) {
+            // 세션에 username이 없으면, 비정상적인 접근이므로 리다이렉트
+            return "redirect:/user/findPassword";
+        }
+
 //        try {
 //            findService.updatePassword(username, password);
 //            model.addAttribute("successMessage", "비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
@@ -121,8 +142,11 @@ public class FindController {
                 return "login/modify_password";
             }
             findService.updatePassword(username, password);
-            model.addAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
-            return "redirect:/user/login"; // PRG 패턴 적용
+            session.removeAttribute("verifiedUsername");
+//            model.addAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
+//            return "redirect:/user/login"; // PRG 패턴 적용
+            // 메세지를 쿼리 파라미터로 전달.
+            return "redirect:/user/login?successMessage=비밀번호가 성공적으로 변경되었습니다.";
         } catch (RuntimeException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("username", username); // 오류 발생 시 username을 다시 추가
