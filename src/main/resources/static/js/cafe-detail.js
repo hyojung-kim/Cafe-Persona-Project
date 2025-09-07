@@ -1,7 +1,8 @@
-// 리뷰 작성 폼 기본 검증 (이미지 URL 최대 5개, 별점 0.5 단위, 내용 50자 이상)
+// src/main/resources/static/js/cafe-detail.js
+// 리뷰 작성 폼 기본 검증 (이미지 URL 최대 5개, 별점 0.5 단위, 내용 5자 이상)
 (function(){
   // CSRF
-  const CSRF_TOKEN = document.querySelector('meta[name="_csrf"]')?.content;
+  const CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]')?.content;
   const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content;
 
   // 폼 비동기 제출
@@ -10,17 +11,44 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // 간단 유효성 (서버에서도 검증함)
-      const rating = form.querySelector('input[name="rating"]').value;
-      const content = form.querySelector('textarea[name="content"]').value.trim();
-      if (!content || content.length < 5) {
-        alert('리뷰 내용은 최소 5자 이상 작성해 주세요.');
+      // 입력 값
+      const ratingEl   = form.querySelector('input[name="rating"]');
+      const contentEl  = form.querySelector('textarea[name="content"]');
+      const imageEls   = form.querySelectorAll('input[name="imageUrl"]');
+
+      const rating  = Number(ratingEl?.value ?? NaN);
+      const content = (contentEl?.value ?? '').trim();
+
+      // ✅ 클라이언트 유효성 (서버에서도 검증함)
+      if (!Number.isFinite(rating) || rating < 1.0 || rating > 5.0 || (Math.round(rating * 10) % 5 !== 0)) {
+        alert('별점은 1.0 ~ 5.0 범위의 0.5 단위여야 합니다.');
+        ratingEl?.focus();
         return;
       }
-      const cafeId = form.action.split('/cafes/')[1].split('/')[0];
+      if (content.length < 5) {
+        alert('리뷰 내용은 최소 5자 이상 작성해 주세요.');
+        contentEl?.focus();
+        return;
+      }
 
-      // FormData → 그대로 전송 (ModelAttribute 바인딩용)
-      const fd = new FormData(form);
+      // ✅ cafeId: data-attribute 우선, 없으면 경로에서 추출
+      const cafeId = form.dataset.cafeId
+        || (function(){
+             try { return form.action.split('/cafes/')[1].split('/')[0]; } catch { return ''; }
+           })();
+
+      // ✅ FormData 구성: 빈 이미지 URL은 제외해서 전송
+      const raw = new FormData(form);
+      const fd = new FormData();
+      // 이미지 외 필드 복사
+      raw.forEach((val, key) => {
+        if (key !== 'imageUrl') fd.append(key, val);
+      });
+      // 이미지 URL만 깨끗이 추가
+      imageEls.forEach(inp => {
+        const v = (inp.value || '').trim();
+        if (v) fd.append('imageUrl', v);
+      });
 
       try {
         const res = await fetch(form.action, {
@@ -33,17 +61,13 @@
         });
 
         const data = await res.json().catch(() => ({}));
-
         if (!res.ok || !data.ok) {
-          const msg = data.message || '등록 중 오류가 발생했습니다.';
-          alert(msg);
+          alert(data.message || '등록 중 오류가 발생했습니다.');
           return;
         }
 
-        // 폼 비우기
+        // 성공 처리: 폼 리셋 + 섹션 리로드
         form.reset();
-
-        // ✅ 리뷰 섹션만 다시 로드
         await reloadReviewsSection(cafeId);
 
       } catch (err) {
@@ -53,20 +77,21 @@
     });
   }
 
+  // 리뷰 섹션만 교체
   async function reloadReviewsSection(cafeId) {
     const target = document.getElementById('reviewsSection');
-    if (!target) return;
-    // 첫 페이지 새로고침 (원하면 현재 페이지 유지 로직으로 바꿔도 됨)
-    const url = `/cafe/detail/${cafeId}/reviews/section?rpage=0&rsize=5`;
+    if (!target || !cafeId) return;
+
+    const url  = `/cafe/detail/${cafeId}/reviews/section?rpage=0&rsize=5`;
     const html = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }}).then(r => r.text());
-    // 받는 건 <section ...> 프래그먼트이므로 바깥을 그대로 교체
+
     const temp = document.createElement('div');
     temp.innerHTML = html.trim();
+
     const newSection = temp.querySelector('#reviewsSection') || temp.firstElementChild;
     if (newSection) {
       target.replaceWith(newSection);
     } else {
-      // 서버가 프래그먼트를 순수 body 없이 반환하는 경우를 대비
       target.innerHTML = html;
     }
   }

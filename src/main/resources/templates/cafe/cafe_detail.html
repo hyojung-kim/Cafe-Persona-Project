@@ -8,6 +8,7 @@
 <!-- 레이아웃이 head 삽입 포인트를 제공하는 경우 -->
 <th:block layout:fragment="headExtra">
     <meta charset="UTF-8"/>
+    <!-- JS가 CSRF 헤더를 읽을 수 있도록 메타 추가 -->
     <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
     <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="stylesheet" th:href="@{/css/cafe-detail.css}"/>
@@ -49,7 +50,7 @@
         <section class="card" sec:authorize="isAuthenticated()">
             <h3>리뷰 작성</h3>
 
-            <!-- ✅ JS에서 쉽게 참조하도록 id + data-cafe-id 부여 -->
+            <!-- ✅ 단일 폼 + JS에서 참조할 data-cafe-id 제공 -->
             <form id="reviewCreateForm"
                   th:action="@{/cafes/{id}/reviews(id=${cafe.id})}"
                   th:attr="data-cafe-id=${cafe.id}"
@@ -62,9 +63,10 @@
                 </div>
 
                 <div class="form-row">
+                    <!-- ✅ 50자 → 5자로 변경 -->
                     <label for="content">내용 (최소 5자)</label>
-                    <textarea id="content" name="content" minlength="5f" maxlength="4000"
-                              placeholder="카페 이용 경험을 구체적으로 작성해 주세요." required></textarea>
+                    <textarea id="content" name="content" minlength="5" maxlength="4000"
+                              placeholder="카페 이용 경험을 간단히 적어 주세요." required></textarea>
                 </div>
 
                 <div class="form-row">

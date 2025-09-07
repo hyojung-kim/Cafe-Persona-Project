@@ -14,6 +14,7 @@
 </head>
 <body>
 
+<!-- 데이터가 있을 때 -->
 <div class="rd-wrap" th:if="${review != null}">
   <header class="rd-header">
     <div class="rd-head-left">
@@ -34,23 +35,25 @@
       <a class="rd-link" th:if="${review.cafe != null}"
          th:href="@{|/cafes/${review.cafe.id}/reviews|}">← 리뷰 목록</a>
 
-      <form class="rd-inline" sec:authorize="isAuthenticated()" th:action="@{|/reviews/${review.id}/like|}" method="post">
+      <!-- 좋아요 / 취소 -->
+      <form class="rd-inline" sec:authorize="isAuthenticated()"
+            th:action="@{|/reviews/${review.id}/like|}" method="post">
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <button class="rd-btn" type="submit">👍 좋아요</button>
       </form>
-      <form class="rd-inline" sec:authorize="isAuthenticated()" th:action="@{|/reviews/${review.id}/unlike|}" method="post">
+      <form class="rd-inline" sec:authorize="isAuthenticated()"
+            th:action="@{|/reviews/${review.id}/unlike|}" method="post">
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <button class="rd-btn" type="submit">↩ 취소</button>
       </form>
 
-      <!-- 수정/삭제: 작성자 or ADMIN -->
+      <!-- 수정/삭제: 작성자 또는 관리자만 -->
       <a class="rd-link"
-         sec:authorize="isAuthenticated()"
-         th:if="${review.author != null and #authentication?.name == review.author.username} or ${#authorization.expression('hasRole(''ADMIN'')')}"
+         sec:authorize="isAuthenticated() and (hasAnyAuthority('ROLE_ADMIN','ADMIN') or principal?.username == #vars.review?.author?.username)"
          th:href="@{|/reviews/${review.id}/edit|}">✏️ 수정</a>
 
-      <form class="rd-inline" sec:authorize="isAuthenticated()"
-            th:if="${review.author != null and #authentication?.name == review.author.username} or ${#authorization.expression('hasRole(''ADMIN'')')}"
+      <form class="rd-inline"
+            sec:authorize="isAuthenticated() and (hasAnyAuthority('ROLE_ADMIN','ADMIN') or principal?.username == #vars.review?.author?.username)"
             th:action="@{|/reviews/${review.id}/delete|}" method="post"
             onsubmit="return confirm('정말 삭제하시겠습니까?');">
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
@@ -70,7 +73,7 @@
   </article>
 </div>
 
-<!-- 빈 상태(안정장치) -->
+<!-- 빈 상태 -->
 <div class="rd-wrap" th:if="${review == null}">
   <div class="rd-card">
     <p class="rd-muted">리뷰를 찾을 수 없습니다.</p>
@@ -81,4 +84,3 @@
 <script th:src="@{/js/review-detail.js}" defer></script>
 </body>
 </html>
-
