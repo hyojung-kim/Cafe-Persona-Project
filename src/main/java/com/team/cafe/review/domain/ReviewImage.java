@@ -36,7 +36,7 @@ public class ReviewImage extends BaseEntity {
     private int sortOrder = 0;
 
     // ---- 기본 생성자 ----
-    protected ReviewImage() {
+    public ReviewImage() {
     }
 
     // ---- 편의 생성자 ----
