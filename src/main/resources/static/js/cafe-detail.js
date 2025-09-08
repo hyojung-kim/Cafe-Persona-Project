@@ -1,39 +1,95 @@
-// 리뷰 작성 폼 기본 검증 (이미지 URL 최대 5개, 별점 0.5 단위, 내용 50자 이상)
-function validateReviewForm(form) {
-  // 별점
-  var rating = Number(form.rating?.value || 0);
-  if (rating < 1.0 || rating > 5.0) {
-    alert('별점은 1.0 ~ 5.0 사이여야 합니다.');
-    return false;
-  }
-  if ((rating * 10) % 5 !== 0) { // 0.5 단위 체크
-    alert('별점은 0.5 단위로만 선택할 수 있습니다.');
-    return false;
+// /static/js/cafe-detail.js
+(function () {
+  const form = document.getElementById('reviewCreateForm');
+  const section = document.getElementById('reviewsSection');
+  if (!form || !section) return;
+
+  // CSRF 메타
+  const CSRF_TOKEN = document.querySelector('meta[name="_csrf"]')?.content;
+  const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+  // 카페 id (템플릿에서 data-cafe-id 세팅됨)
+  const cafeId = form.getAttribute('data-cafe-id');
+
+  // 간단 토스트 (Bootstrap alert)
+  function toast(msg, kind = 'info') {
+    const div = document.createElement('div');
+    div.className = `alert alert-${kind} position-fixed top-0 start-50 translate-middle-x mt-3 shadow`;
+    div.style.zIndex = 1080;
+    div.textContent = msg;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 1800);
   }
 
-  // 내용
-  var content = (form.content?.value || '').trim();
-  if (content.length < 50) {
-    alert('리뷰 내용은 최소 50자 이상 작성해 주세요.');
-    return false;
+  // 부트스트랩 폼 검증 표시
+  (function enableBootstrapValidation() {
+    form.addEventListener('submit', (event) => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  })();
+
+  // 리뷰 섹션 프래그먼트 새로고침
+  async function refreshReviews(page = 0, size = 5) {
+    const url = `/cafe/detail/${encodeURIComponent(cafeId)}/reviews/section?rpage=${page}&rsize=${size}`;
+    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    if (!res.ok) throw new Error('리뷰 섹션을 불러오지 못했습니다.');
+    const html = await res.text();
+
+    // 새 섹션으로 교체
+    const temp = document.createElement('div');
+    temp.innerHTML = html.trim();
+    const newSection = temp.querySelector('#reviewsSection') || temp.firstElementChild;
+    if (newSection) section.replaceWith(newSection);
   }
 
-  // 이미지 URL(최대 5개, 빈칸 제외)
-  var inputs = form.querySelectorAll('input[name="imageUrl"]');
-  var urls = [];
-  inputs.forEach(function (i) {
-    var v = (i.value || '').trim();
-    if (v) urls.push(v);
+  // 폼 제출 → AJAX
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // HTML5 검증 미통과 시 중단
+    if (!form.checkValidity()) return;
+
+    try {
+      const fd = new FormData(form); // rating, content, images(File[]), (선택) imageUrl[]
+
+      // AJAX 라우트 태우기 위한 헤더 + CSRF
+      const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+      if (CSRF_HEADER && CSRF_TOKEN) headers[CSRF_HEADER] = CSRF_TOKEN;
+
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers,
+        body: fd
+      });
+
+      if (!res.ok) {
+        let message = '등록에 실패했습니다.';
+        try {
+          const err = await res.json();
+          message = err?.message || message;
+        } catch (_) {}
+        toast(message, 'danger');
+        return;
+      }
+
+      const data = await res.json();
+      if (!data.ok) {
+        toast(data.message || '등록에 실패했습니다.', 'danger');
+        return;
+      }
+
+      // 성공: 폼 리셋, 검증 초기화, 섹션 새로고침
+      form.reset();
+      form.classList.remove('was-validated');
+      await refreshReviews(0, 5);
+      toast('리뷰가 등록되었습니다.', 'success');
+    } catch (err) {
+      console.error(err);
+      toast('네트워크 오류가 발생했습니다.', 'danger');
+    }
   });
-  if (urls.length > 5) {
-    alert('이미지 URL은 최대 5개까지만 가능합니다.');
-    return false;
-  }
-  return true;
-}
-
-// (옵션) 추후 AJAX 좋아요 토글을 붙일 경우를 대비한 CSRF 헬퍼
-window.__CSRF__ = {
-  token: document.querySelector('meta[name="_csrf"]')?.content || null,
-  header: document.querySelector('meta[name="_csrf_header"]')?.content || null,
-};
+})();

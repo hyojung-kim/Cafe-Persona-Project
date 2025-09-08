@@ -34,7 +34,7 @@ public class Review extends BaseEntity {
             foreignKey = @ForeignKey(name = "fk_review_cafe"))
     private Cafe cafe;
 
-    /** 작성자 (SiteUser 엔티티 존재를 가정) */
+    /** 작성자 */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_review_author"))
@@ -46,8 +46,8 @@ public class Review extends BaseEntity {
     @Column(name = "rating", nullable = false)
     private double rating;
 
-    /** 내용(최소 50자 권장) */
-    @Size(min = 50, message = "리뷰 내용은 50자 이상이어야 합니다.")
+    /** 내용(최소 5자) — 컨트롤러/서비스와 일치시킴 */
+    @Size(min = 5, message = "리뷰 내용은 5자 이상이어야 합니다.")
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
@@ -73,7 +73,7 @@ public class Review extends BaseEntity {
     private List<ReviewImage> images = new ArrayList<>();
 
     // ---- 기본 생성자 ----
-    public Review() { }   // protected → public
+    public Review() { }
 
     // ---- 편의 생성자 ----
     public Review(Cafe cafe, SiteUser author, double rating, String content) {
@@ -100,7 +100,7 @@ public class Review extends BaseEntity {
 
     public long getViewCount() { return viewCount; }
     public long getLikeCount() { return likeCount; }
-    public void setLikeCount(long likeCount) { this.likeCount = Math.max(0, likeCount); }  // ✅ 추가됨
+    public void setLikeCount(long likeCount) { this.likeCount = Math.max(0, likeCount); }
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
@@ -155,4 +155,18 @@ public class Review extends BaseEntity {
             this.images.get(i).setSortOrder(i);
         }
     }
+
+    // (선택) equals/hashCode를 id 기준으로 정의하려면 아래 주석 해제
+    // @Override
+    // public boolean equals(Object o) {
+    //     if (this == o) return true;
+    //     if (!(o instanceof Review)) return false;
+    //     Review that = (Review) o;
+    //     return id != null && id.equals(that.id);
+    // }
+    //
+    // @Override
+    // public int hashCode() {
+    //     return 31;
+    // }
 }
