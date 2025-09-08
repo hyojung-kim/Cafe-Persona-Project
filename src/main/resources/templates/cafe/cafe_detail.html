@@ -12,6 +12,7 @@
         <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
         <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
     </h2>
+
     <!-- 주소 + 영업시간 -->
     <p>
         <strong>주소:</strong>
@@ -23,8 +24,8 @@
         <strong>영업시간:</strong>
         <span th:if="${cafe.openTime != null and cafe.closeTime != null}"
               th:text="|${#temporals.format(cafe.openTime,'HH:mm')} ~ ${#temporals.format(cafe.closeTime,'HH:mm')}|">
-      09:00 ~ 22:00
-    </span>
+          09:00 ~ 22:00
+        </span>
         <span th:unless="${cafe.openTime != null and cafe.closeTime != null}" class="muted">미등록</span>
     </p>
 
@@ -39,9 +40,8 @@
         <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
         <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
     </p>
+
     <span class="muted">조회수: <strong th:text="${cafe.hitCount}">0</strong></span>
-
-
 
     <div id="likeBox"
          th:data-cafe-id="${cafe.id}"
@@ -60,6 +60,10 @@
     </div>
 
     <script src="/js/cafe-like.js"></script>
-</div>
 
+    <!-- 하단: 리뷰 리스트 페이지로 이동 (스타일 없음) -->
+    <div style="margin-top:16px;">
+        <a th:href="@{/cafes/{id}/reviews(id=${cafe.id})}">리뷰 목록 보기</a>
+    </div>
+</div>
 </html>
