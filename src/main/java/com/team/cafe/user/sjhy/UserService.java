@@ -31,4 +31,10 @@ public class UserService {
                 .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
     }
 
+    // 닉네임
+    public SiteUser getNickname(String nickname) {
+        return userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+    }
+
 }

@@ -2,7 +2,8 @@
 <div layout:fragment="content">
 
     <div sec:authorize="isAuthenticated()">
-        안녕하세요, <b sec:authentication="principal.username">사용자</b> 님!
+<!--        안녕하세요, <b sec:authentication="principal.nickname">사용자</b> 님!-->
+        안녕하세요, <b th:text="${@securityService.getNickname()}">사용자</b> 님!
     </div>
 
     <div sec:authorize="isAnonymous()">

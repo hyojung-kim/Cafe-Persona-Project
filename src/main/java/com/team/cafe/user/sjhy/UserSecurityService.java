@@ -1,18 +1,24 @@
 package com.team.cafe.user.sjhy;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Component("securityService")
 @RequiredArgsConstructor
 @Service
 public class UserSecurityService implements UserDetailsService {
@@ -21,17 +27,21 @@ public class UserSecurityService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         Optional<SiteUser> _siteUser = this.userRepository.findByUsername(username);
         if (_siteUser.isEmpty()) {
             throw new UsernameNotFoundException("사용자를 찾을수 없습니다.");
         }
         SiteUser siteUser = _siteUser.get();
+
         List<GrantedAuthority> authorities = new ArrayList<>();
         if ("business".equals(username)) {
             authorities.add(new SimpleGrantedAuthority(UserRole.BUSINESS.getValue()));
         } else {
             authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
         }
+        // principal을 SiteUser로 사용
+
         // 카카오 로그인 위한 임시 데이터
 //        return User.builder()
 //                .username(siteUser.getUsername())
@@ -45,6 +55,27 @@ public class UserSecurityService implements UserDetailsService {
 
         // 카카오 api는 비밀번호 null상태로 데이터를 받아오기 때문에
         // null 값일때 임시 데이터를 넣어주기로,
-        return new User(siteUser.getUsername(),siteUser.getPassword() != null ? siteUser.getPassword() : "{noop}kakao_user", authorities);
+        return new User(siteUser.getUsername(),
+                siteUser.getPassword() != null ? siteUser.getPassword() : "{noop}kakao_user",
+                authorities);
+    }
+
+    // ===================================================
+    // 화면에서 nickname 가져올 때 사용
+    // ===================================================
+    public String getNickname() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // 로그인하지 않은 상태면 "게스트" 반환
+        if (auth == null || auth instanceof AnonymousAuthenticationToken) {
+            return "게스트";
+        }
+
+        String username = auth.getName(); // 로그인 시 사용한 아이디(username)
+
+        // DB 조회 후 nickname 반환
+        return userRepository.findByUsername(username)
+                .map(SiteUser::getNickname)
+                .orElse("알 수 없음");
     }
 }

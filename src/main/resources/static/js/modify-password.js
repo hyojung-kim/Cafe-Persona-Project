@@ -133,3 +133,5 @@ document.addEventListener("DOMContentLoaded", function () {
     if (passwordConfirm) passwordConfirm.addEventListener("keyup", validatePasswordConfirm);
     if (form) form.addEventListener("submit", validateForm);
 });
+
+
