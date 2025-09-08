@@ -16,7 +16,7 @@
     <form th:action="@{/cafe/list}" method="get" style="margin-bottom:12px; display:flex; gap:8px; justify-content:flex-end;">
         <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}">
         <select name="sort" th:value="${sort}">
-            <option value="createdAt">최신순</option>
+            <option value="createdAt">기본순</option>
             <option value="name">이름순</option>
             <option value="hit">인기순</option>
         </select>

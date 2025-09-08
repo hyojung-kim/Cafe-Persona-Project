@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -47,14 +46,16 @@ public class CafeListController {
                        @RequestParam(defaultValue = "desc") String dir,
                        @RequestParam(required = false) Boolean parking,  // true면 가능만
                        @RequestParam(required = false) Boolean openNow,  // true면 영업중만
+                       @RequestParam(name = "keyList", required = false) List<Long> keyList,
                        Model model
     ) {
-        var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
+        // 기존 코드 : var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
+        Page<CafeMatchDto> paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow, keyList);
 
         // 이번 페이지의 카페 ID들만 모아서
         List<Long> ids = paging.getContent().stream()
-                .map(Cafe::getId)
-                .collect(Collectors.toList());
+               .map(CafeMatchDto::getId)
+               .toList();
 
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);

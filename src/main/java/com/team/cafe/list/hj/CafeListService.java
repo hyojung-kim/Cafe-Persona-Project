@@ -22,26 +22,26 @@ public class CafeListService {
     private final CafeListRepository cafeListRepository;
     private final ReviewRepository reviewRepository; // ⬅️ 리뷰 조회용
 
-    public List<Cafe> getAllCafes() {
-        return cafeListRepository.findAll();
-    }
+//    public List<Cafe> getAllCafes() {
+//        return cafeListRepository.findAll();
+//    }
 
-    public Page<Cafe> getCafes(String kw, int page, int size, String sort, String dir,
-                               Boolean parking, Boolean openNow) {
-        Sort sortSpec = buildSort(sort, dir);
-        Pageable pageable = PageRequest.of(page, size, sortSpec);
-        String kwTrim = (kw == null) ? null : kw.trim();
+//    public Page<Cafe> getCafes2(String kw, int page, int size, String sort, String dir,
+//                               Boolean parking, Boolean openNow) {
+//        Sort sortSpec = buildSort(sort, dir);
+//        Pageable pageable = PageRequest.of(page, size, sortSpec);
+//        String kwTrim = (kw == null) ? null : kw.trim();
+//
+//        // 현재 시간(한국)
+//        LocalTime now = null;
+//        if (Boolean.TRUE.equals(openNow)) {
+//            now = LocalTime.now(java.time.ZoneId.of("Asia/Seoul"));
+//        }
+//
+//        return cafeListRepository.searchWithFilters(kwTrim, parking, now, pageable);
+//    }
 
-        // 현재 시간(한국)
-        LocalTime now = null;
-        if (Boolean.TRUE.equals(openNow)) {
-            now = LocalTime.now(java.time.ZoneId.of("Asia/Seoul"));
-        }
-
-        return cafeListRepository.searchWithFilters(kwTrim, parking, now, pageable);
-    }
-
-    // 허용된 정렬 키만 사용
+     //허용된 정렬 키만 사용
     private Sort buildSort(String sort, String dir) {
         String key = (sort == null || sort.isBlank()) ? "createdAt" : sort;
         Sort.Direction direction = "asc".equalsIgnoreCase(dir) ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -112,6 +112,44 @@ public class CafeListService {
         }
         if (viewed.add(cafeId)) {
             cafeListRepository.incrementHitCount(cafeId);
+        }
+    }
+
+    public Page<CafeMatchDto> getCafes(String kw,
+                                       int page, int size,
+                                       String sort, String dir,
+                                       Boolean parking,
+                                       Boolean openNow,
+                                       List<Long> keyList) {
+
+        //var pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1)); // 정렬은 쿼리 고정
+
+        // 기존 필터만 (종전 로직 그대로)
+        Sort sortSpec = buildSort(sort, dir);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sortSpec);
+        String kwTrim = (kw == null) ? null : kw.trim();
+
+        // 현재 시간(한국)
+        LocalTime now = null;
+        if (Boolean.TRUE.equals(openNow)) {
+            now = LocalTime.now(java.time.ZoneId.of("Asia/Seoul"));
+        }
+
+
+
+        boolean hasKeyWord = keyList != null && !keyList.isEmpty();
+        //java.time.LocalTime now = Boolean.TRUE.equals(openNow) ? java.time.LocalTime.now() : null;
+
+        if (hasKeyWord) {
+            // ✅ 태그 모두일치 + 기존 필터 동시 적용
+            pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1)); // 정렬은 쿼리 고정
+            Long selectedSize = (Long) keyList.stream().distinct().count();
+            Page<Cafe> pageAll = cafeListRepository.findAllMatchAllWithFiltersCaseOrder(kw, parking, now, keyList, selectedSize, sort, dir, pageable);
+            return pageAll.map(c -> new CafeMatchDto(c, selectedSize));
+        } else {
+
+            Page<Cafe> pageOnlyFilters = cafeListRepository.searchWithFilters(kw, parking, now, pageable);
+            return pageOnlyFilters.map(c -> new CafeMatchDto(c, 0L));
         }
     }
 
