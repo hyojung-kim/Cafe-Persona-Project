@@ -1,9 +1,11 @@
 package com.team.cafe.review.controller;
 
 import com.team.cafe.list.hj.CafeListService;
-import com.team.cafe.review.ImageStorageService;
+import com.team.cafe.review.service.ImageStorageService;
 import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.review.service.CurrentUserService;
+import com.team.cafe.review.service.ReviewLikeService;   // [ADDED]
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.validation.constraints.DecimalMax;
@@ -35,15 +37,21 @@ public class ReviewController {
     private final CafeListService cafeService;
     private final CurrentUserService currentUserService;
     private final ImageStorageService imageStorageService;
+    private final ReviewRepository reviewRepository;
+    private final ReviewLikeService reviewLikeService; // [ADDED]
 
     public ReviewController(ReviewService reviewService,
                             CafeListService cafeService,
                             CurrentUserService currentUserService,
-                            ImageStorageService imageStorageService) {
+                            ImageStorageService imageStorageService,
+                            ReviewRepository reviewRepository,
+                            ReviewLikeService reviewLikeService) {
         this.reviewService = reviewService;
         this.cafeService = cafeService;
         this.currentUserService = currentUserService;
         this.imageStorageService = imageStorageService;
+        this.reviewRepository = reviewRepository;
+        this.reviewLikeService = reviewLikeService;
     }
 
     /** 항상 th:object="${form}" 제공 */
@@ -69,13 +77,13 @@ public class ReviewController {
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
-        model.addAttribute("page", reviews); // 템플릿에서 ${page}
+        model.addAttribute("page", reviews);
 
         return "review/list";
     }
 
     /* =======================
-       리뷰 리스트 “프래그먼트”(부분 갱신용)
+       리뷰 리스트 “프래그먼트”
        ======================= */
     @GetMapping(value = "/cafes/{cafeId}/reviews/section", produces = MediaType.TEXT_HTML_VALUE)
     public String listSection(@PathVariable Long cafeId,
@@ -95,12 +103,23 @@ public class ReviewController {
         model.addAttribute("reviewCount", reviewCount);
         model.addAttribute("page", reviews);
 
-        // templates/review/list.html 안의 th:fragment="section"
         return "review/list :: section";
     }
 
     /* =======================
-       작성 폼 (리스트 페이지 상단에서 필요 시 분리)
+       리뷰 상세 (GET)
+       ======================= */
+    @GetMapping("/reviews/{id}")
+    public String detail(@PathVariable Long id, Model model) {
+        reviewService.increaseViewCount(id);
+        Review review = reviewRepository.findWithUserAndImagesById(id)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
+        model.addAttribute("review", review);
+        return "review/detail";
+    }
+
+    /* =======================
+       작성 폼
        ======================= */
     @GetMapping("/cafes/{cafeId}/reviews/new")
     public String createForm(@PathVariable Long cafeId, Model model) {
@@ -108,12 +127,12 @@ public class ReviewController {
         var cafe = cafeService.getById(cafeId);
         model.addAttribute("cafe", cafe);
         model.addAttribute("mode", "create");
-        model.addAttribute("user", me); // author -> user
+        model.addAttribute("user", me);
         return "review/edit";
     }
 
     /* =======================
-       작성 처리 (일반 제출)
+       작성 (일반 제출)
        ======================= */
     @PostMapping("/cafes/{cafeId}/reviews")
     public String create(@PathVariable Long cafeId,
@@ -167,8 +186,7 @@ public class ReviewController {
     }
 
     /* =======================
-       작성 처리 (AJAX, 파일 + URL)
-       - JSON 반환 → JS가 프래그먼트 다시 로드
+       작성 (AJAX)
        ======================= */
     @PostMapping(value = "/cafes/{cafeId}/reviews", headers = "X-Requested-With=XMLHttpRequest")
     @ResponseBody
@@ -217,7 +235,35 @@ public class ReviewController {
     }
 
     /* =======================
-       내부 DTO
+       좋아요 토글
+       ======================= */
+
+    /** AJAX 토글 */
+    @PostMapping(value = "/reviews/{id}/like", headers = "X-Requested-With=XMLHttpRequest")
+    @ResponseBody
+    public ResponseEntity<?> likeAjax(@PathVariable Long id) {
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+        var result = reviewLikeService.toggle(id, me);
+        return ResponseEntity.ok(java.util.Map.of(
+                "ok", true,
+                "liked", result.liked(),
+                "count", result.count()
+        ));
+    }
+
+    /** 폼 제출 폴백 */
+    @PostMapping("/reviews/{id}/like")
+    public String likeForm(@PathVariable Long id,
+                           @RequestHeader(value = "Referer", required = false) String referer,
+                           RedirectAttributes ra) {
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+        reviewLikeService.toggle(id, me);
+        ra.addFlashAttribute("message", "처리되었습니다.");
+        return (referer != null && !referer.isBlank()) ? "redirect:" + referer : "redirect:/reviews/" + id;
+    }
+
+    /* =======================
+       내부 DTO/헬퍼
        ======================= */
     public static class CreateReviewForm {
         @DecimalMin(value = "1.0", message = "별점은 1.0 이상이어야 합니다.")
@@ -239,9 +285,6 @@ public class ReviewController {
         public void setImageUrl(List<String> imageUrl) { this.imageUrl = imageUrl; }
     }
 
-    /* =======================
-       헬퍼
-       ======================= */
     private static int safeSize(List<?> list) {
         if (list == null) return 0;
         int c = 0;

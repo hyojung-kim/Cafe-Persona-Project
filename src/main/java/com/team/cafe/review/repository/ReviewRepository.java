@@ -19,7 +19,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @EntityGraph(attributePaths = {"user"})
     Page<Review> findByCafe_IdAndActiveTrue(Long cafeId, Pageable pageable);
 
-    /** 카페별 활성 리뷰 전체 (필요 시 사용) */
+    /** 카페별 활성 리뷰 전체 */
     List<Review> findByCafe_IdAndActiveTrue(Long cafeId);
 
     /** 작성자별 활성 리뷰 (user 즉시 로딩) */
