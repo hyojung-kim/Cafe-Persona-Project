@@ -96,7 +96,7 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-3">
-              <div>
+              <div data-review-box>
                 <!-- 좋아요: AJAX + 폴백 -->
                 <form th:action="@{|/reviews/${rv.id}/like|}"
                       method="post"
@@ -106,7 +106,14 @@
                 </form>
                 <span class="text-muted ms-2 small">♡ <b class="like-count" th:text="${rv.likeCount}">0</b></span>
               </div>
-              <a class="btn btn-sm btn-outline-primary" th:href="@{|/reviews/${rv.id}|}">상세보기</a>
+              <div class="text-end">
+                <a class="btn btn-sm btn-outline-primary" th:href="@{|/reviews/${rv.id}|}">상세보기</a>
+                <a th:if="${me != null and (me.id == rv.user?.id or me.role == 'ADMIN' or me.role == 'ROLE_ADMIN')}" class="btn btn-sm btn-secondary ms-1" th:href="@{|/reviews/${rv.id}/edit|}">수정</a>
+                <form th:if="${me != null and (me.id == rv.user?.id or me.role == 'ADMIN' or me.role == 'ROLE_ADMIN')}" th:action="@{|/reviews/${rv.id}/delete|}" method="post" class="d-inline ms-1" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                  <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+                </form>
+              </div>
             </div>
           </div>
         </article>

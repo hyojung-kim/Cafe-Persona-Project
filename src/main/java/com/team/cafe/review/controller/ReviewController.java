@@ -74,6 +74,7 @@ public class ReviewController {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
+        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -98,6 +99,7 @@ public class ReviewController {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
+        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -114,7 +116,13 @@ public class ReviewController {
         reviewService.increaseViewCount(id);
         Review review = reviewRepository.findWithUserAndImagesById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
+        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
         model.addAttribute("review", review);
+        boolean canEdit = currentUserService.getCurrentUser()
+                .map(me -> review.getUser() != null && review.getUser().getId().equals(me.getId())
+                        || "ADMIN".equalsIgnoreCase(me.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(me.getRole()))
+                .orElse(false);
+        model.addAttribute("canEdit", canEdit);
         return "review/detail";
     }
 
@@ -232,6 +240,108 @@ public class ReviewController {
         );
 
         return ResponseEntity.ok(java.util.Map.of("ok", true, "id", saved.getId(), "message", "리뷰가 등록되었습니다."));
+    }
+
+    /* =======================
+       수정 폼
+       ======================= */
+    @GetMapping("/reviews/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+        Review review = reviewRepository.findWithUserAndImagesById(id)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
+
+        boolean isAuthor = review.getUser() != null && review.getUser().getId().equals(me.getId());
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(me.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(me.getRole());
+        if (!isAuthor && !isAdmin) throw new SecurityException("작성자 또는 관리자만 수정할 수 있습니다.");
+
+        CreateReviewForm form = new CreateReviewForm();
+        form.setRating(review.getRating());
+        form.setContent(review.getContent());
+        if (review.getImages() != null) {
+            List<String> urls = new ArrayList<>();
+            review.getImages().forEach(img -> urls.add(img.getImageUrl()));
+            form.setImageUrl(urls);
+        }
+
+        model.addAttribute("form", form);
+        model.addAttribute("review", review);
+        model.addAttribute("cafe", review.getCafe());
+        model.addAttribute("mode", "edit");
+        model.addAttribute("user", me);
+        return "review/edit";
+    }
+
+    /* =======================
+       수정 (POST)
+       ======================= */
+    @PostMapping("/reviews/{id}")
+    public String update(@PathVariable Long id,
+                         @ModelAttribute("form") CreateReviewForm form,
+                         BindingResult bindingResult,
+                         RedirectAttributes ra,
+                         Model model,
+                         @RequestParam(value = "images", required = false) List<MultipartFile> images) {
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+        Review review = reviewRepository.findWithUserAndImagesById(id)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
+
+        if (form.getContent() == null || form.getContent().trim().length() < 5) {
+            bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
+        }
+        if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
+            bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
+        }
+
+        int urlCount = safeSize(form.getImageUrl());
+        int fileCount = safeSize(images);
+        if (urlCount + fileCount > MAX_IMAGES) {
+            bindingResult.reject("images.tooMany", "이미지는 최대 " + MAX_IMAGES + "장까지만 가능합니다.");
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("review", review);
+            model.addAttribute("cafe", review.getCafe());
+            model.addAttribute("mode", "edit");
+            model.addAttribute("user", me);
+            return "review/edit";
+        }
+
+        List<String> urls = normalizeUrls(form.getImageUrl());
+        int remaining = MAX_IMAGES - urls.size();
+        if (images != null && remaining > 0) {
+            int added = 0;
+            for (MultipartFile file : images) {
+                if (file == null || file.isEmpty()) continue;
+                if (added >= remaining) break;
+                String url = imageStorageService.store(file);
+                urls.add(url);
+                added++;
+            }
+        }
+
+        reviewService.updateReview(id, me, form.getRating(), form.getContent().trim(), urls);
+        ra.addFlashAttribute("message", "리뷰가 수정되었습니다.");
+        return "redirect:/reviews/" + id;
+    }
+
+    /* =======================
+       삭제
+       ======================= */
+    @PostMapping("/reviews/{id}/delete")
+    public String delete(@PathVariable Long id,
+                         @RequestHeader(value = "Referer", required = false) String referer,
+                         RedirectAttributes ra) {
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
+        Long cafeId = review.getCafe().getId();
+        reviewService.deleteReview(id, me);
+        ra.addFlashAttribute("message", "리뷰가 삭제되었습니다.");
+        if (referer != null && !referer.isBlank()) {
+            return "redirect:" + referer;
+        }
+        return "redirect:/cafes/" + cafeId + "/reviews";
     }
 
     /* =======================
