@@ -1,11 +1,9 @@
 package com.team.cafe.cafeListImg.hj;
 
 import com.team.cafe.list.hj.Cafe;
+import com.team.cafe.review.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,7 +17,7 @@ import java.time.LocalDateTime;
 //                @Index(name = "idx_cafe_image_primary_sort", columnList = "is_primary, sort_order")
         }
 )
-public class CafeImage {
+public class CafeImage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")                 // PK
@@ -42,8 +40,8 @@ public class CafeImage {
 //    @Column(name = "sort_order", nullable = false)
 //    private int sortOrder;               // 정렬 우선순위 (낮을수록 먼저)
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;     // 등록 시각
+//    @CreationTimestamp
+//    @Column(name = "created_at", nullable = false, updatable = false)
+//    private LocalDateTime createdAt;     // 등록 시각
 
 }
