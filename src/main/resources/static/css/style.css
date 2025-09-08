@@ -5,6 +5,7 @@
 }
 .active {
     font-weight: bold;
+
 }
 a {
     margin: 0 4px;
@@ -133,6 +134,17 @@ table td:nth-child(8) {
 /* a) 순서 보장: .hidden을 .badge 뒤에 둔다 */
 
 .hidden { display: none !important; }
+
+
+.tag-chip {
+      display:inline-block; padding:6px 10px; border:1px solid #ddd; border-radius:999px;
+      margin:4px; cursor:pointer; font-size:14px; user-select:none;
+    }
+    .tag-chip input { display:none; }
+    .tag-chip.active { background:#f6f6ff; border-color:#bdbdff; }
+    .tag-group-title { font-weight:600; margin:12px 4px 6px; }
+    .cafe-card img { width:100%; height:160px; object-fit:cover; border-radius:10px; }
+    .badge-soft { background:#f3f4f6; color:#333; }
 
 
 /*임시코드 끝 */
