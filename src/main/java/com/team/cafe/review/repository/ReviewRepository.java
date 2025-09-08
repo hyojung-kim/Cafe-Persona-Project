@@ -22,7 +22,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /** 카페별 활성 리뷰 전체 */
     List<Review> findByCafe_IdAndActiveTrue(Long cafeId);
 
-    /** 작성자별 활성 리뷰 (user 즉시 로딩) */
+    /** 사용자별 활성 리뷰 (user 즉시 로딩) */
     @EntityGraph(attributePaths = {"user"})
     Page<Review> findByUser_IdAndActiveTrue(Long userId, Pageable pageable);
 
