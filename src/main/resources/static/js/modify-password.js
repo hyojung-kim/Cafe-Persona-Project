@@ -1,4 +1,6 @@
 /* ================= 비밀번호 검증 ================= */
+console.log("✅ modify-password.js 로드됨");
+
 function validatePassword() {
     const pw = document.getElementById("password").value.trim();
     const msg = document.getElementById("passwordError");
