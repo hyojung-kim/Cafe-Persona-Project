@@ -11,7 +11,8 @@
         <header>
             <h1>마이 페이지</h1>
             <div class="controls">
-                <span th:text="${user.username} + '님 안녕하세요'"></span>
+                <!--    username -> nickname으로 바꿨어요 hy    -->
+                <span th:text="${user.nickname} + '님 안녕하세요'"></span>
                 <span th:text="${user.businessUser != null ? '사업자회원' : '일반회원'}"></span>
 
                 <form th:action="@{/user/logout}" method="post">
@@ -49,7 +50,14 @@
             </a>
         </div>
 
-
+        <!--    hy    -->
+        <header>
+            <h3>나만의 카페</h3>
+            <div class="myBookmark">
+                북마크
+                <a class="btn btn-primary" th:href="@{/mypage/my/bookmark}">자세히 보기 ></a>
+            </div>
+        </header>
     </div>
 </div>
 </body>
