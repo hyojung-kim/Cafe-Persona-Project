@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>사업장 관리</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/css/cafe-manage.css}">
+</head>
+<body>
+<div class="container" th:with="biz=${user != null and user.businessUser != null ? user.businessUser : null}">
+    <!-- 헤더 -->
+    <div class="header">
+        <div>
+            <h1 class="title">사업장 관리</h1>
+            <p class="subtitle">메뉴·운영시간·사진을 손쉽게 업데이트하세요.</p>
+            <span class="badge">사업자 회원 전용</span>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center">
+            <!-- 사업장이 없는 경우에만 '사업장 등록하기' 보이기 -->
+            <a class="btn" th:if="${business == null}" th:href="@{/mypage/cafe/register}">
+                사업장 등록하기
+            </a>
+            <!-- 이미 사업장이 있으면 바로 프로필/메뉴 등으로 가는 숏컷 -->
+            <a class="btn secondary" th:if="${business != null}" th:href="@{/mypage/cafe/profile}">
+                프로필 관리
+            </a>
+        </div>
+    </div>
+
+
+    <div class="grid grid-cols-3" style="margin-top:16px">
+
+        <!-- 지표 영역 -->
+        <section class="stats-area">
+            <div class="card">
+                <h3>핵심 지표</h3>
+                <div class="stat-grid">
+                    <div class="stat">
+                        <div class="k">찜/좋아요</div>
+                        <div class="v" th:text="${likeCount != null ? likeCount : 0}">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="k">리뷰 수</div>
+                        <div class="v" th:text="${reviewCount != null ? reviewCount : 0}">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="k">평균 평점</div>
+                        <div class="v" th:text="${avgRating != null ? avgRating : '—'}">—</div>
+                    </div>
+                    <div class="stat">
+                        <div class="k">메뉴 항목</div>
+                        <div class="v" th:text="${menuCount != null ? menuCount : 0}">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="k">사진 수</div>
+                        <div class="v" th:text="${photoCount != null ? photoCount : 0}">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <h3>최근 리뷰</h3>
+                <!-- 샘플 아이템 (서비스 연동 전) -->
+                <div class="item">
+                    <div>
+                        <div style="font-weight:700">아메리카노가 정말 맛있어요 <span class="star">★ 4.5</span></div>
+                        <div class="muted">user123 · 2025-09-05</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div>
+                        <div style="font-weight:700">좌석이 편하고 콘센트 많음 <span class="star">★ 5.0</span></div>
+                        <div class="muted">latte_lover · 2025-09-04</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                <div style="display:flex; justify-content:flex-end">
+                    <a class="btn secondary" th:href="@{/mypage/cafe/reviews}">리뷰 관리로 이동</a>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <h3>공지 & 프로모션</h3>
+                <div class="item">
+                    <div style="flex:1">
+                        <div><span class="chip">이벤트</span> 9월 신메뉴 2+1</div>
+                        <div class="muted">2025-09-01 ~ 2025-09-30</div>
+                    </div>
+                    <div class="ok">진행중</div>
+                </div>
+                <div class="item">
+                    <div style="flex:1">
+                        <div><span class="chip">공지</span> 추석 연휴 휴무 안내</div>
+                        <div class="muted">2025-09-14 ~ 2025-09-16</div>
+                    </div>
+                    <div class="warn">예정</div>
+                </div>
+
+                <div class="divider"></div>
+                <div style="display:flex; gap:8px; justify-content:flex-end">
+                    <a class="btn secondary" th:href="@{/mypage/cafe/promotions}">목록 보기</a>
+                    <a class="btn" th:href="@{/mypage/cafe/promotions/new}">새 프로모션</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA 영역 -->
+        <aside class="ctas-area">
+            <div class="card">
+                <h3>빠른 작업</h3>
+                <div class="cta-grid">
+                    <a class="cta" th:href="@{/mypage/cafe/menu}">
+                        <div>
+                            <div style="font-weight:700">메뉴 관리</div>
+                            <div class="meta">메뉴/카테고리/가격 추가·수정</div>
+                        </div>
+                        <button class="btn">이동</button>
+                    </a>
+
+                    <a class="cta" th:href="@{/mypage/cafe/hours}">
+                        <div>
+                            <div style="font-weight:700">영업시간 설정</div>
+                            <div class="meta">요일별 개점/마감 · 브레이크타임</div>
+                        </div>
+                        <button class="btn">이동</button>
+                    </a>
+
+                    <a class="cta" th:href="@{/mypage/cafe/photos}">
+                        <div>
+                            <div style="font-weight:700">사진 관리</div>
+                            <div class="meta">대표/갤러리 이미지 업로드</div>
+                        </div>
+                        <button class="btn">이동</button>
+                    </a>
+
+                    <a class="cta" th:href="@{/mypage/cafe/reviews}">
+                        <div>
+                            <div style="font-weight:700">리뷰 관리</div>
+                            <div class="meta">리뷰 확인 · 사장님 답글</div>
+                        </div>
+                        <button class="btn">이동</button>
+                    </a>
+
+                    <a class="cta" th:href="@{/mypage/cafe/promotions}">
+                        <div>
+                            <div style="font-weight:700">프로모션</div>
+                            <div class="meta">쿠폰/이벤트 · 공지</div>
+                        </div>
+                        <button class="btn">이동</button>
+                    </a>
+
+                    <a class="cta" th:href="@{/mypage/cafe/analytics}">
+                        <div>
+                            <div style="font-weight:700">분석</div>
+                            <div class="meta">조회수/찜/전환 간단 리포트</div>
+                        </div>
+                        <button class="btn">이동</button>
+                    </a>
+
+                    <a class="cta" th:href="@{/mypage/cafe/inquiries}">
+                        <div>
+                            <div style="font-weight:700">문의함 / 예약</div>
+                            <div class="meta">메시지/예약 확인 (선택 기능)</div>
+                        </div>
+                        <button class="btn">이동</button>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 리스트/미리보기 기타 영역 -->
+        <section class="lists-area">
+            <div class="card">
+                <h3>메뉴 요약</h3>
+                <div class="item">
+                    <div style="flex:1">
+                        <div style="font-weight:700">아메리카노</div>
+                        <div class="muted">커피 · 4,500원</div>
+                    </div>
+                    <span class="chip">판매중</span>
+                </div>
+                <div class="item">
+                    <div style="flex:1">
+                        <div style="font-weight:700">카페라떼</div>
+                        <div class="muted">커피 · 5,000원</div>
+                    </div>
+                    <span class="chip">판매중</span>
+                </div>
+
+                <div class="divider"></div>
+                <div style="display:flex; justify-content:flex-end">
+                    <a class="btn secondary" th:href="@{/mypage/cafe/menu}">전체 메뉴 보기</a>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <h3>사진 갤러리</h3>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px">
+                    <div style="background:#ddd; aspect-ratio:1/1; border-radius:12px;"></div>
+                    <div style="background:#ddd; aspect-ratio:1/1; border-radius:12px;"></div>
+                    <div style="background:#ddd; aspect-ratio:1/1; border-radius:12px;"></div>
+                </div>
+
+                <div class="divider"></div>
+                <div style="display:flex; justify-content:flex-end">
+                    <a class="btn secondary" th:href="@{/mypage/cafe/photos}">사진 관리</a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+</body>
+</html>
