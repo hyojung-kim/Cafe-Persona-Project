@@ -288,7 +288,15 @@ function jusoCallBack(selectedAddress) {
 
 
 
-
+// 알림팝업 띄우고 포커스 주기
+function alertAndFocus(msg, inputId) {
+    showAlert(msg);
+    const el = document.getElementById(inputId);
+    if (el) {
+        // setTimeout으로 모달이 뜬 뒤 포커스가 덮어쓰이지 않게 살짝 지연
+        setTimeout(() => { el.focus(); el.select && el.select(); }, 150);
+    }
+}
 
 
 
@@ -311,19 +319,74 @@ async function validateForm(e) {
         return false;
     }
 
-    const usernameAvailable = checkUsername();
-    const emailAvailable = checkEmail();
-    const businessNumberAvailable = checkBusinessNumber();
+    // ⬇️ 제출 직전에 최신 값으로 서버 중복 체크(반드시 await)
+        const username = document.getElementById("username")?.value?.trim() || "";
+        const email = document.getElementById("email")?.value?.trim() || "";
+        const bizNo = document.getElementById("businessNumber")?.value?.trim() || "";
 
-    if (usernameAvailable === false) { showAlert("아이디가 이미 존재합니다."); e.preventDefault(); return false; }
-    if (emailAvailable === false) { showAlert("이메일이 이미 존재합니다."); e.preventDefault(); return false; }
-    if (businessNumberAvailable === false) { showAlert("사업자등록번호가 이미 존재합니다."); e.preventDefault(); return false; }
+        // 서버와 즉시 통신해서 true/false/null을 받는다
+        const [uAvail, eAvail, bAvail] = await Promise.all([
+            username ? checkDuplicate("username", username) : null,
+            email ? checkDuplicate("email", email) : null,
+            bizNo ? checkDuplicate("businessNumber", bizNo) : null
+        ]);
 
-    return true;
+        if (uAvail === false) {
+            e.preventDefault();
+            alertAndFocus("아이디가 이미 존재합니다.", "username");
+            return false;
+        }
+        if (eAvail === false) {
+            e.preventDefault();
+            alertAndFocus("이메일이 이미 존재합니다.", "email");
+            return false;
+        }
+        if (bAvail === false) {
+            e.preventDefault();
+            alertAndFocus("이미 등록된 사업자등록번호입니다.", "businessNumber");
+            return false;
+        }
 
+        // 네트워크 에러 등으로 확인 실패했을 때는 기존 로직대로 제출(서버에서 한 번 더 검증)
+        return true;
+    }
 
+document.addEventListener("DOMContentLoaded", () => {
+    // 휴대폰 번호 입력 칸 3개
+    const phone1 = document.getElementById("phone1");
+    const phone2 = document.getElementById("phone2");
+    const phone3 = document.getElementById("phone3");
 
-}
+    // 실제 서버에 보낼 hidden input
+    const phoneHidden = document.getElementById("phone");
+
+    if (phone1 && phone2 && phone3 && phoneHidden) {
+        const phoneInputs = [phone1, phone2, phone3];
+
+        phoneInputs.forEach((input, idx) => {
+            // 입력 시 이벤트
+            input.addEventListener("input", () => {
+                // 숫자만 허용
+                input.value = input.value.replace(/\D/g, "");
+
+                // 자동 포커스 이동
+                if (idx < 2 && input.value.length === parseInt(input.maxLength)) {
+                    phoneInputs[idx + 1].focus();
+                }
+
+                // hidden input에 합치기
+                phoneHidden.value = `${phone1.value}-${phone2.value}-${phone3.value}`;
+            });
+
+            // 백스페이스로 이전 칸 이동
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && input.value.length === 0 && idx > 0) {
+                    phoneInputs[idx - 1].focus();
+                }
+            });
+        });
+    }
+});
 
 
 

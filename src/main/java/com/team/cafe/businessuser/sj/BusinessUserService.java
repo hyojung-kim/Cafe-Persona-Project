@@ -5,6 +5,9 @@ import com.team.cafe.user.sjhy.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -12,15 +15,19 @@ public class BusinessUserService {
 
     private final BusinessUserRepository businessUserRepository;
     private final UserRepository siteUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public BusinessUser register(BusinessUserDto dto) {
         // 1. 일반 회원 정보 생성
         SiteUser user = new SiteUser();
         user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword()); // 나중에 암호화
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setEmail(dto.getEmail());
         user.setNickname(dto.getNickname());
+        user.setCreateDate(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setRole("BUSINESS_USER");
 
         // SiteUser 저장
         siteUserRepository.save(user);

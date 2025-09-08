@@ -63,6 +63,15 @@ public class Review extends BaseEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id") // FK 이름은 DB에 맞춰서
+    private SiteUser user;
+
+
+
+
     /**
      * 리뷰 이미지 컬렉션(정렬 보장)
      * - ReviewImage.sortOrder 기준 오름차순
