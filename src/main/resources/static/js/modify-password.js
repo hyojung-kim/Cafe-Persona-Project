@@ -17,13 +17,13 @@ function validatePassword() {
         msg.classList.remove("text-success");
         msg.classList.add("text-danger");
         msg.innerText = "조건을 만족하지 않는 비밀번호입니다.";
-        msg.classList.remove("d-none");
+//        msg.classList.remove("d-none");
         return false;
     } else {
         msg.classList.remove("text-danger");
         msg.classList.add("text-success");
         msg.innerText = "사용 가능한 비밀번호입니다.";
-        msg.classList.remove("d-none");
+//        msg.classList.remove("d-none");
         return true;
     }
 }
