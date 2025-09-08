@@ -39,18 +39,18 @@ public class ReviewService {
         return reviewRepository.findByCafe_IdAndActiveTrue(cafeId, pageable);
     }
 
-    /** 카페별 활성 리뷰 페이징 + author/images 동시 로딩(N+1 방지) */
+    /** 카페별 활성 리뷰 페이징 + user/images 동시 로딩(N+1 방지) */
     @Transactional(readOnly = true)
-    public Page<Review> getActiveReviewsByCafeWithAuthorImages(Long cafeId, Pageable pageable) {
+    public Page<Review> getActiveReviewsByCafeWithUserImages(Long cafeId, Pageable pageable) {
         Objects.requireNonNull(cafeId, "cafeId is required");
-        return reviewRepository.findByCafe_IdAndActiveTrueFetchAuthorImages(cafeId, pageable);
+        return reviewRepository.findByCafe_IdAndActiveTrueFetchUserImages(cafeId, pageable);
     }
 
-    /** 작성자별 활성 리뷰 페이징 */
+    /** 작성자(user)별 활성 리뷰 페이징 */
     @Transactional(readOnly = true)
-    public Page<Review> getActiveReviewsByAuthor(Long authorId, Pageable pageable) {
-        Objects.requireNonNull(authorId, "authorId is required");
-        return reviewRepository.findByAuthor_IdAndActiveTrue(authorId, pageable);
+    public Page<Review> getActiveReviewsByUser(Long userId, Pageable pageable) {
+        Objects.requireNonNull(userId, "userId is required");
+        return reviewRepository.findByUser_IdAndActiveTrue(userId, pageable);
     }
 
     // ========================= 생성 =========================
@@ -62,12 +62,12 @@ public class ReviewService {
      * - 양방향 연관관계 세팅은 Review.addImage(...)에 위임 (img.review = this 세팅)
      */
     public Review createReview(Long cafeId,
-                               SiteUser author,
+                               SiteUser user,
                                Double rating,
                                String content,
                                List<String> imageUrls) {
 
-        Objects.requireNonNull(author, "author is required");
+        Objects.requireNonNull(user, "user is required");
         Objects.requireNonNull(cafeId, "cafeId is required");
 
         Cafe cafe = cafeListRepository.findById(cafeId)
@@ -80,7 +80,7 @@ public class ReviewService {
         // 부모 엔티티 생성
         Review review = new Review();
         review.setCafe(cafe);
-        review.setAuthor(author);
+        review.setUser(user);
         review.setRating(rating);
         review.setContent(content.trim());
 
@@ -116,7 +116,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        boolean isAuthor = review.getAuthor() != null && review.getAuthor().getId().equals(editor.getId());
+        boolean isAuthor = review.getUser() != null && review.getUser().getId().equals(editor.getId());
         boolean isAdmin = "ADMIN".equalsIgnoreCase(editor.getRole())
                 || "ROLE_ADMIN".equalsIgnoreCase(editor.getRole());
         if (!isAuthor && !isAdmin) {
@@ -133,10 +133,9 @@ public class ReviewService {
 
         // 기존 이미지 전량 제거 (orphanRemoval=true 전제)
         if (review.getImages() != null && !review.getImages().isEmpty()) {
-            // 복사본에서 안전하게 순회
             List<ReviewImage> copy = new ArrayList<>(review.getImages());
             for (ReviewImage img : copy) {
-                review.removeImage(img); // 내부에서 images.remove + img.setReview(null)
+                review.removeImage(img);
             }
         }
 
@@ -165,7 +164,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        boolean isAuthor = review.getAuthor() != null && review.getAuthor().getId().equals(requester.getId());
+        boolean isAuthor = review.getUser() != null && review.getUser().getId().equals(requester.getId());
         boolean isAdmin = "ADMIN".equalsIgnoreCase(requester.getRole())
                 || "ROLE_ADMIN".equalsIgnoreCase(requester.getRole());
         if (!isAuthor && !isAdmin) {
@@ -185,11 +184,11 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        if (review.getAuthor() != null && review.getAuthor().getId().equals(liker.getId())) {
+        if (review.getUser() != null && review.getUser().getId().equals(liker.getId())) {
             throw new IllegalArgumentException("자신의 리뷰에는 좋아요를 누를 수 없습니다.");
         }
 
-        review.addLike();              // 엔티티 규칙에 맞게 증감
+        review.addLike();
         reviewRepository.save(review);
     }
 
@@ -201,7 +200,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        review.removeLike();           // 엔티티 규칙에 맞게 증감
+        review.removeLike();
         reviewRepository.save(review);
     }
 

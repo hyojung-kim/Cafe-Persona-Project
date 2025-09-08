@@ -68,9 +68,9 @@ public class ReviewController {
         long reviewCount = cafeService.getActiveReviewCount(cafeId);
 
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(cafeId, pageable);
+        // author -> user 로 변경된 서비스 메서드 사용
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
-        // ✅ review/list.html 이 기대하는 키 이름들
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -94,15 +94,15 @@ public class ReviewController {
         long reviewCount = cafeService.getActiveReviewCount(id);
 
         var pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(id, pageable);
+        // author -> user 로 변경
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(id, pageable);
 
-        // ✅ review/list.html 의 fragment가 쓰는 키와 동일하게
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
         model.addAttribute("page", reviews);
 
-        // ✅ templates/review/list.html 안에 th:fragment="section" 이어야 함
+        // templates/review/list.html 안의 th:fragment="section"
         return "review/list :: section";
     }
 
@@ -112,7 +112,8 @@ public class ReviewController {
     @GetMapping("/reviews/{id}")
     public String detail(@PathVariable Long id, Model model) {
         reviewService.increaseViewCount(id);
-        Review review = reviewRepository.findWithAuthorAndImagesById(id)
+        // author -> user 로 변경된 레포지토리 메서드 사용
+        Review review = reviewRepository.findWithUserAndImagesById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
         model.addAttribute("review", review);
         return "review/detail";
@@ -127,7 +128,8 @@ public class ReviewController {
         var cafe = cafeService.getById(cafeId);
         model.addAttribute("cafe", cafe);
         model.addAttribute("mode", "create");
-        model.addAttribute("author", me);
+        // 템플릿 바인딩 키도 author -> user 로 통일
+        model.addAttribute("user", me);
         return "review/edit";
     }
 
@@ -160,7 +162,7 @@ public class ReviewController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("cafe", cafe);
             model.addAttribute("mode", "create");
-            model.addAttribute("author", me);
+            model.addAttribute("user", me);
             return "review/edit";
         }
 
@@ -262,7 +264,7 @@ public class ReviewController {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
 
-        boolean isAuthor = review.getAuthor() != null && review.getAuthor().getId().equals(me.getId());
+        boolean isAuthor = review.getUser() != null && review.getUser().getId().equals(me.getId());
         boolean isAdmin = "ADMIN".equalsIgnoreCase(me.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(me.getRole());
         if (!isAuthor && !isAdmin) {
             ra.addFlashAttribute("message", "작성자 또는 관리자만 수정할 수 있습니다.");
