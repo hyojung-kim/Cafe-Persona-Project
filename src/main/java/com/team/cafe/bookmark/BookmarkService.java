@@ -7,6 +7,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class BookmarkService {
@@ -41,5 +44,9 @@ public class BookmarkService {
 
     public boolean existsByUser_IdAndCafe_Id(Long id, Long cafeId) {
         return bookmarkRepository.existsByUser_IdAndCafe_Id(id, cafeId);
+    }
+
+    public List<Bookmark> getBookmarksByUser(Long userId) {
+        return bookmarkRepository.findAllByUserIdWithCafe(userId);
     }
 }
