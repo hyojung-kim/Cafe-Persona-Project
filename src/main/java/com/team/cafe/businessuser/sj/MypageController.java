@@ -29,7 +29,7 @@ public class MypageController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final CafeManageService cafeManageService;
-    private final BusinessUserRepository businessUserRepository;
+    private final BusinessRepository businessRepository;
 
     // 현재 로그인한 사용자 가져오기
     private SiteUser getCurrentUser() {

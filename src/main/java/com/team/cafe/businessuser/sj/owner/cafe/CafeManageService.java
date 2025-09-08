@@ -1,9 +1,6 @@
 package com.team.cafe.businessuser.sj.owner.cafe;
 
-import com.team.cafe.businessuser.sj.Business;
-import com.team.cafe.businessuser.sj.BusinessUserRepository;
-import com.team.cafe.businessuser.sj.BusinessStatus;
-import com.team.cafe.businessuser.sj.DuplicateBusinessNumberException;
+import com.team.cafe.businessuser.sj.*;
 import com.team.cafe.user.sjhy.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +22,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CafeManageService {
 
-    private final BusinessUserRepository businessUserRepository;
+    private final BusinessRepository businessRepository;
 
     /**
      * 사업장 신규 등록
