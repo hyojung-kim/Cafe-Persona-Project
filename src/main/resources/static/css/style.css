@@ -128,4 +128,11 @@ table td:nth-child(8) {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+
+/* a) 순서 보장: .hidden을 .badge 뒤에 둔다 */
+
+.hidden { display: none !important; }
+
+
 /*임시코드 끝 */

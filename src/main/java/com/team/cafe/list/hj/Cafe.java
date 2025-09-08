@@ -3,6 +3,7 @@ package com.team.cafe.list.hj;
 
 import com.team.cafe.bookmark.Bookmark;
 import com.team.cafe.keyword.hj.CafeKeyword;
+import com.team.cafe.review.domain.BaseEntity;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
@@ -11,7 +12,6 @@ import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-public class Cafe {
+public class Cafe extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,13 +84,13 @@ public class Cafe {
 //    @Comment("좋아요 수")
 //    private int likeCount;
 
-    @Column(name = "created_at", nullable = false, columnDefinition = "DATETIME")
-    @Comment("생성 시각")
-    private LocalDateTime createdAt;
+//    @Column(name = "created_at", nullable = false, columnDefinition = "DATETIME")
+//    @Comment("생성 시각")
+//    private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false, columnDefinition = "DATETIME")
-    @Comment("수정 시각")
-    private LocalDateTime updatedAt;
+//    @Column(name = "updated_at", nullable = false, columnDefinition = "DATETIME")
+//    @Comment("수정 시각")
+//    private LocalDateTime updatedAt;
 
     //관계구조
 

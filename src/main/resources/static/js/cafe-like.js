@@ -6,6 +6,7 @@ $(function () {
   const cafeId  = box.data('cafe-id');
   const btn     = $('#likeBtn');
   const countEl = $('#likeCount');
+  const badgeEl = $('#bookmark-badge'); // 있으면 토글, 없으면 무시
 
   // CSRF (Thymeleaf 메타태그 사용 시)
   const csrfToken  = $('meta[name="_csrf"]').attr('content');
@@ -31,8 +32,10 @@ $(function () {
       cache: false
     })
     .done(function (res) {
+      console.log("JSON 응답", res); // {count: 12, liked: true, bookmarked: true}
       countEl.text(String(res.count));
       setLikedUI(!!res.liked);
+      badgeEl.toggleClass('hidden', !res.bookmarked);
     })
     .fail(function (xhr) {
       if (xhr.status === 401 || xhr.status === 403) {

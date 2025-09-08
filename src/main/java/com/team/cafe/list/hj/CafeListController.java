@@ -1,11 +1,14 @@
 package com.team.cafe.list.hj;
 
+import com.team.cafe.bookmark.BookmarkService;
+import com.team.cafe.bookmark.LikeBookmarkFacade;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -33,6 +35,8 @@ public class CafeListController {
     private final LikeService likeService;
     private final CafeImageService cafeImageService;
     private final ReviewService reviewService;
+    private final LikeBookmarkFacade likeBookmarkFacade;
+    private final BookmarkService bookmarkService;
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
@@ -42,14 +46,16 @@ public class CafeListController {
                        @RequestParam(defaultValue = "desc") String dir,
                        @RequestParam(required = false) Boolean parking,  // true면 가능만
                        @RequestParam(required = false) Boolean openNow,  // true면 영업중만
+                       @RequestParam(name = "keyList", required = false) List<Long> keyList,
                        Model model
     ) {
-        var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
+        // 기존 코드 : var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
+        Page<CafeMatchDto> paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow, keyList);
 
         // 이번 페이지의 카페 ID들만 모아서
         List<Long> ids = paging.getContent().stream()
-                .map(Cafe::getId)
-                .collect(Collectors.toList());
+               .map(CafeMatchDto::getId)
+               .toList();
 
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
@@ -72,9 +78,13 @@ public class CafeListController {
                          @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
                          @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
                          Principal principal,
+                         HttpSession session,
                          Model model) {
 
         Cafe cafe = cafeListService.getById(cafeId);
+        boolean bookmarked = false;
+
+        cafeListService.increaseViewOncePerSession(cafeId, session);
 
         // 로그인 사용자
         SiteUser loginUser = null;
@@ -85,8 +95,12 @@ public class CafeListController {
         boolean liked = false;
         if (loginUser != null) {
             liked = likeService.isLiked(cafeId, loginUser.getId());
+            //북마크
+            bookmarked = bookmarkService.existsByUser_IdAndCafe_Id(loginUser.getId(), cafeId);
+         
         }
 
+        
         long likeCount = likeService.getLikeCount(cafeId);
         boolean openNow = cafeListService.isOpenNow(cafe);
 
@@ -102,6 +116,7 @@ public class CafeListController {
         model.addAttribute("liked", liked);
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("openNow", openNow);
+        model.addAttribute("bookmarked", bookmarked);
 
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -118,6 +133,7 @@ public class CafeListController {
     // @PreAuthorize("isAuthenticated()")
     // 상태 변경은 POST로
     @PostMapping(value = "/like/{cafeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody  // 이 메서드만 JSON으로
     public ResponseEntity<?> toggle(@PathVariable Long cafeId, Principal principal) {
         if (principal == null) {
             // 비로그인 → 401
@@ -127,13 +143,16 @@ public class CafeListController {
         SiteUser user = userService.getUser(principal.getName());
 
         // toggle이 true/false(현재 상태) 반환하도록 만들면 최고
-        boolean liked = likeService.toggle(cafeId, user.getId());
+        //boolean liked = likeService.toggle(cafeId, user.getId());
+        boolean likedNow = likeBookmarkFacade.toggleAndSync(cafeId, user.getId(), true);
 
         long count = likeService.getLikeCount(cafeId);
 
+        // 북마크 정책이 “좋아요 ON == 북마크 보장”이면 결과는 likedNow와 동일하게 안내 가능
         return ResponseEntity.ok(Map.of(
                 "count", count,
-                "liked", liked
+                "liked", likedNow,
+                "bookmarked", likedNow   // 정책상 보장됨(OFF도 유지 정책이면 exists 쿼리로 반환)
         ));
     }
 
