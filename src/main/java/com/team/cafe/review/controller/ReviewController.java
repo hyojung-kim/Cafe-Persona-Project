@@ -58,14 +58,14 @@ public class ReviewController {
     public String redirectListToCafeDetail(@PathVariable Long cafeId,
                                            @RequestParam(defaultValue = "0", name = "page") int page,
                                            @RequestParam(defaultValue = "10", name = "size") int size) {
-        return "redirect:/cafe/detail/" + cafeId + "?rpage=" + page + "&rsize=" + size;
+        return "redirect:/review/list/" + cafeId + "?rpage=" + page + "&rsize=" + size;
     }
 
     @GetMapping("/cafes/{cafeId}/reviews/section")
     public String redirectSectionToCafeDetail(@PathVariable Long cafeId,
                                               @RequestParam(defaultValue = "0", name = "page") int page,
                                               @RequestParam(defaultValue = "10", name = "size") int size) {
-        return "redirect:/cafe/detail/" + cafeId + "?rpage=" + page + "&rsize=" + size;
+        return "redirect:/review/list/" + cafeId + "?rpage=" + page + "&rsize=" + size;
     }
 
     /* ===== 리뷰 상세 ===== */
@@ -222,7 +222,7 @@ public class ReviewController {
         model.addAttribute("reviewCount", reviewCount);
         model.addAttribute("reviews", reviews);
 
-        return "cafe/detail :: reviews_section";
+        return "review/list :: reviews_section";
     }
 
     /* ===== 좋아요/취소 ===== */

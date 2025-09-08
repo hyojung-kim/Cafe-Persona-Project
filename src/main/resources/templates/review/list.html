@@ -13,7 +13,7 @@
   <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
   <!-- 프로젝트 전용 CSS (선택) -->
-  <link rel="stylesheet" th:href="@{/css/cafe-detail.css}"/>
+  <link rel="stylesheet" th:href="@{/css/review-detail.css}"/>
 </th:block>
 
 <!-- ✅ Bootstrap 클래스 적용 -->
@@ -174,7 +174,7 @@
 
 <!-- 레이아웃이 body-end 삽입 포인트를 제공하는 경우 (Bootstrap JS는 레이아웃에서 로드됨) -->
 <th:block layout:fragment="bodyEndExtra">
-  <script th:src="@{/js/cafe-detail.js}" defer></script>
+  <script th:src="@{/js/review-detail.js}" defer></script>
 </th:block>
 
 </html>
