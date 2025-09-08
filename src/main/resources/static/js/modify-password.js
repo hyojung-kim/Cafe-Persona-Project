@@ -17,13 +17,13 @@ function validatePassword() {
         msg.classList.remove("text-success");
         msg.classList.add("text-danger");
         msg.innerText = "조건을 만족하지 않는 비밀번호입니다.";
-//        msg.classList.remove("d-none");
+        msg.classList.remove("d-none");
         return false;
     } else {
         msg.classList.remove("text-danger");
         msg.classList.add("text-success");
         msg.innerText = "사용 가능한 비밀번호입니다.";
-//        msg.classList.remove("d-none");
+        msg.classList.remove("d-none");
         return true;
     }
 }
@@ -54,7 +54,6 @@ function validatePasswordConfirm() {
 //        msg.innerText = "비밀번호가 일치합니다.";
 //        return true;
 //    }
-        //  지피티 실험
     if (pw !== pw2) {
         msg.innerText = "비밀번호가 일치하지 않습니다.";
         msg.classList.remove("text-success");
@@ -91,10 +90,10 @@ function validateForm(e) {
 
 
     // 인증된 아이디인지 체크
-    if (!verifiedId || username !== verifiedId) {
-        showAlert("인증을 완료한 아이디만 비밀번호를 변경할 수 있습니다.");
-        return;
-    }
+//    if (!verifiedId || username !== verifiedId) {
+//        showAlert("인증을 완료한 아이디만 비밀번호를 변경할 수 있습니다.");
+//        return;
+//    }
 
     // 검증 통과하면 폼 제출
     e.target.submit();
@@ -105,7 +104,17 @@ function showAlert(message) {
     const modalEl = document.getElementById("alertModal");
     const msgEl = document.getElementById("alertMessage");
     msgEl.innerText = message;
+
     const modal = new bootstrap.Modal(modalEl);
+
+    // 모달 닫힐 때 페이지 새로고침
+    // 이벤트 제거 후 다시 등록 (중복 방지)
+    modalEl.removeEventListener('hidden.bs.modal', reloadPage);
+    function reloadPage() {
+        window.location.reload();
+    }
+    modalEl.addEventListener('hidden.bs.modal', reloadPage, { once: true });
+
     modal.show();
 }
 
