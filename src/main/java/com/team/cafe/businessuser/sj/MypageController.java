@@ -55,9 +55,15 @@ public class MypageController {
             return "redirect:/user/login";
         }
 
-        model.addAttribute("username", siteUser.getUsername());
+        // ▼ 변경: 템플릿에서 user.businessUser 판별할 수 있게 user 객체를 모델에 넣기
+        model.addAttribute("user", siteUser);
+
+        // (username만 필요 없다면 아래 줄은 지워도 됩니다)
+        // model.addAttribute("username", siteUser.getUsername());
+
         return "mypage/main";
     }
+
 
     // 계정 관리 화면
     @GetMapping("/mypage/account")

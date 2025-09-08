@@ -76,10 +76,17 @@
         <input type="text" class="form-control" id="ceoName" name="ceoName" required>
     </div>
 
-    <!-- 연락처 -->
+    <!-- 실제 서버에 전송할 hidden input -->
+    <input type="hidden" id="phone" name="phone">
+
+    <!-- 휴대폰 번호 -->
     <div class="form-row">
-        <label for="phone">연락처</label>
-        <input type="tel" class="form-control" id="phone" name="phone" placeholder="예: 010-1234-5678" required>
+        <label for="phone1">휴대폰 번호</label>
+        <div style="display: flex; gap: 5px;">
+            <input type="text" id="phone1" name="phone1" maxlength="3" pattern="\d{3}" required placeholder="010" class="form-control">
+            <input type="text" id="phone2" name="phone2" maxlength="4" pattern="\d{4}" required placeholder="1234" class="form-control">
+            <input type="text" id="phone3" name="phone3" maxlength="4" pattern="\d{4}" required placeholder="5678" class="form-control">
+        </div>
     </div>
 
     <div class="form-row">

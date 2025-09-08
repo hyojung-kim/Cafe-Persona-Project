@@ -4,11 +4,15 @@ import com.team.cafe.like.LikeService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -29,9 +33,34 @@ public class CafeListController {
                        @RequestParam(required = false) Boolean openNow,  // true면 영업중만
                        Model model
                        ) {
+
+        // 검색어가 공백 문자열이면 null로 정규화
+        if (kw != null && kw.isBlank()) kw = null;
+
         var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
 
+        // 데이터가 null 값이면 html 타임리프에서 파싱하는 과정에서 isEmpty()에서 터져서 수정 조금 했습니다
+        // null 전달하지 않게 빈 페이지로 대체하는 코드입니다
+        if (paging == null) {
+            try {
+                paging = Page.empty(PageRequest.of(page, size));
+            } catch (Throwable t) {
+                paging = new PageImpl<Cafe>(List.of());
+            }
+        }
+
+        // 템플릿에서 바로 쓰기 편하게 content도 별도 제공
+        List<Cafe> cafes;
+        try {
+            cafes = (List<Cafe>) paging.getContent(); // Page인 경우
+        } catch (Throwable t) {
+            // 커스텀 페이징 타입이라면 서비스에서 content 꺼내는 메서드 사용
+            cafes = (paging != null && paging.getContent() != null) ? paging.getContent() : List.of();
+        }
+
+
         model.addAttribute("paging", paging);
+        model.addAttribute("cafes", cafes); // 리스트 전용
         model.addAttribute("kw", kw);
         model.addAttribute("size", size);
         model.addAttribute("sort", sort);

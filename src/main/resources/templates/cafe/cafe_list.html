@@ -106,7 +106,7 @@
     </table>
 
     <!-- 페이징: 모든 파라미터 유지 -->
-    <div style="margin-top:20px; text-align:center" th:if="${!paging.isEmpty()}">
+    <div style="margin-top:20px; text-align:center" th:if="${paging != null and !paging.isEmpty()}">
         <a th:if="${!paging.first}"
            th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">이전</a>
 

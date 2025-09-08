@@ -12,6 +12,8 @@
             <h1>마이 페이지</h1>
             <div class="controls">
                 <span th:text="${username} + '님 안녕하세요'"></span>
+                <span th:text="${user.businessUser != null ? '사업자회원' : '일반회원'}"></span>
+
                 <form th:action="@{/user/logout}" method="post">
                     <button type="submit">로그아웃</button>
                 </form>

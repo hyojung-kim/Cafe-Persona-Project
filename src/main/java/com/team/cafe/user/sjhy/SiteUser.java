@@ -65,9 +65,13 @@ public class SiteUser implements UserDetails {
     @Comment("최근 로그인 일시")
     private LocalDateTime lastLogin;
 
-    @Column(name = "create_date", nullable = false)
+    @Column(name = "created_at", nullable = false)
     @Comment("회원 가입 일시")
     private LocalDateTime createDate;
+
+    @Column(name = "updated_at", nullable = false)
+    @Comment("회원 가입 일시")
+    private LocalDateTime updatedAt;
 
 
 //    @Column(name = "is_active", nullable = false)
@@ -116,5 +120,7 @@ public class SiteUser implements UserDetails {
     // 일반 회원과 비즈니스 회원 1:1 연결
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private BusinessUser businessUser;
+
+
 }
 
