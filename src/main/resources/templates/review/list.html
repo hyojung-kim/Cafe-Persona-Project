@@ -5,108 +5,87 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 
-<!-- 레이아웃이 head 삽입 포인트를 제공하는 경우 (Bootstrap은 레이아웃에 이미 포함) -->
 <th:block layout:fragment="headExtra">
   <meta charset="UTF-8"/>
-  <!-- CSRF 메타 -->
+  <!-- CSRF (AJAX용) -->
   <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
   <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-  <!-- 프로젝트 전용 CSS (선택) -->
-  <link rel="stylesheet" th:href="@{/css/review-detail.css}"/>
+  <title th:text="|리뷰 목록 - ${cafe.name}|">리뷰 목록</title>
+  <!-- 필요하면 전용 CSS 추가 가능 -->
+  <!-- <link rel="stylesheet" th:href="@{/css/review-list.css}"/> -->
 </th:block>
 
-<!-- ✅ Bootstrap 클래스 적용 -->
 <div layout:fragment="content" class="container mt-4">
 
-  <!-- 상단: 카페 정보 -->
+  <!-- 상단: 카페 요약 -->
   <section class="card shadow-sm mb-3">
-    <div class="card-body">
-      <div class="d-flex justify-content-between">
-        <div>
-          <h2 class="h3 mb-1" th:text="${cafe.name}">카페 이름</h2>
-          <div class="text-muted small">
-            <span th:text="${cafe.address1} ?: '주소 정보 없음'">주소1</span>
-            <span th:if="${cafe.address2}" th:text="| ${cafe.address2}|"></span>
-          </div>
-          <div class="text-muted small" th:if="${cafe.phoneNum}">
-            전화: <span th:text="${cafe.phoneNum}">010-0000-0000</span>
-          </div>
+    <div class="card-body d-flex justify-content-between">
+      <div>
+        <h2 class="h4 mb-1" th:text="${cafe.name}">카페명</h2>
+        <div class="text-muted small">
+          평균 ★ <span th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,1) : '0.0'}">0.0</span> / 5.0
+          <span class="ms-2">리뷰 <b th:text="${reviewCount}">0</b>개</span>
         </div>
-
-        <div class="text-end">
-          <div class="badge bg-warning text-dark">
-            평균 ★
-            <span th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,1) : '0.0'}">0.0</span>
-            / 5.0
-          </div>
-          <div class="mt-2" th:if="${openNow != null}">
-            <span th:classappend="${openNow} ? 'badge bg-success' : 'badge bg-secondary'"
-                  th:text="${openNow} ? '영업중' : '마감'">영업상태</span>
-          </div>
-        </div>
+      </div>
+      <div class="text-end">
+        <a th:href="@{|/cafe/detail/${cafe.id}|}" class="btn btn-outline-secondary btn-sm">카페 상세</a>
       </div>
     </div>
   </section>
 
-  <!-- 로그인한 사용자만: 리뷰 작성 -->
+  <!-- 로그인 사용자만: 리뷰 작성 폼 -->
   <section class="card shadow-sm mb-3" sec:authorize="isAuthenticated()">
     <div class="card-body">
-      <h3 class="h5 mb-3">리뷰 작성</h3>
+      <h3 class="h6 mb-3">리뷰 작성</h3>
 
-      <!-- ✅ 파일 업로드 가능 + 동일 액션/속성 유지 -->
       <form id="reviewCreateForm"
             th:action="@{/cafes/{id}/reviews(id=${cafe.id})}"
-            th:attr="data-cafe-id=${cafe.id}"
             method="post"
             enctype="multipart/form-data"
             class="needs-validation" novalidate>
         <input th:if="${_csrf}" type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-        <div class="mb-3">
-          <label for="rating" class="form-label">별점 (1.0~5.0, 0.5단위)</label>
-          <input id="rating" name="rating" type="number" step="0.5" min="1.0" max="5.0"
-                 class="form-control" value="4.0" required/>
-          <div class="invalid-feedback">별점을 입력하세요.</div>
+        <div class="row g-2">
+          <div class="col-12 col-md-2">
+            <input id="rating" name="rating" type="number" step="0.5" min="1.0" max="5.0"
+                   class="form-control" value="4.0" required/>
+          </div>
+          <div class="col-12 col-md-7">
+            <input id="content" name="content" class="form-control" minlength="5" maxlength="4000"
+                   placeholder="후기를 입력하세요(최소 5자)" required/>
+          </div>
+          <div class="col-12 col-md-3">
+            <input type="file" name="images" class="form-control" accept="image/*" multiple>
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label for="content" class="form-label">내용 (최소 5자)</label>
-          <textarea id="content" name="content" minlength="5" maxlength="4000"
-                    class="form-control"
-                    placeholder="카페 이용 경험을 간단히 적어 주세요." required></textarea>
-          <div class="invalid-feedback">리뷰 내용은 5자 이상이어야 합니다.</div>
-        </div>
-
-        <!-- 파일 업로드 (여러 장 가능) -->
-        <div class="mb-3">
-          <label class="form-label">이미지 파일 업로드 (여러 장 가능)</label>
-          <input type="file" name="images" class="form-control" accept="image/*" multiple>
-        </div>
-
-        <div class="d-grid d-md-block">
-          <button class="btn btn-primary" type="submit">등록</button>
+        <div class="mt-2">
+          <button class="btn btn-primary btn-sm" type="submit">등록</button>
         </div>
       </form>
     </div>
   </section>
 
-  <!-- 리뷰 리스트 (프래그먼트 + 교체 타겟) -->
-  <section class="card shadow-sm" id="reviewsSection" th:fragment="reviews_section">
+  <!-- ▼▼ 리뷰 리스트 섹션 (프래그먼트 대상) ▼▼ -->
+  <section id="reviewsSection"
+           th:fragment="section"
+           class="card shadow-sm"
+           th:attr="data-review-section-url=@{|/cafes/${cafe.id}/reviews/section?rpage=${page.number}&rsize=${page.size}|}">
     <div class="card-body">
+
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h3 class="h5 mb-0">리뷰</h3>
-        <div class="text-muted small" th:if="${reviews != null}">
-          페이지 <span th:text="${reviews.number + 1}">1</span> / <span th:text="${reviews.totalPages}">1</span>
+        <h3 class="h6 mb-0">리뷰</h3>
+        <div class="text-muted small">
+          페이지 <span th:text="${page.number + 1}">1</span> / <span th:text="${page.totalPages}">1</span>
         </div>
       </div>
 
-      <div class="row g-3" th:if="${reviews != null and reviews.totalElements > 0}">
-        <article th:each="rv : ${reviews.content}" class="col-12">
+      <div class="row g-3" th:if="${page != null and page.totalElements > 0}">
+        <article th:each="rv : ${page.content}" class="col-12">
           <div class="border rounded p-3 h-100">
             <div class="d-flex justify-content-between">
               <h4 class="h6 mb-0">
-                <!-- author -> user 로 교체 -->
                 <span class="badge bg-info text-dark"
                       th:text="${rv.user != null ? rv.user.username : '알 수 없음'}">작성자</span>
                 <span class="ms-2">★ <span th:text="${#numbers.formatDecimal(rv.rating,1,1)}">4.0</span></span>
@@ -124,57 +103,51 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-3">
-              <div>
-                <form th:action="@{|/reviews/${rv.id}/like|}" method="post" class="d-inline">
-                  <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                  <button class="btn btn-outline-success btn-sm" type="submit">👍 좋아요</button>
-                </form>
-                <form th:action="@{|/reviews/${rv.id}/unlike|}" method="post" class="d-inline ms-1">
-                  <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                  <button class="btn btn-outline-secondary btn-sm" type="submit">↩ 취소</button>
-                </form>
-                <span class="text-muted ms-2 small">♡ <b th:text="${rv.likeCount}">0</b></span>
-              </div>
+              <div class="text-muted small">♡ <b th:text="${rv.likeCount}">0</b></div>
               <a class="btn btn-sm btn-outline-primary" th:href="@{|/reviews/${rv.id}|}">상세보기</a>
             </div>
           </div>
         </article>
       </div>
 
-      <nav class="mt-3" th:if="${reviews != null and reviews.totalPages > 1}">
+      <!-- 페이지네이션 (클릭 가로채서 AJAX로 로드) -->
+      <nav class="mt-3 review-pagination" th:if="${page != null and page.totalPages > 1}">
         <ul class="pagination pagination-sm mb-0">
-          <li class="page-item" th:classappend="${!reviews.hasPrevious()}? 'disabled'">
+          <li class="page-item" th:classappend="${!page.hasPrevious()}? 'disabled'">
             <a class="page-link"
-               th:href="@{/cafe/detail/{id}(id=${cafe.id}, rpage=${reviews.number - 1}, rsize=${reviews.size})}">&laquo; 이전</a>
+               th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${page.number - 1}, rsize=${page.size})}">&laquo; 이전</a>
           </li>
 
           <li class="page-item"
-              th:each="p : ${#numbers.sequence(0, reviews.totalPages - 1)}"
-              th:classappend="${p} == ${reviews.number} ? 'active'">
+              th:each="p : ${#numbers.sequence(0, page.totalPages - 1)}"
+              th:classappend="${p} == ${page.number} ? 'active'">
             <a class="page-link"
-               th:if="${p} != ${reviews.number}"
-               th:href="@{/cafe/detail/{id}(id=${cafe.id}, rpage=${p}, rsize=${reviews.size})}"
+               th:if="${p} != ${page.number}"
+               th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${p}, rsize=${page.size})}"
                th:text="${p+1}">1</a>
-            <span class="page-link" th:if="${p} == ${reviews.number}" th:text="${p+1}">1</span>
+            <span class="page-link" th:if="${p} == ${page.number}" th:text="${p+1}">1</span>
           </li>
 
-          <li class="page-item" th:classappend="${!reviews.hasNext()}? 'disabled'">
+          <li class="page-item" th:classappend="${!page.hasNext()}? 'disabled'">
             <a class="page-link"
-               th:href="@{/cafe/detail/{id}(id=${cafe.id}, rpage=${reviews.number + 1}, rsize=${reviews.size})}">다음 &raquo;</a>
+               th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${page.number + 1}, rsize=${page.size})}">다음 &raquo;</a>
           </li>
         </ul>
       </nav>
 
-      <div th:if="${reviews == null || reviews.totalElements == 0}" class="text-muted">
+      <div th:if="${page == null || page.totalElements == 0}" class="text-muted">
         아직 작성된 리뷰가 없어요.
       </div>
+
     </div>
   </section>
+  <!-- ▲▲ 프래그먼트 끝 ▲▲ -->
+
 </div>
 
-<!-- 레이아웃이 body-end 삽입 포인트를 제공하는 경우 (Bootstrap JS는 레이아웃에서 로드됨) -->
 <th:block layout:fragment="bodyEndExtra">
-  <script th:src="@{/js/review-detail.js}" defer></script>
+  <!-- 리뷰 전용 JS(폼 AJAX + 섹션 갱신) -->
+  <script th:src="@{/js/reviews-section.js}" defer></script>
 </th:block>
 
 </html>
