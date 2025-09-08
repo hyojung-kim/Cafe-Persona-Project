@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<!-- 레이아웃이 head 삽입 포인트를 제공하는 경우 (Bootstrap은 레이아웃에 이미 포함) -->
+<th:block layout:fragment="headExtra">
+  <meta charset="UTF-8"/>
+  <!-- CSRF 메타 -->
+  <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+  <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <!-- 프로젝트 전용 CSS (선택) -->
+  <link rel="stylesheet" th:href="@{/css/cafe-detail.css}"/>
+</th:block>
+
+<!-- ✅ Bootstrap 클래스 적용 -->
+<div layout:fragment="content" class="container mt-4">
+
+  <!-- 상단: 카페 정보 -->
+  <section class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div>
+          <h2 class="h3 mb-1" th:text="${cafe.name}">카페 이름</h2>
+          <div class="text-muted small">
+            <span th:text="${cafe.address1} ?: '주소 정보 없음'">주소1</span>
+            <span th:if="${cafe.address2}" th:text="| ${cafe.address2}|"></span>
+          </div>
+          <div class="text-muted small" th:if="${cafe.phoneNum}">
+            전화: <span th:text="${cafe.phoneNum}">010-0000-0000</span>
+          </div>
+        </div>
+
+        <div class="text-end">
+          <div class="badge bg-warning text-dark">
+            평균 ★
+            <span th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,1) : '0.0'}">0.0</span>
+            / 5.0
+          </div>
+          <div class="mt-2" th:if="${openNow != null}">
+                        <span th:classappend="${openNow} ? 'badge bg-success' : 'badge bg-secondary'"
+                              th:text="${openNow} ? '영업중' : '마감'">영업상태</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 로그인한 사용자만: 리뷰 작성 -->
+  <section class="card shadow-sm mb-3" sec:authorize="isAuthenticated()">
+    <div class="card-body">
+      <h3 class="h5 mb-3">리뷰 작성</h3>
+
+      <!-- ✅ 파일 업로드 가능 + 동일 액션/속성 유지 -->
+      <form id="reviewCreateForm"
+            th:action="@{/cafes/{id}/reviews(id=${cafe.id})}"
+            th:attr="data-cafe-id=${cafe.id}"
+            method="post"
+            enctype="multipart/form-data"
+            class="needs-validation" novalidate>
+        <input th:if="${_csrf}" type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="mb-3">
+          <label for="rating" class="form-label">별점 (1.0~5.0, 0.5단위)</label>
+          <input id="rating" name="rating" type="number" step="0.5" min="1.0" max="5.0"
+                 class="form-control" value="4.0" required/>
+          <div class="invalid-feedback">별점을 입력하세요.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="content" class="form-label">내용 (최소 5자)</label>
+          <textarea id="content" name="content" minlength="5" maxlength="4000"
+                    class="form-control"
+                    placeholder="카페 이용 경험을 간단히 적어 주세요." required></textarea>
+          <div class="invalid-feedback">리뷰 내용은 5자 이상이어야 합니다.</div>
+        </div>
+
+
+        <!-- 파일 업로드 (여러 장 가능) -->
+        <div class="mb-3">
+          <label class="form-label">이미지 파일 업로드 (여러 장 가능)</label>
+          <input type="file" name="images" class="form-control" accept="image/*" multiple>
+        </div>
+
+        <div class="d-grid d-md-block">
+          <button class="btn btn-primary" type="submit">등록</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- 리뷰 리스트 (프래그먼트 + 교체 타겟) -->
+  <section class="card shadow-sm" id="reviewsSection" th:fragment="reviews_section">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="h5 mb-0">리뷰</h3>
+        <div class="text-muted small" th:if="${reviews != null}">
+          페이지 <span th:text="${reviews.number + 1}">1</span> / <span th:text="${reviews.totalPages}">1</span>
+        </div>
+      </div>
+
+      <div class="row g-3" th:if="${reviews != null and reviews.totalElements > 0}">
+        <article th:each="rv : ${reviews.content}" class="col-12">
+          <div class="border rounded p-3 h-100">
+            <div class="d-flex justify-content-between">
+              <h4 class="h6 mb-0">
+                                <span class="badge bg-info text-dark"
+                                      th:text="${rv.author != null ? rv.author.username : '알 수 없음'}">작성자</span>
+                <span class="ms-2">★ <span th:text="${#numbers.formatDecimal(rv.rating,1,1)}">4.0</span></span>
+              </h4>
+              <time class="text-muted small"
+                    th:text="${#temporals.format(rv.createdAt,'yyyy-MM-dd HH:mm')}">2025-09-01</time>
+            </div>
+
+            <p class="mt-2 mb-2" th:text="${rv.content}">리뷰 내용</p>
+
+            <div class="row g-2 mt-1" th:if="${rv.images != null and !rv.images.isEmpty()}">
+              <div class="col-4" th:each="img : ${rv.images}">
+                <img th:src="${img.imageUrl}" alt="review image" class="img-fluid rounded">
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div>
+                <form th:action="@{|/reviews/${rv.id}/like|}" method="post" class="d-inline">
+                  <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <button class="btn btn-outline-success btn-sm" type="submit">👍 좋아요</button>
+                </form>
+                <form th:action="@{|/reviews/${rv.id}/unlike|}" method="post" class="d-inline ms-1">
+                  <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <button class="btn btn-outline-secondary btn-sm" type="submit">↩ 취소</button>
+                </form>
+                <span class="text-muted ms-2 small">♡ <b th:text="${rv.likeCount}">0</b></span>
+              </div>
+              <a class="btn btn-sm btn-outline-primary" th:href="@{|/reviews/${rv.id}|}">상세보기</a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <nav class="mt-3" th:if="${reviews != null and reviews.totalPages > 1}">
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" th:classappend="${!reviews.hasPrevious()}? 'disabled'">
+            <a class="page-link"
+               th:href="@{/cafe/detail/{id}(id=${cafe.id}, rpage=${reviews.number - 1}, rsize=${reviews.size})}">&laquo; 이전</a>
+          </li>
+
+          <li class="page-item"
+              th:each="p : ${#numbers.sequence(0, reviews.totalPages - 1)}"
+              th:classappend="${p} == ${reviews.number} ? 'active'">
+            <a class="page-link"
+               th:if="${p} != ${reviews.number}"
+               th:href="@{/cafe/detail/{id}(id=${cafe.id}, rpage=${p}, rsize=${reviews.size})}"
+               th:text="${p+1}">1</a>
+            <span class="page-link" th:if="${p} == ${reviews.number}" th:text="${p+1}">1</span>
+          </li>
+
+          <li class="page-item" th:classappend="${!reviews.hasNext()}? 'disabled'">
+            <a class="page-link"
+               th:href="@{/cafe/detail/{id}(id=${cafe.id}, rpage=${reviews.number + 1}, rsize=${reviews.size})}">다음 &raquo;</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div th:if="${reviews == null || reviews.totalElements == 0}" class="text-muted">
+        아직 작성된 리뷰가 없어요.
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- 레이아웃이 body-end 삽입 포인트를 제공하는 경우 (Bootstrap JS는 레이아웃에서 로드됨) -->
+<th:block layout:fragment="bodyEndExtra">
+  <script th:src="@{/js/cafe-detail.js}" defer></script>
+</th:block>
+
+</html>

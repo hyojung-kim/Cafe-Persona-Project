@@ -1,95 +1,56 @@
-// /static/js/cafe-detail.js
+// /js/cafe-detail.js
 (function () {
   const form = document.getElementById('reviewCreateForm');
-  const section = document.getElementById('reviewsSection');
-  if (!form || !section) return;
+  if (!form) return;
 
-  // CSRF 메타
-  const CSRF_TOKEN = document.querySelector('meta[name="_csrf"]')?.content;
-  const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content;
+  const csrfToken  = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
-  // 카페 id (템플릿에서 data-cafe-id 세팅됨)
-  const cafeId = form.getAttribute('data-cafe-id');
-
-  // 간단 토스트 (Bootstrap alert)
-  function toast(msg, kind = 'info') {
-    const div = document.createElement('div');
-    div.className = `alert alert-${kind} position-fixed top-0 start-50 translate-middle-x mt-3 shadow`;
-    div.style.zIndex = 1080;
-    div.textContent = msg;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 1800);
-  }
-
-  // 부트스트랩 폼 검증 표시
-  (function enableBootstrapValidation() {
-    form.addEventListener('submit', (event) => {
-      if (!form.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      form.classList.add('was-validated');
-    }, false);
-  })();
-
-  // 리뷰 섹션 프래그먼트 새로고침
-  async function refreshReviews(page = 0, size = 5) {
-    const url = `/cafe/detail/${encodeURIComponent(cafeId)}/reviews/section?rpage=${page}&rsize=${size}`;
-    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-    if (!res.ok) throw new Error('리뷰 섹션을 불러오지 못했습니다.');
-    const html = await res.text();
-
-    // 새 섹션으로 교체
-    const temp = document.createElement('div');
-    temp.innerHTML = html.trim();
-    const newSection = temp.querySelector('#reviewsSection') || temp.firstElementChild;
-    if (newSection) section.replaceWith(newSection);
-  }
-
-  // 폼 제출 → AJAX
+  // 부트스트랩 클라이언트 검증(선택)
   form.addEventListener('submit', async (e) => {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
     e.preventDefault();
 
-    // HTML5 검증 미통과 시 중단
-    if (!form.checkValidity()) return;
+    const fd = new FormData(form); // rating, content, images[] 자동 수집
 
     try {
-      const fd = new FormData(form); // rating, content, images(File[]), (선택) imageUrl[]
-
-      // AJAX 라우트 태우기 위한 헤더 + CSRF
-      const headers = { 'X-Requested-With': 'XMLHttpRequest' };
-      if (CSRF_HEADER && CSRF_TOKEN) headers[CSRF_HEADER] = CSRF_TOKEN;
-
-      const res = await fetch(form.action, {
+      const res = await fetch(form.getAttribute('action'), {
         method: 'POST',
-        headers,
+        headers: {
+          ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
+          // Content-Type 은 FormData 사용 시 자동으로 boundary 포함되어 지정됩니다. 절대 직접 세팅하지 마세요.
+        },
         body: fd
       });
 
       if (!res.ok) {
-        let message = '등록에 실패했습니다.';
-        try {
-          const err = await res.json();
-          message = err?.message || message;
-        } catch (_) {}
-        toast(message, 'danger');
-        return;
+        const text = await res.text();
+        throw new Error(text || `HTTP ${res.status}`);
       }
 
-      const data = await res.json();
-      if (!data.ok) {
-        toast(data.message || '등록에 실패했습니다.', 'danger');
-        return;
-      }
+      // 서버가 보내주는 프래그먼트 HTML을 #reviewsSection에 교체
+      const html = await res.text();
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html.trim();
 
-      // 성공: 폼 리셋, 검증 초기화, 섹션 새로고침
+      const newSection = wrapper.querySelector('#reviewsSection');
+      if (!newSection) throw new Error('프래그먼트에 #reviewsSection 이 없습니다.');
+
+      document.getElementById('reviewsSection').replaceWith(newSection);
+
+      // 폼 리셋
       form.reset();
       form.classList.remove('was-validated');
-      await refreshReviews(0, 5);
-      toast('리뷰가 등록되었습니다.', 'success');
+      const rating = form.querySelector('#rating');
+      if (rating) rating.value = '4.0';
     } catch (err) {
       console.error(err);
-      toast('네트워크 오류가 발생했습니다.', 'danger');
+      alert('리뷰 등록에 실패했어요. 잠시 후 다시 시도해 주세요.');
     }
   });
 })();
