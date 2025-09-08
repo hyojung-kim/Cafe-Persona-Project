@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -65,12 +67,14 @@ public class SiteUser implements UserDetails {
     @Comment("최근 로그인 일시")
     private LocalDateTime lastLogin;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     @Comment("회원 가입 일시")
     private LocalDateTime createDate;
 
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    @Comment("회원 가입 일시")
+    @Comment("회원 정보 수정 일시")
     private LocalDateTime updatedAt;
 
 
