@@ -78,7 +78,7 @@ public class ReviewService {
         List<String> urls = sanitizeAndLimitImageUrls(imageUrls); // 최대 5개, 공백 제거
 
         // 부모 엔티티 생성
-        Review review = new Review();
+        Review review = new Review(cafe, user, rating, content.trim());
         review.setCafe(cafe);
         review.setUser(user);
         review.setRating(rating);

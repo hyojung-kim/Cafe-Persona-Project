@@ -110,7 +110,7 @@ public class CafeListController {
 
         // 리뷰 페이지 (작성자/이미지 N+1 방지 메서드 사용)
         Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(cafeId, pageable);
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("liked", liked);
