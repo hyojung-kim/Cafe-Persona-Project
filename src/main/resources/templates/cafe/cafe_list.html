@@ -2,7 +2,8 @@
 <div layout:fragment="content">
 
     <div sec:authorize="isAuthenticated()">
-        안녕하세요, <b sec:authentication="principal.username">사용자</b> 님!
+<!--        안녕하세요, <b sec:authentication="principal.nickname">사용자</b> 님!-->
+        안녕하세요, <b th:text="${@securityService.getNickname()}">사용자</b> 님!
     </div>
 
     <div sec:authorize="isAnonymous()">
@@ -13,20 +14,23 @@
     <h2>카페 목록</h2>
 
     <!-- 검색 + 정렬 폼 -->
-    <form th:action="@{/cafe/list}" method="get" style="margin-bottom:12px; display:flex; gap:8px; justify-content:flex-end;">
+    <form th:action="@{/cafe/list}" method="get" class="filter-form">
         <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}">
+
         <select name="sort" th:value="${sort}">
             <option value="createdAt">기본순</option>
             <option value="name">이름순</option>
             <option value="hit">인기순</option>
         </select>
-        <select name="dir" th:value="${dir}">
-            <option value="desc">내림차순</option>
-            <option value="asc">오름차순</option>
-        </select>
-        <input type="hidden" name="size" th:value="${size}">
-        <button type="submit">적용</button>
 
+        <select name="dir" th:value="${dir}">
+            <option value="DESC">내림차순</option>
+            <option value="ASC">오름차순</option>
+        </select>
+
+        <input type="hidden" name="size" th:value="${size}">
+
+        <!-- ✅ 이 두 개만 즉시 제출 -->
         <div style="display:flex; gap:12px; align-items:center;">
             <label>
                 <input type="checkbox" name="parking" value="true"
@@ -40,6 +44,28 @@
                        onchange="this.form.submit()"> 지금 영업중만
             </label>
         </div>
+
+        <!-- 키워드 태그: 버튼 눌러야 제출 -->
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+            <div th:each="entry : ${keywordsByType}">
+                <div style="font-weight:600; margin:8px 0 4px;"
+                     th:text="${entry.key.typeName}">키워드 타입</div>
+
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <label th:each="k : ${entry.value}"
+                           style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid #ddd; border-radius:999px; cursor:pointer; user-select:none;"
+                           th:classappend="${selectedKeys != null and #lists.contains(selectedKeys, k.id)} ? ' active' : null">
+                        <input type="checkbox"
+                               name="keyList"
+                               th:value="${k.id}"
+                               th:checked="${selectedKeys != null and #lists.contains(selectedKeys, k.id)}">
+                        <span th:text="${k.name}">태그명</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit">적용</button>
     </form>
 
     <table>
@@ -117,7 +143,7 @@
     </table>
 
     <!-- 페이징: 모든 파라미터 유지 -->
-    <div style="margin-top:20px; text-align:center" th:if="${!paging.isEmpty()}">
+    <div style="margin-top:20px; text-align:center" th:if="${paging != null and !paging.isEmpty()}">
         <a th:if="${!paging.first}"
            th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">이전</a>
 

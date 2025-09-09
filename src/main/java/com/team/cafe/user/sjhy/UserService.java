@@ -25,10 +25,24 @@ public class UserService {
                 });
     }
 
+    // 일반 회원가입
+    public SiteUser registerUser(SiteUser user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+
+
+
     // 사용자 조회
     public SiteUser getUser(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
     }
+
+    // mypage 저장 메서드
+    public SiteUser save(SiteUser user) {
+        return userRepository.save(user);
+    }
+
 
 }

@@ -242,6 +242,54 @@ attachNicknameCheck();
 document.getElementById("password").addEventListener("input", validatePassword);
 document.getElementById("passwordConfirm").addEventListener("input", validatePasswordConfirm);
 
+/* ================= 주민등록번호 검증 ================= */
+function validateRRN() {
+    const front = document.getElementById("rrnFront").value.trim();
+    const back = document.getElementById("rrnBack").value.trim();
+    const msg = document.getElementById("rrnError");
+
+    // 길이 체크
+    if (front.length !== 6 || back.length !== 7) {
+        msg.classList.remove("hidden");
+        msg.classList.remove("text-success");
+        msg.classList.add("text-danger");
+        msg.innerText = "주민등록번호 형식이 올바르지 않습니다.";
+        return false;
+    }
+
+    // 숫자 체크
+    if (!/^\d+$/.test(front + back)) {
+        msg.classList.remove("hidden");
+        msg.classList.remove("text-success");
+        msg.classList.add("text-danger");
+        msg.innerText = "주민등록번호는 숫자만 입력해야 합니다.";
+        return false;
+    }
+
+    // 체크섬 계산
+    const rrn = front + back;
+    const weights = [2,3,4,5,6,7,8,9,2,3,4,5];
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+        sum += parseInt(rrn[i]) * weights[i];
+    }
+    const checkDigit = (11 - (sum % 11)) % 10;
+
+    if (checkDigit !== parseInt(rrn[12])) {
+        msg.classList.remove("hidden");
+        msg.classList.remove("text-success");
+        msg.classList.add("text-danger");
+        msg.innerText = "유효하지 않은 주민등록번호입니다.";
+        return false;
+    }
+
+    msg.classList.remove("text-danger");
+    msg.classList.add("text-success");
+    msg.classList.remove("hidden");
+    msg.innerText = "유효한 주민등록번호입니다.";
+    return true;
+}
+
 /* ================= 폼 제출 검증 ================= */
 async function validateForm(e) {
     if (!validatePassword() || !validatePasswordConfirm()) {
@@ -256,5 +304,51 @@ async function validateForm(e) {
     if (usernameAvailable === false) { showAlert("아이디가 이미 존재합니다."); e.preventDefault(); return false; }
     if (emailAvailable === false) { showAlert("이메일이 이미 존재합니다."); e.preventDefault(); return false; }
 
+    // 주민등록번호 체크 추가
+    if (!validateRRN()) { showAlert("주민등록번호를 확인해주세요."); e.preventDefault(); return false; }
+
     return true;
 }
+
+/* ================= RRN 입력 이벤트 ================= */
+document.getElementById("rrnFront")?.addEventListener("input", validateRRN);
+document.getElementById("rrnBack")?.addEventListener("input", validateRRN);
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    // 휴대폰 번호 입력 칸 3개
+    const phone1 = document.getElementById("phone1");
+    const phone2 = document.getElementById("phone2");
+    const phone3 = document.getElementById("phone3");
+
+    // 실제 서버에 보낼 hidden input
+    const phoneHidden = document.getElementById("phone");
+
+    if (phone1 && phone2 && phone3 && phoneHidden) {
+        const phoneInputs = [phone1, phone2, phone3];
+
+        phoneInputs.forEach((input, idx) => {
+            // 입력 시 이벤트
+            input.addEventListener("input", () => {
+                // 숫자만 허용
+                input.value = input.value.replace(/\D/g, "");
+
+                // 자동 포커스 이동
+                if (idx < 2 && input.value.length === parseInt(input.maxLength)) {
+                    phoneInputs[idx + 1].focus();
+                }
+
+                // hidden input에 합치기
+                phoneHidden.value = `${phone1.value}-${phone2.value}-${phone3.value}`;
+            });
+
+            // 백스페이스로 이전 칸 이동
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && input.value.length === 0 && idx > 0) {
+                    phoneInputs[idx - 1].focus();
+                }
+            });
+        });
+    }
+});
+

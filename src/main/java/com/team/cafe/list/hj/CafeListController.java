@@ -3,6 +3,9 @@ package com.team.cafe.list.hj;
 import com.team.cafe.bookmark.BookmarkService;
 import com.team.cafe.bookmark.LikeBookmarkFacade;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
+import com.team.cafe.keyword.hj.Keyword;
+import com.team.cafe.keyword.hj.KeywordService;
+import com.team.cafe.keyword.hj.KeywordType;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.service.ReviewService;
@@ -22,6 +25,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +42,7 @@ public class CafeListController {
     private final ReviewService reviewService;
     private final LikeBookmarkFacade likeBookmarkFacade;
     private final BookmarkService bookmarkService;
+    private final KeywordService keywordService;
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
@@ -51,6 +57,13 @@ public class CafeListController {
     ) {
         // 기존 코드 : var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
         Page<CafeMatchDto> paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow, keyList);
+
+        List<Keyword> all = keywordService.findAllOrderByTypeAndName(); // 네 엔티티/레포에 맞춰 사용
+        Map<KeywordType, List<Keyword>> keywordsByType  = new LinkedHashMap<>();
+        for (Keyword k : all) {
+            KeywordType key = k.getType();
+            keywordsByType.computeIfAbsent(key, t -> new ArrayList<>()).add(k);
+        }
 
         // 이번 페이지의 카페 ID들만 모아서
         List<Long> ids = paging.getContent().stream()
@@ -68,6 +81,10 @@ public class CafeListController {
         model.addAttribute("parking", parking);
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
+        //키워드 모델
+        model.addAttribute("keywordsByType", keywordsByType);
+        model.addAttribute("selectedKeys", keyList);
+
         return "cafe/cafe_list";
     }
 

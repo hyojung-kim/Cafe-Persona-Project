@@ -55,8 +55,8 @@ public class ReviewCafeService {
         if (rating == null || rating < 1.0 || rating > 5.0) {
             throw new IllegalArgumentException("별점은 1.0 ~ 5.0 사이여야 합니다.");
         }
-        if (content == null || content.trim().length() < 50) {
-            throw new IllegalArgumentException("리뷰 내용은 50자 이상이어야 합니다.");
+        if (content == null || content.trim().length() < 5) {
+            throw new IllegalArgumentException("리뷰 내용은 5자 이상이어야 합니다.");
         }
 
         // 빌더 대신 명시적 세터 사용 (병합 시 안정성 ↑)

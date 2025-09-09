@@ -1,84 +1,105 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-  <meta charset="UTF-8"/>
-  <title th:text="${(review != null and review.cafe != null) ? review.cafe.name + ' - 리뷰 상세' : '리뷰 상세'}">리뷰 상세</title>
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 
-  <!-- CSRF (POST 폼용) -->
+<!-- 레이아웃의 <head> 확장 -->
+<th:block layout:fragment="headExtra">
+  <meta charset="UTF-8"/>
+  <!-- CSRF (AJAX가 필요할 수 있으니 메타로 노출) -->
   <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
   <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
+  <!-- 페이지 전용 CSS (선택) -->
   <link rel="stylesheet" th:href="@{/css/review-detail.css}"/>
-</head>
-<body>
+</th:block>
 
-<div class="rd-wrap" th:if="${review != null}">
-  <header class="rd-header">
-    <div class="rd-head-left">
-      <h1 class="rd-title" th:text="${review.cafe != null ? review.cafe.name : '카페'}">카페명</h1>
-      <div class="rd-pillset">
-        <span class="rd-pill" th:text="'★ ' + ${#numbers.formatDecimal(review.rating,1,1)}">★ 0.0</span>
-        <span class="rd-pill" th:text="'좋아요 ' + ${review.likeCount}">좋아요 0</span>
-        <span class="rd-pill" th:text="'조회 ' + ${review.viewCount}">조회 0</span>
-        <span class="rd-pill" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
-      </div>
-      <div class="rd-meta">
-        작성자:
-        <span th:text="${review.author != null ? review.author.username : '알수없음'}">작성자</span>
+<!-- 본문 -->
+<div layout:fragment="content" class="container mt-4">
+
+  <!-- 상단: 타이틀/작성자/일시/별점 -->
+  <section class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h2 class="h4 mb-1">리뷰 상세</h2>
+          <div class="text-muted small">
+            작성자:
+            <span class="badge bg-info text-dark"
+                  th:text="${review.author != null ? review.author.username : '알 수 없음'}">작성자</span>
+            <span class="ms-2">작성일:
+                            <time th:text="${#temporals.format(review.createdAt,'yyyy-MM-dd HH:mm')}">2025-09-01 12:00</time>
+                        </span>
+          </div>
+        </div>
+        <div class="text-end">
+                    <span class="badge bg-warning text-dark">
+                        ★ <span th:text="${#numbers.formatDecimal(review.rating,1,1)}">4.0</span> / 5.0
+                    </span>
+          <div class="text-muted small mt-1">
+            조회수: <span th:text="${review.viewCount}">0</span>
+            <span class="ms-2">좋아요: <b th:text="${review.likeCount}">0</b></span>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="rd-head-right">
-      <a class="rd-link" th:if="${review.cafe != null}"
-         th:href="@{|/cafes/${review.cafe.id}/reviews|}">← 리뷰 목록</a>
-
-      <form class="rd-inline" sec:authorize="isAuthenticated()" th:action="@{|/reviews/${review.id}/like|}" method="post">
-        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <button class="rd-btn" type="submit">👍 좋아요</button>
-      </form>
-      <form class="rd-inline" sec:authorize="isAuthenticated()" th:action="@{|/reviews/${review.id}/unlike|}" method="post">
-        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <button class="rd-btn" type="submit">↩ 취소</button>
-      </form>
-
-      <!-- 수정/삭제: 작성자 or ADMIN -->
-      <a class="rd-link"
-         sec:authorize="isAuthenticated()"
-         th:if="${review.author != null and #authentication?.name == review.author.username} or ${#authorization.expression('hasRole(''ADMIN'')')}"
-         th:href="@{|/reviews/${review.id}/edit|}">✏️ 수정</a>
-
-      <form class="rd-inline" sec:authorize="isAuthenticated()"
-            th:if="${review.author != null and #authentication?.name == review.author.username} or ${#authorization.expression('hasRole(''ADMIN'')')}"
-            th:action="@{|/reviews/${review.id}/delete|}" method="post"
-            onsubmit="return confirm('정말 삭제하시겠습니까?');">
-        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <button class="rd-btn rd-btn-danger" type="submit">🗑 삭제</button>
-      </form>
-    </div>
-  </header>
-
-  <!-- 이미지 갤러리 -->
-  <section class="rd-gallery" th:if="${review.images != null and !#lists.isEmpty(review.images)}">
-    <img class="rd-thumb" th:each="img : ${review.images}" th:src="${img.imageUrl}" alt="리뷰 이미지"/>
   </section>
 
-  <!-- 본문 -->
-  <article class="rd-card">
-    <div class="rd-content" th:text="${review.content}">리뷰 본문</div>
-  </article>
+  <!-- 본문 내용 -->
+  <section class="card shadow-sm mb-3">
+    <div class="card-body">
+      <p class="mb-0" th:text="${review.content}">리뷰 내용</p>
+    </div>
+  </section>
+
+  <!-- 이미지 그리드 -->
+  <section class="card shadow-sm mb-3" th:if="${review.images != null and !#lists.isEmpty(review.images)}">
+    <div class="card-body">
+      <h3 class="h6 mb-3">첨부 이미지</h3>
+      <div class="row row-cols-2 row-cols-md-3 g-2">
+        <div class="col" th:each="img : ${review.images}">
+          <img th:src="${img.imageUrl}" alt="review image" class="img-fluid rounded" loading="lazy"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 액션 버튼 -->
+  <section class="card shadow-sm">
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <div>
+        <form th:action="@{|/reviews/${review.id}/like|}" method="post" class="d-inline">
+          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button type="submit" class="btn btn-outline-success btn-sm">👍 좋아요</button>
+        </form>
+        <form th:action="@{|/reviews/${review.id}/unlike|}" method="post" class="d-inline ms-1">
+          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button type="submit" class="btn btn-outline-secondary btn-sm">↩ 취소</button>
+        </form>
+        <span class="text-muted ms-2 small">♡ <b th:text="${review.likeCount}">0</b></span>
+      </div>
+
+      <div>
+        <!-- 작성자 또는 관리자만 수정 버튼 노출 (권한 로직은 컨트롤러/보안설정과 조화롭게) -->
+        <a class="btn btn-sm btn-outline-primary me-2"
+           th:href="@{|/reviews/${review.id}/edit|}"
+           sec:authorize="isAuthenticated()">수정</a>
+
+        <!-- 카페 상세로 돌아가기 -->
+        <a class="btn btn-sm btn-primary"
+           th:href="@{|/cafe/detail/${review.cafe.id}|}">카페로 돌아가기</a>
+      </div>
+    </div>
+  </section>
+
 </div>
 
-<!-- 빈 상태(안정장치) -->
-<div class="rd-wrap" th:if="${review == null}">
-  <div class="rd-card">
-    <p class="rd-muted">리뷰를 찾을 수 없습니다.</p>
-    <a class="rd-link" th:href="@{/cafe/list}">← 카페 목록</a>
-  </div>
-</div>
+<!-- 레이아웃의 body-end 확장 -->
+<th:block layout:fragment="bodyEndExtra">
+  <!-- 필요 시 상세용 스크립트 -->
+  <script th:src="@{/js/review-detail.js}" defer></script>
+</th:block>
 
-<script th:src="@{/js/review-detail.js}" defer></script>
-</body>
 </html>
-

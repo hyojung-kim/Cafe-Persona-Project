@@ -29,9 +29,12 @@ public class SignupController {
                          @RequestParam String email,
                          @RequestParam String password,
                          @RequestParam String nickname,
+                         @RequestParam String phone,
+                         @RequestParam String rrnFront,
+                         @RequestParam String rrnBack,
                          Model model) {
 
-        String errorMessage = signupService.register(username, email, password, nickname);
+        String errorMessage = signupService.register(username, email, password, nickname, phone, rrnFront, rrnBack);
 
         if (errorMessage != null) {
             model.addAttribute("errorMessage", errorMessage);

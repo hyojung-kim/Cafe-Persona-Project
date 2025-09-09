@@ -19,6 +19,8 @@ import java.util.Objects;
 @Transactional // 기본: write 트랜잭션. 읽기 전용 메서드에만 readOnly=true 지정
 public class ReviewService {
 
+    private static final int MAX_IMAGES = 5;
+
     private final CafeListRepository cafeListRepository;
     private final ReviewRepository reviewRepository;
 
@@ -56,7 +58,8 @@ public class ReviewService {
     /**
      * 리뷰 생성 + 이미지 최대 5장 저장
      * - 빈/공백 URL 제거 후 최대 5개만 반영
-     * - 부모(review)만 save (cascade = ALL, orphanRemoval = true)
+     * - 부모(review)만 save (cascade = ALL, orphanRemoval = true 전제)
+     * - 양방향 연관관계 세팅은 Review.addImage(...)에 위임 (img.review = this 세팅)
      */
     public Review createReview(Long cafeId,
                                SiteUser author,
@@ -81,13 +84,13 @@ public class ReviewService {
         review.setRating(rating);
         review.setContent(content.trim());
 
-        // 자식(이미지) 추가
+        // 자식(이미지) 추가 — 도메인 헬퍼 사용 (양방향 일관성 보장)
         int order = 0;
         for (String url : urls) {
             ReviewImage img = new ReviewImage();
             img.setImageUrl(url);
             img.setSortOrder(order++);
-            review.addImage(img); // 양방향 연관관계 일관성 보장
+            review.addImage(img); // 내부에서 img.setReview(this)
         }
 
         // 부모만 저장하면 cascade로 자식도 저장
@@ -99,6 +102,7 @@ public class ReviewService {
     /**
      * 리뷰 수정(작성자 또는 관리자)
      * - 내용/별점/이미지 전체 교체 (orphanRemoval 작동)
+     * - 이미지 교체 시 Review.removeImage(...) 사용 (img.review = null 세팅)
      */
     public Review updateReview(Long reviewId,
                                SiteUser editor,
@@ -127,11 +131,12 @@ public class ReviewService {
         review.setRating(newRating);
         review.setContent(newContent.trim());
 
-        // 기존 이미지 전량 제거 (orphanRemoval=true)
+        // 기존 이미지 전량 제거 (orphanRemoval=true 전제)
         if (review.getImages() != null && !review.getImages().isEmpty()) {
+            // 복사본에서 안전하게 순회
             List<ReviewImage> copy = new ArrayList<>(review.getImages());
             for (ReviewImage img : copy) {
-                review.removeImage(img); // 컬렉션 제거 + img.review = null + sort 재정렬(도메인 로직에 따름)
+                review.removeImage(img); // 내부에서 images.remove + img.setReview(null)
             }
         }
 
@@ -184,7 +189,7 @@ public class ReviewService {
             throw new IllegalArgumentException("자신의 리뷰에는 좋아요를 누를 수 없습니다.");
         }
 
-        review.addLike();              // 엔티티가 하한/중복 등 자체 규칙을 보장
+        review.addLike();              // 엔티티 규칙에 맞게 증감
         reviewRepository.save(review);
     }
 
@@ -196,7 +201,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        review.removeLike();           // 엔티티에서 0 미만 방지
+        review.removeLike();           // 엔티티 규칙에 맞게 증감
         reviewRepository.save(review);
     }
 
@@ -216,8 +221,8 @@ public class ReviewService {
         if (rating == null || rating < 1.0 || rating > 5.0) {
             throw new IllegalArgumentException("별점은 1.0 ~ 5.0 사이여야 합니다.");
         }
-        if (content == null || content.trim().length() < 50) {
-            throw new IllegalArgumentException("리뷰 내용은 50자 이상이어야 합니다.");
+        if (content == null || content.trim().length() < 5) {
+            throw new IllegalArgumentException("리뷰 내용은 5자 이상이어야 합니다.");
         }
     }
 
@@ -235,7 +240,7 @@ public class ReviewService {
             String t = u.trim();
             if (t.isEmpty()) continue;
             urls.add(t);
-            if (urls.size() == 5) break; // 최대 5개
+            if (urls.size() >= MAX_IMAGES) break; // 최대 5개
         }
         return urls;
     }

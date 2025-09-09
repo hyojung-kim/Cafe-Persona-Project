@@ -41,9 +41,9 @@
 
         <!-- 내용 -->
         <div class="rev-row">
-          <label class="rev-label" for="content">내용 (최소 50자)</label>
+          <label class="rev-label" for="content">내용 (최소 5자)</label>
           <textarea id="content" class="rev-textarea" th:field="*{content}"
-                    placeholder="카페에 대한 자세한 후기(최소 50자)" required></textarea>
+                    placeholder="카페에 대한 자세한 후기(최소 5자)" required></textarea>
           <div class="rev-error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">내용 오류</div>
           <div class="rev-muted" id="contentCounter">0자 / 최소 50자</div>
         </div>
