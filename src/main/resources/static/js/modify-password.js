@@ -6,26 +6,32 @@ function validatePassword() {
     const msg = document.getElementById("passwordError");
     const regex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
 
-    if (!pw) {
+    if (!pw || !regex.test(pw)) {
         msg.classList.remove("text-success");
         msg.classList.add("text-danger");
-        msg.innerText = "8자 이상, 특수문자 포함/^(?=.*[!@#$%^&*(),.?:{}|<>]).{8,}$/;";
-        return false;
-    }
-
-    if (!regex.test(pw)) {
-        msg.classList.remove("text-success");
-        msg.classList.add("text-danger");
-        msg.innerText = "조건을 만족하지 않는 비밀번호입니다.";
+        msg.innerText = "8자 이상, 특수문자 1개 이상 포함/^(?=.*[!@#$%^&*(),.?:{}|]).{8,}$/;><";
         msg.classList.remove("d-none");
         return false;
     } else {
-        msg.classList.remove("text-danger");
-        msg.classList.add("text-success");
-        msg.innerText = "사용 가능한 비밀번호입니다.";
-        msg.classList.remove("d-none");
-        return true;
+           msg.classList.remove("text-danger", "d-none");
+           msg.classList.add("text-success");
+           msg.innerText = "사용 가능한 비밀번호입니다.";
+           return true;
     }
+
+//    if (!regex.test(pw)) {
+//        msg.classList.remove("text-success");
+//        msg.classList.add("text-danger");
+//        msg.innerText = "조건을 만족하지 않는 비밀번호입니다.";
+//        msg.classList.remove("d-none");
+//        return false;
+//    } else {
+//        msg.classList.remove("text-danger");
+//        msg.classList.add("text-success");
+//        msg.innerText = "사용 가능한 비밀번호입니다.";
+//        msg.classList.remove("d-none");
+//        return true;
+//    }
 }
 
 /* ================= 비밀번호 확인 검증 ================= */
