@@ -1,6 +1,6 @@
 // /js/reviews-section.js
 (function () {
-  var box = document.getElementById('reviews-section');
+  var box = document.getElementById('reviewsSection');
   if (!box) return;
 
   var baseUrl = box.getAttribute('data-review-section-url');
@@ -10,29 +10,24 @@
     fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
       .then(function (r) { return r.text(); })
       .then(function (html) {
-        box.innerHTML = html;
-        bindPagination();
+        // 프래그먼트 전체 교체
+        var wrap = document.createElement('div');
+        wrap.innerHTML = html;
+        var next = wrap.querySelector('#reviewsSection');
+        if (next) box.replaceWith(next);
       })
       .catch(function () {
-        box.innerHTML = '<p>리뷰를 불러오지 못했습니다.</p>';
+        box.innerHTML = '<div class="card-body"><p class="text-danger m-0">리뷰를 불러오지 못했습니다.</p></div>';
       });
   }
 
-  function bindPagination() {
-    var nav = box.querySelector('.review-pagination');
-    if (!nav) return;
-
-    nav.addEventListener('click', function (e) {
-      var a = e.target.closest('a');
-      if (!a) return;
-      var href = a.getAttribute('href');
-      if (!href) return;
-
-      e.preventDefault();
-      load(href);
-    });
-  }
-
-  // 최초 1회 로드
-  load(baseUrl);
+  // 페이지네이션 위임
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('.review-pagination a');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href) return;
+    e.preventDefault();
+    load(href);
+  });
 })();

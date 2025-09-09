@@ -15,31 +15,31 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     /* ========== 페이징/전체 조회 ========== */
 
-    /** 카페별 활성 리뷰 (author 즉시 로딩으로 N+1 축소) */
-    @EntityGraph(attributePaths = {"author"})
+    /** 카페별 활성 리뷰 (user 즉시 로딩으로 N+1 축소) */
+    @EntityGraph(attributePaths = {"user"})
     Page<Review> findByCafe_IdAndActiveTrue(Long cafeId, Pageable pageable);
 
-    /** 카페별 활성 리뷰 전체 (필요 시 사용) */
+    /** 카페별 활성 리뷰 전체 */
     List<Review> findByCafe_IdAndActiveTrue(Long cafeId);
 
-    /** 작성자별 활성 리뷰 (author 즉시 로딩) */
-    @EntityGraph(attributePaths = {"author"})
-    Page<Review> findByAuthor_IdAndActiveTrue(Long authorId, Pageable pageable);
+    /** 사용자별 활성 리뷰 (user 즉시 로딩) */
+    @EntityGraph(attributePaths = {"user"})
+    Page<Review> findByUser_IdAndActiveTrue(Long userId, Pageable pageable);
 
-    /** 카페별 활성 리뷰 (author + images 즉시 로딩; 서비스에서 사용) */
-    @EntityGraph(attributePaths = {"author", "images"})
+    /** 카페별 활성 리뷰 (user + images 즉시 로딩; 서비스에서 사용) */
+    @EntityGraph(attributePaths = {"user", "images"})
     @Query("SELECT r FROM Review r WHERE r.cafe.id = :cafeId AND r.active = true")
-    Page<Review> findByCafe_IdAndActiveTrueFetchAuthorImages(@Param("cafeId") Long cafeId, Pageable pageable);
+    Page<Review> findByCafe_IdAndActiveTrueFetchUserImages(@Param("cafeId") Long cafeId, Pageable pageable);
 
     /** 활성 리뷰 개수 */
     long countByCafe_IdAndActiveTrue(Long cafeId);
 
     /* ========== 단건 상세/통계 ========== */
 
-    /** 상세: author + images 함께 로딩 */
-    @EntityGraph(attributePaths = {"author", "images"})
+    /** 상세: user + images 함께 로딩 */
+    @EntityGraph(attributePaths = {"user", "images"})
     @Query("SELECT r FROM Review r WHERE r.id = :id")
-    Optional<Review> findWithAuthorAndImagesById(@Param("id") Long id);
+    Optional<Review> findWithUserAndImagesById(@Param("id") Long id);
 
     /** 활성 리뷰 평균 평점 */
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.cafe.id = :cafeId AND r.active = true")

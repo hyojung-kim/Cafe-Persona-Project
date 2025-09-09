@@ -1,4 +1,4 @@
-package com.team.cafe.review;
+package com.team.cafe.review.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
