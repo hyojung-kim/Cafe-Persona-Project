@@ -19,7 +19,7 @@
   var grid = document.getElementById('previewGrid');
   var urlInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="imageUrl"]'));
   var fileInput = document.querySelector('input[type="file"][name="images"]');
-  var form = document.querySelector('form.rev-form');
+  var form = document.getElementById('reviewEditForm');
   var submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   // 간단 플레이스홀더 박스 생성
@@ -127,17 +127,23 @@
     });
   }
 
-  // 제출 시 최종 제한 검사
+  // 제출 시 최종 제한 + 글자수 검사
   if (form) {
     form.addEventListener('submit', function (e) {
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        e.stopPropagation();
+        form.classList.add('was-validated');
+        return;
+      }
+
       var total = currentUrlValues().length + currentFiles().length;
       if (total > MAX_IMAGES) {
         e.preventDefault();
         e.stopPropagation();
         alert('이미지는 최대 ' + MAX_IMAGES + '장까지만 업로드할 수 있어요.');
-        return false;
+        return;
       }
-      return true;
     });
   }
 

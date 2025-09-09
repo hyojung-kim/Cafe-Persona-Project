@@ -45,6 +45,7 @@
           <div class="col-12 col-md-7">
             <textarea id="content" th:field="*{content}" class="form-control" minlength="5" maxlength="4000"
                       placeholder="후기를 입력하세요(최소 5자)" required></textarea>
+            <div id="contentCounter" class="text-muted small text-end">0자 / 최소 5자</div>
           </div>
           <div class="col-12 col-md-3">
             <input type="file" name="images" class="form-control" accept="image/*" multiple>
@@ -72,7 +73,10 @@
   </section>
 </div>
 
-<th:block layout:fragment="bodyEndExtra"></th:block>
+<th:block layout:fragment="bodyEndExtra">
+  <script th:src="@{/js/review-edit.js}" defer></script>
+</th:block>
 
 </html>
+
 
