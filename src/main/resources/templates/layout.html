@@ -15,14 +15,15 @@
 
 
     <!-- (선택) 로컬 백업: static/lib/bootstrap/bootstrap.min.css 가 있을 때 -->
-  <!--  <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css"
-          th:href="@{/lib/bootstrap/bootstrap.min.css}"> -->
+    <!--  <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css"
+            th:href="@{/lib/bootstrap/bootstrap.min.css}"> -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <!-- 프로젝트 공통 스타일 -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <th:block layout:fragment="headExtra"></th:block>
 
     <title th:text="${pageTitle} ?: 'Cafe Project'">Cafe Project</title>
 </head>
@@ -42,9 +43,10 @@
                 crossorigin="anonymous"></script>
         <script th:src="@{/lib/bootstrap/bootstrap.bundle.min.js}"></script>
         <!-- (선택) 로컬 백업 -->
-       <!-- <script src="/lib/bootstrap/bootstrap.bundle.min.js"
-                th:src="@{/lib/bootstrap/bootstrap.bundle.min.js}"></script>
-                -->
+        <!-- <script src="/lib/bootstrap/bootstrap.bundle.min.js"
+                 th:src="@{/lib/bootstrap/bootstrap.bundle.min.js}"></script>
+                 -->
+        <th:block layout:fragment="bodyEndExtra"></th:block>
 
     </body>
 </html>

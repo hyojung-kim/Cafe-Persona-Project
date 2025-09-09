@@ -59,8 +59,6 @@
       // 3) 폼 리셋
       form.reset();
       form.classList.remove('was-validated');
-      const rating = form.querySelector('#rating');
-      if (rating) rating.value = '4.0';
     } catch (err) {
       console.error(err);
       alert('리뷰 등록에 실패했어요. 잠시 후 다시 시도해 주세요.');
