@@ -4,8 +4,6 @@ import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.domain.ReviewImage;
-import com.team.cafe.review.domain.ReviewLike;
-import com.team.cafe.review.repository.ReviewLikeRepository;
 import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.user.sjhy.SiteUser;
 import org.springframework.data.domain.Page;
@@ -25,14 +23,11 @@ public class ReviewService {
 
     private final CafeListRepository cafeListRepository;
     private final ReviewRepository reviewRepository;
-    private final ReviewLikeRepository reviewLikeRepository;
 
     public ReviewService(CafeListRepository cafeListRepository,
-                         ReviewRepository reviewRepository,
-                         ReviewLikeRepository reviewLikeRepository) {
+                         ReviewRepository reviewRepository) {
         this.cafeListRepository = cafeListRepository;
         this.reviewRepository = reviewRepository;
-        this.reviewLikeRepository = reviewLikeRepository;
     }
 
     // ========================= 조회 =========================
@@ -142,44 +137,6 @@ public class ReviewService {
         if (!isAuthor && !isAdmin) throw new SecurityException("작성자 또는 관리자만 삭제할 수 있습니다.");
 
         reviewRepository.delete(review);
-    }
-
-    // ========================= 좋아요 토글(ReviewLike 사용) =========================
-
-    /** 좋아요 토글: 이번 클릭 후 상태와 현재 카운트를 반환 */
-    public ToggleResult toggleLike(Long reviewId, SiteUser user) {
-        Objects.requireNonNull(user, "user is required");
-        Objects.requireNonNull(reviewId, "reviewId is required");
-
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
-
-        if (review.getUser() != null && review.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("자신의 리뷰에는 좋아요를 누를 수 없습니다.");
-        }
-
-        boolean already = reviewLikeRepository.existsByReviewAndUser(review, user);
-        if (already) {
-            reviewLikeRepository.deleteByReviewAndUser(review, user);
-        } else {
-            ReviewLike rl = ReviewLike.builder().review(review).user(user).build();
-            reviewLikeRepository.save(rl);
-        }
-
-        long count = reviewLikeRepository.countByReview(review);
-        review.setLikeCount(count);          // 동기화
-        reviewRepository.save(review);
-
-        return new ToggleResult(!already, count);
-    }
-
-    /** 컨트롤러에서 record처럼 result.liked() / result.count() 로 쓰도록 액세서 제공 */
-    public static class ToggleResult {
-        private final boolean liked;
-        private final long count;
-        public ToggleResult(boolean liked, long count) { this.liked = liked; this.count = count; }
-        public boolean liked() { return liked; }
-        public long count() { return count; }
     }
 
     // ========================= 조회수 =========================

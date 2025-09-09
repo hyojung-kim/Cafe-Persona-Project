@@ -130,21 +130,19 @@
               </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-              <div data-review-box>
-                <!-- 좋아요: AJAX + 폴백 -->
-                <form th:action="@{|/reviews/${rv.id}/like|}"
-                      method="post"
-                      class="d-inline review-like-form">
-                  <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                  <button class="btn btn-outline-success btn-sm like-btn" type="submit">👍 좋아요</button>
-                </form>
-                <span class="text-muted ms-2 small">♡ <b class="like-count" th:text="${rv.likeCount}">0</b></span>
+            <div class="d-flex align-items-center mt-3">
+              <div class="review-like-box" th:data-review-id="${rv.id}"
+                   th:data-liked="${likedMap[rv.id] != null ? likedMap[rv.id] : false}">
+                <button type="button" class="btn btn-sm btn-outline-danger review-like-btn">
+                  <span class="label-liked" th:if="${likedMap[rv.id]}">♥ 좋아요 취소</span>
+                  <span class="label-unliked" th:if="${likedMap[rv.id] == null || !likedMap[rv.id]}">♡ 좋아요</span>
+                </button>
+                <span class="review-like-count ms-1" th:text="${likeCountMap[rv.id]}">0</span>
               </div>
-              <div class="text-end">
+              <div class="ms-auto text-end">
                 <a class="btn btn-sm btn-outline-primary" th:href="@{|/reviews/${rv.id}|}">상세보기</a>
-                <a th:if="${me != null and (me.id == rv.user?.id or me.role == 'ADMIN' or me.role == 'ROLE_ADMIN')}" class="btn btn-sm btn-secondary ms-1" th:href="@{|/reviews/${rv.id}/edit|}">수정</a>
-                <form th:if="${me != null and (me.id == rv.user?.id or me.role == 'ADMIN' or me.role == 'ROLE_ADMIN')}" th:action="@{|/reviews/${rv.id}/delete|}" method="post" class="d-inline ms-1" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                <a th:if="${me != null && (me.id == rv.user?.id or me.role == 'ADMIN' or me.role == 'ROLE_ADMIN')}" class="btn btn-sm btn-secondary ms-1" th:href="@{|/reviews/${rv.id}/edit|}">수정</a>
+                <form th:if="${me != null && (me.id == rv.user?.id or me.role == 'ADMIN' or me.role == 'ROLE_ADMIN')}" th:action="@{|/reviews/${rv.id}/delete|}" method="post" class="d-inline ms-1" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                   <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                   <button type="submit" class="btn btn-sm btn-danger">삭제</button>
                 </form>
@@ -185,9 +183,9 @@
   </section>
 
   <!-- ✅ 레이아웃 삽입 슬롯을 못 쓰더라도 여기서 직접 로드 -->
+  <script th:src="@{/js/review-like.js}" defer></script>
   <script th:src="@{/js/review-list.js}" defer></script>
   <script th:src="@{/js/reviews-section.js}" defer></script>
-  <script th:src="@{/js/review-like.js}" defer></script>
 </div>
 
 </html>
