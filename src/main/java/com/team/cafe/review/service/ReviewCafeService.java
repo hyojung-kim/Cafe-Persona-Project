@@ -44,10 +44,10 @@ public class ReviewCafeService {
 
     /** 카페 리뷰 생성 */
     public Review createCafeReview(Long cafeId,
-                                   SiteUser author,
+                                   SiteUser user,
                                    Double rating,
                                    String content) {
-        Objects.requireNonNull(author, "author is required");
+        Objects.requireNonNull(user, "user is required");
 
         Cafe cafe = cafeListRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("카페를 찾을 수 없습니다. id=" + cafeId));
@@ -60,11 +60,7 @@ public class ReviewCafeService {
         }
 
         // 빌더 대신 명시적 세터 사용 (병합 시 안정성 ↑)
-        Review review = new Review();
-        review.setCafe(cafe);
-        review.setAuthor(author);
-        review.setRating(rating);
-        review.setContent(content.trim());
+        Review review = new Review(cafe, user, rating, content.trim());
 
         return reviewRepository.save(review);
     }
@@ -76,8 +72,8 @@ public class ReviewCafeService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        boolean isAuthor = review.getAuthor() != null
-                && review.getAuthor().getId().equals(requester.getId());
+        boolean isAuthor = review.getUser() != null
+                && review.getUser().getId().equals(requester.getId());
         boolean isAdmin = "ADMIN".equalsIgnoreCase(requester.getRole())
                 || "ROLE_ADMIN".equalsIgnoreCase(requester.getRole());
 
@@ -93,7 +89,7 @@ public class ReviewCafeService {
     public void activateReview(Long reviewId, SiteUser requester) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
-
+        // 어드민 계정이 있을 때;;
         boolean isAdmin = "ADMIN".equalsIgnoreCase(requester.getRole())
                 || "ROLE_ADMIN".equalsIgnoreCase(requester.getRole());
 

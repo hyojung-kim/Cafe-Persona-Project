@@ -3,6 +3,9 @@ package com.team.cafe.list.hj;
 import com.team.cafe.bookmark.BookmarkService;
 import com.team.cafe.bookmark.LikeBookmarkFacade;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
+import com.team.cafe.keyword.hj.Keyword;
+import com.team.cafe.keyword.hj.KeywordService;
+import com.team.cafe.keyword.hj.KeywordType;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.service.ReviewService;
@@ -22,6 +25,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +42,7 @@ public class CafeListController {
     private final ReviewService reviewService;
     private final LikeBookmarkFacade likeBookmarkFacade;
     private final BookmarkService bookmarkService;
+    private final KeywordService keywordService;
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
@@ -51,6 +57,13 @@ public class CafeListController {
     ) {
         // 기존 코드 : var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
         Page<CafeMatchDto> paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow, keyList);
+
+        List<Keyword> all = keywordService.findAllOrderByTypeAndName(); // 네 엔티티/레포에 맞춰 사용
+        Map<KeywordType, List<Keyword>> keywordsByType  = new LinkedHashMap<>();
+        for (Keyword k : all) {
+            KeywordType key = k.getType();
+            keywordsByType.computeIfAbsent(key, t -> new ArrayList<>()).add(k);
+        }
 
         // 이번 페이지의 카페 ID들만 모아서
         List<Long> ids = paging.getContent().stream()
@@ -68,6 +81,10 @@ public class CafeListController {
         model.addAttribute("parking", parking);
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
+        //키워드 모델
+        model.addAttribute("keywordsByType", keywordsByType);
+        model.addAttribute("selectedKeys", keyList);
+
         return "cafe/cafe_list";
     }
 
@@ -110,7 +127,7 @@ public class CafeListController {
 
         // 리뷰 페이지 (작성자/이미지 N+1 방지 메서드 사용)
         Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(cafeId, pageable);
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("liked", liked);
@@ -120,6 +137,9 @@ public class CafeListController {
 
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
+
+        model.addAttribute("reviewSectionUrl",
+                String.format("/cafe/detail/%d/reviews/section?rpage=%d&rsize=%d", cafeId, reviewPage, reviewSize));
 
         // 템플릿에서 ${reviews}로 사용
         model.addAttribute("reviews", reviews);
@@ -156,6 +176,27 @@ public class CafeListController {
         ));
     }
 
+    // 리뷰 목록 프래그먼트 (HTML 조각만 반환)
+    @GetMapping(value = "/detail/{cafeId}/reviews/section", produces = MediaType.TEXT_HTML_VALUE)
+    public String reviewsSection(@PathVariable Long cafeId,
+                                 @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
+                                 @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
+                                 Model model) {
 
+        Cafe cafe = cafeListService.getById(cafeId);
+        double avgRating = cafeListService.getActiveAverageRating(cafeId);
+        long reviewCount = cafeListService.getActiveReviewCount(cafeId);
 
+        Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
+
+        model.addAttribute("cafe", cafe);
+        model.addAttribute("avgRating", avgRating);
+        model.addAttribute("reviewCount", reviewCount);
+        model.addAttribute("reviews", reviews);
+
+        // 템플릿 선택: 프로젝트에 있는 프래그먼트로 바꿔도 됨
+        // return "review/list :: section";
+        return "cafe/reviews_section :: reviews_section";
+    }
 }

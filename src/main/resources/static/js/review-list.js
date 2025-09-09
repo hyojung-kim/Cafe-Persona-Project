@@ -1,12 +1,12 @@
-// /js/cafe-detail.js
+// /js/cafe-list.js
 (function () {
   const form = document.getElementById('reviewCreateForm');
   if (!form) return;
 
   const csrfToken  = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
   const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+  const cafeId     = form.getAttribute('data-cafe-id');
 
-  // 부트스트랩 클라이언트 검증(선택)
   form.addEventListener('submit', async (e) => {
     if (!form.checkValidity()) {
       e.preventDefault();
@@ -16,34 +16,47 @@
     }
     e.preventDefault();
 
-    const fd = new FormData(form); // rating, content, images[] 자동 수집
+    const fd = new FormData(form); // rating, content, images[]
 
     try {
+      // 1) AJAX로 리뷰 생성 (컨트롤러가 JSON 반환)
       const res = await fetch(form.getAttribute('action'), {
         method: 'POST',
         headers: {
+          'X-Requested-With': 'XMLHttpRequest',
           ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
-          // Content-Type 은 FormData 사용 시 자동으로 boundary 포함되어 지정됩니다. 절대 직접 세팅하지 마세요.
+          // Content-Type 은 FormData 사용 시 자동 지정됩니다.
         },
         body: fd
       });
 
       if (!res.ok) {
+        // 컨트롤러는 400일 때 에러 목록 JSON/텍스트를 내려줄 수 있음
         const text = await res.text();
         throw new Error(text || `HTTP ${res.status}`);
       }
 
-      // 서버가 보내주는 프래그먼트 HTML을 #reviewsSection에 교체
-      const html = await res.text();
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.message || '등록 실패');
+
+      // 2) 최신 리뷰 섹션 로드해서 교체
+      if (!cafeId) throw new Error('cafeId 누락');
+      const secRes = await fetch(`/cafe/detail/${encodeURIComponent(cafeId)}/reviews/section`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      if (!secRes.ok) throw new Error(`섹션 로드 실패: HTTP ${secRes.status}`);
+
+      const html = await secRes.text();
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html.trim();
 
       const newSection = wrapper.querySelector('#reviewsSection');
-      if (!newSection) throw new Error('프래그먼트에 #reviewsSection 이 없습니다.');
+      const oldSection = document.getElementById('reviewsSection');
+      if (!newSection || !oldSection) throw new Error('섹션 엘리먼트를 찾을 수 없습니다.');
 
-      document.getElementById('reviewsSection').replaceWith(newSection);
+      oldSection.replaceWith(newSection);
 
-      // 폼 리셋
+      // 3) 폼 리셋
       form.reset();
       form.classList.remove('was-validated');
       const rating = form.querySelector('#rating');
@@ -54,3 +67,4 @@
     }
   });
 })();
+

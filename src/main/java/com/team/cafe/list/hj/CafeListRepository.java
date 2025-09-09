@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -62,47 +61,76 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
 
 
     @Query(value = """
-        SELECT c.*
-        FROM cafe c
-        JOIN cafe_keyword ck ON ck.cafe_id = c.id
-        WHERE (:kw IS NULL OR :kw = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :kw, '%')))
-          AND (:parking IS NULL OR c.parking = :parking)
-          AND (:now IS NULL OR (c.open_time <= :now AND c.close_time > :now))
-          AND ck.keyword_id IN (:ids)
-        GROUP BY c.id
-        HAVING COUNT(DISTINCT ck.keyword_id) = :size
-        ORDER BY
-              CASE WHEN :sort = 'name'  AND :dir = 'ASC'  THEN c.name END ASC,
-              CASE WHEN :sort = 'name'  AND :dir = 'DESC' THEN c.name END DESC,
-              CASE WHEN :sort = 'hit'   AND :dir = 'ASC'  THEN c.hit END ASC,
-              CASE WHEN :sort = 'hit'   AND :dir = 'DESC' THEN c.hit END DESC,
-              CASE WHEN :sort = 'date'  AND :dir = 'ASC'  THEN c.created_at END ASC,
-              CASE WHEN :sort = 'date'  AND :dir = 'DESC' THEN c.created_at END DESC,
-              c.created_at DESC
-        """,
+    SELECT c.*
+    FROM cafe c
+    JOIN cafe_keyword ck ON ck.cafe_id = c.cafe_id
+    WHERE (:kw IS NULL OR :kw = '' OR
+       LOWER(c.cafe_name) LIKE LOWER(CONCAT('%', :kw, '%'))
+       /* 필요시 확장:
+       OR LOWER(c.city)     LIKE LOWER(CONCAT('%', :kw, '%'))
+       OR LOWER(c.district) LIKE LOWER(CONCAT('%', :kw, '%'))
+       OR LOWER(c.address1) LIKE LOWER(CONCAT('%', :kw, '%')) */
+    )
+    AND (
+        :parking IS NULL
+        OR c.parking_yn = CASE WHEN :parking THEN 1 ELSE 0 END
+      )
+    AND (
+        :now IS NULL
+        OR (
+             (c.open_time <= c.close_time AND c.open_time <= :now AND :now <= c.close_time)
+             OR
+             (c.open_time >  c.close_time AND (:now >= c.open_time OR :now <= c.close_time))
+           )
+      )
+    AND ck.keyword_id IN (:keyList)
+    GROUP BY c.cafe_id
+    HAVING COUNT(DISTINCT ck.keyword_id) = :size
+    ORDER BY
+      CASE WHEN :sort = 'name'      AND :dir = 'ASC'  THEN c.cafe_name  END ASC,
+      CASE WHEN :sort = 'name'      AND :dir = 'DESC' THEN c.cafe_name  END DESC,
+      CASE WHEN :sort = 'hit'       AND :dir = 'ASC'  THEN c.hit_count  END ASC,
+      CASE WHEN :sort = 'hit'       AND :dir = 'DESC' THEN c.hit_count  END DESC,
+      CASE WHEN :sort = 'createdAt' AND :dir = 'ASC'  THEN c.created_at END ASC,
+      CASE WHEN :sort = 'createdAt' AND :dir = 'DESC' THEN c.created_at END DESC,
+      c.created_at DESC
+    """,
             countQuery = """
-        SELECT COUNT(*)
-        FROM (
-          SELECT c.id
-          FROM cafe c
-          JOIN cafe_keyword ck ON ck.cafe_id = c.id
-          WHERE (:kw IS NULL OR :kw = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :kw, '%')))
-            AND (:parking IS NULL OR c.parking = :parking)
-            AND (:now IS NULL OR (c.open_time <= :now AND c.close_time > :now))
-            AND ck.keyword_id IN (:ids)
-          GROUP BY c.id
-          HAVING COUNT(DISTINCT ck.keyword_id) = :size
-        ) t
-        """,
+    SELECT COUNT(*)
+    FROM (
+        SELECT c.cafe_id
+    FROM cafe c
+    JOIN cafe_keyword ck ON ck.cafe_id = c.cafe_id
+    WHERE (:kw IS NULL OR :kw = '' OR
+         LOWER(c.cafe_name) LIKE LOWER(CONCAT('%', :kw, '%'))
+         /* 필요시 확장 동일 적용 */
+    )
+    AND (
+          :parking IS NULL
+          OR c.parking_yn = CASE WHEN :parking THEN 1 ELSE 0 END
+        )
+    AND (
+          :now IS NULL
+          OR (
+               (c.open_time <= c.close_time AND c.open_time <= :now AND :now <= c.close_time)
+               OR
+               (c.open_time >  c.close_time AND (:now >= c.open_time OR :now <= c.close_time))
+             )
+        )
+    AND ck.keyword_id IN (:keyList)
+    GROUP BY c.cafe_id
+    HAVING COUNT(DISTINCT ck.keyword_id) = :size
+    ) t
+""",
             nativeQuery = true)
     Page<Cafe> findAllMatchAllWithFiltersCaseOrder(
             @Param("kw") String kw,
             @Param("parking") Boolean parking,
-            @Param("now") LocalTime now,
-            @Param("ids") List<Long> ids,
+            @Param("now") java.time.LocalTime now,
+            @Param("keyList") List<Long> keyList,
             @Param("size") Long size,
-            @Param("sort") String sort,   // 👉 여기
-            @Param("dir")  String dir,    // 👉 여기
+            @Param("sort") String sort,
+            @Param("dir")  String dir,
             Pageable pageable
     );
 }

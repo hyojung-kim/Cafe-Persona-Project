@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<html lang="ko" layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org">
+<div layout:fragment="content">
 <head>
     <meta charset="UTF-8">
     <title>마이 페이지</title>
-    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/mypage-main.css}">
 </head>
 <body>
+
 <div class="wrapper">
     <div class="card">
         <header>

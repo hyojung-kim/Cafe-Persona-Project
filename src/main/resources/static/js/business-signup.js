@@ -175,79 +175,38 @@ function attachNicknameCheck() {
     input.addEventListener("blur", runCheck);
 }
 
-/* ================= 사업자등록번호 검증 ================= */
-function attachBusinessNumberCheck() {
-    const input = document.getElementById("businessNumber");
-    const error = document.getElementById("businessNumberError");
-    const success = document.getElementById("businessNumberSuccess");
 
-    let timer = null;
-    let lastResult = null;
-
-    async function runCheck() {
-        const number = input.value.trim();
-        if (!number) {
-            error.classList.add("hidden");
-            success.classList.add("hidden");
-            lastResult = null;
-            return;
-        }
-
-        // 서버 중복 체크
-        const available = await checkDuplicate("businessNumber", number);
-        if (available === true) {
-            success.classList.remove("hidden");
-            error.classList.add("hidden");
-            success.innerText = "확인 완료";
-            lastResult = true;
-        } else if (available === false) {
-            error.classList.remove("hidden");
-            success.classList.add("hidden");
-            error.innerText = "이미 등록된 번호입니다.";
-            lastResult = false;
-        } else {
-            error.classList.add("hidden");
-            success.classList.add("hidden");
-            lastResult = null;
-        }
-    }
-
-    input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(runCheck, 300); });
-    input.addEventListener("blur", runCheck);
-
-    return () => lastResult;
-}
 
 /* ================= 비밀번호 검증 ================= */
 function validatePassword() {
-    const pw = document.getElementById("password").value;
-    const msg = document.getElementById("passwordError");
-    const regex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  const pw = document.getElementById("password").value || "";
+  const msg = document.getElementById("passwordError");
+  const ok = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/.test(pw);
 
-    if (!pw) {
-        msg.classList.remove("text-success");
-        msg.classList.add("text-danger");
-        msg.innerText = "8자 이상, 특수문자 포함";
-        return false;
-    }
-
-    if (!regex.test(pw)) {
-        msg.classList.remove("text-success");
-        msg.classList.add("text-danger");
-        msg.innerText = "조건을 만족하지 않는 비밀번호입니다.";
-        return false;
-    } else {
+      if (ok) {
+        // 조건 만족 시에만 성공 문구/초록색
         msg.classList.remove("text-danger");
         msg.classList.add("text-success");
         msg.innerText = "사용 가능한 비밀번호입니다.";
         return true;
-    }
+      } else {
+        // 조건 미달일 땐 항상 기본 가이드만 붉은색으로 유지
+        msg.classList.remove("text-success");
+        msg.classList.add("text-danger");
+        msg.innerText = "8자 이상, 특수문자 포함";
+        return false;
+      }
+
+
 }
 
 function validatePasswordConfirm() {
     const pw = document.getElementById("password").value;
     const pw2 = document.getElementById("passwordConfirm").value;
     const msg = document.getElementById("passwordConfirmError");
+
+
+
 
     if (!pw2) {
         msg.classList.add("hidden");
@@ -306,7 +265,6 @@ function alertAndFocus(msg, inputId) {
 const checkUsername = attachUsernameCheck();
 const checkEmail = attachEmailCheck();
 attachNicknameCheck();
-const checkBusinessNumber = attachBusinessNumberCheck();
 
 document.getElementById("password").addEventListener("input", validatePassword);
 document.getElementById("passwordConfirm").addEventListener("input", validatePasswordConfirm);
@@ -322,13 +280,11 @@ async function validateForm(e) {
     // ⬇️ 제출 직전에 최신 값으로 서버 중복 체크(반드시 await)
         const username = document.getElementById("username")?.value?.trim() || "";
         const email = document.getElementById("email")?.value?.trim() || "";
-        const bizNo = document.getElementById("businessNumber")?.value?.trim() || "";
 
         // 서버와 즉시 통신해서 true/false/null을 받는다
         const [uAvail, eAvail, bAvail] = await Promise.all([
             username ? checkDuplicate("username", username) : null,
             email ? checkDuplicate("email", email) : null,
-            bizNo ? checkDuplicate("businessNumber", bizNo) : null
         ]);
 
         if (uAvail === false) {
@@ -339,11 +295,6 @@ async function validateForm(e) {
         if (eAvail === false) {
             e.preventDefault();
             alertAndFocus("이메일이 이미 존재합니다.", "email");
-            return false;
-        }
-        if (bAvail === false) {
-            e.preventDefault();
-            alertAndFocus("이미 등록된 사업자등록번호입니다.", "businessNumber");
             return false;
         }
 

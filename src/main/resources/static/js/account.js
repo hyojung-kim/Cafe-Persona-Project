@@ -5,7 +5,7 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
 /* ================= 모달 열기/닫기 ================= */
 const modal = document.getElementById("passwordModal");
 const openBtn = document.getElementById("openPasswordModal");
-const closeBtn = document.getElementById("closeModal");
+const closeBtn = document.getElementById("closePasswordModal");
 
 openBtn?.addEventListener("click", () => modal.classList.add("show"));
 closeBtn?.addEventListener("click", () => modal.classList.remove("show"));
@@ -104,5 +104,15 @@ document.getElementById("updatePhoneBtn")?.addEventListener("click", async () =>
         alert("서버 오류 발생");
     }
 });
+
+  // BFCache로 돌아온 경우(뒤/앞 이동), 서버로 다시 요청 보내도록 강제
+  window.addEventListener('pageshow', function (e) {
+    const isBFCache = e.persisted || (performance.getEntriesByType?.('navigation')[0]?.type === 'back_forward');
+    if (isBFCache) {
+      // replace로 히스토리 쌓이지 않게
+      location.replace(location.href);
+    }
+  });
+
 
 

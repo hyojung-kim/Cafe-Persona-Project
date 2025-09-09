@@ -28,13 +28,14 @@
       <form class="rev-form"
             th:action="${mode=='edit'} ? @{/reviews/{id}(id=${review.id})} : @{/cafes/{id}/reviews(id=${cafe.id})}"
             method="post"
+            enctype="multipart/form-data"
             th:object="${form}">
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
         <!-- 별점 -->
         <div class="rev-row">
-          <label class="rev-label" for="rating">별점 (1.0 ~ 5.0)</label>
-          <input id="rating" class="rev-input" type="number" step="0.1" min="1.0" max="5.0"
+          <label class="rev-label" for="rating">별점 (1.0 ~ 5.0, 0.5 단위)</label>
+          <input id="rating" class="rev-input" type="number" step="0.5" min="1.0" max="5.0"
                  th:field="*{rating}" placeholder="예: 4.5" required/>
           <div class="rev-error" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}">별점 오류</div>
         </div>
@@ -45,7 +46,7 @@
           <textarea id="content" class="rev-textarea" th:field="*{content}"
                     placeholder="카페에 대한 자세한 후기(최소 5자)" required></textarea>
           <div class="rev-error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">내용 오류</div>
-          <div class="rev-muted" id="contentCounter">0자 / 최소 50자</div>
+          <div class="rev-muted" id="contentCounter">0자 / 최소 5자</div>
         </div>
 
         <!-- 이미지 URL (최대 5개) -->
@@ -65,7 +66,13 @@
           </div>
 
           <div class="rev-img-grid" id="previewGrid" style="margin-top:8px;"></div>
-          <div class="rev-muted">URL만 입력(파일 업로드는 별도 기능에서 처리).</div>
+          <div class="rev-muted">URL + 파일 합쳐 최대 5장까지 가능합니다.</div>
+        </div>
+
+        <!-- 파일 업로드 -->
+        <div class="rev-row">
+          <label class="rev-label">이미지 파일 업로드</label>
+          <input class="rev-input" type="file" name="images" accept="image/*" multiple>
         </div>
 
         <div class="rev-actions">
@@ -74,15 +81,15 @@
              th:href="${mode=='edit'} ? @{|/reviews/${review.id}|} : @{|/cafe/detail/${cafe.id}|}">
             취소
           </a>
-
-          <!-- 삭제: edit일 때만 -->
-          <form th:if="${mode=='edit'}" th:action="@{|/reviews/${review.id}/delete|}" method="post"
-                style="display:inline-block; margin-left:auto;">
-            <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button type="submit" class="rev-btn rev-btn-danger"
-                    onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-          </form>
         </div>
+      </form>
+
+      <!-- 삭제: edit일 때만 (폼 중첩 방지 위해 분리) -->
+      <form th:if="${mode=='edit'}" th:action="@{|/reviews/${review.id}/delete|}" method="post"
+            style="display:flex; justify-content:flex-end; margin-top:8px;">
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit" class="rev-btn rev-btn-danger"
+                onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
       </form>
     </section>
   </div>

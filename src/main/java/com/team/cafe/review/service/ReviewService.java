@@ -4,6 +4,8 @@ import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.domain.ReviewImage;
+import com.team.cafe.review.domain.ReviewLike;
+import com.team.cafe.review.repository.ReviewLikeRepository;
 import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.user.sjhy.SiteUser;
 import org.springframework.data.domain.Page;
@@ -16,18 +18,21 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@Transactional // 기본: write 트랜잭션. 읽기 전용 메서드에만 readOnly=true 지정
+@Transactional // 기본: write. 조회는 메서드에 readOnly=true
 public class ReviewService {
 
     private static final int MAX_IMAGES = 5;
 
     private final CafeListRepository cafeListRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     public ReviewService(CafeListRepository cafeListRepository,
-                         ReviewRepository reviewRepository) {
+                         ReviewRepository reviewRepository,
+                         ReviewLikeRepository reviewLikeRepository) {
         this.cafeListRepository = cafeListRepository;
         this.reviewRepository = reviewRepository;
+        this.reviewLikeRepository = reviewLikeRepository;
     }
 
     // ========================= 조회 =========================
@@ -39,35 +44,30 @@ public class ReviewService {
         return reviewRepository.findByCafe_IdAndActiveTrue(cafeId, pageable);
     }
 
-    /** 카페별 활성 리뷰 페이징 + author/images 동시 로딩(N+1 방지) */
+    /** 카페별 활성 리뷰 페이징 + user/images 즉시 로딩(N+1 방지) */
     @Transactional(readOnly = true)
-    public Page<Review> getActiveReviewsByCafeWithAuthorImages(Long cafeId, Pageable pageable) {
+    public Page<Review> getActiveReviewsByCafeWithUserImages(Long cafeId, Pageable pageable) {
         Objects.requireNonNull(cafeId, "cafeId is required");
-        return reviewRepository.findByCafe_IdAndActiveTrueFetchAuthorImages(cafeId, pageable);
+        return reviewRepository.findByCafe_IdAndActiveTrueFetchUserImages(cafeId, pageable);
     }
 
-    /** 작성자별 활성 리뷰 페이징 */
+    /** 사용자별 활성 리뷰 페이징 */
     @Transactional(readOnly = true)
-    public Page<Review> getActiveReviewsByAuthor(Long authorId, Pageable pageable) {
-        Objects.requireNonNull(authorId, "authorId is required");
-        return reviewRepository.findByAuthor_IdAndActiveTrue(authorId, pageable);
+    public Page<Review> getActiveReviewsByUser(Long userId, Pageable pageable) {
+        Objects.requireNonNull(userId, "userId is required");
+        return reviewRepository.findByUser_IdAndActiveTrue(userId, pageable);
     }
 
     // ========================= 생성 =========================
 
-    /**
-     * 리뷰 생성 + 이미지 최대 5장 저장
-     * - 빈/공백 URL 제거 후 최대 5개만 반영
-     * - 부모(review)만 save (cascade = ALL, orphanRemoval = true 전제)
-     * - 양방향 연관관계 세팅은 Review.addImage(...)에 위임 (img.review = this 세팅)
-     */
+    /** 리뷰 생성 (+이미지 최대 5장) */
     public Review createReview(Long cafeId,
-                               SiteUser author,
+                               SiteUser user,
                                Double rating,
                                String content,
                                List<String> imageUrls) {
 
-        Objects.requireNonNull(author, "author is required");
+        Objects.requireNonNull(user, "user is required");
         Objects.requireNonNull(cafeId, "cafeId is required");
 
         Cafe cafe = cafeListRepository.findById(cafeId)
@@ -75,35 +75,25 @@ public class ReviewService {
 
         validateRatingAndContent(rating, content);
 
-        List<String> urls = sanitizeAndLimitImageUrls(imageUrls); // 최대 5개, 공백 제거
+        List<String> urls = sanitizeAndLimitImageUrls(imageUrls);
 
-        // 부모 엔티티 생성
-        Review review = new Review();
-        review.setCafe(cafe);
-        review.setAuthor(author);
-        review.setRating(rating);
-        review.setContent(content.trim());
+        // 명시적 생성자 사용 (cafe, user, rating, content)
+        Review review = new Review(cafe, user, rating, content.trim());
 
-        // 자식(이미지) 추가 — 도메인 헬퍼 사용 (양방향 일관성 보장)
         int order = 0;
         for (String url : urls) {
             ReviewImage img = new ReviewImage();
             img.setImageUrl(url);
             img.setSortOrder(order++);
-            review.addImage(img); // 내부에서 img.setReview(this)
+            review.addImage(img);
         }
 
-        // 부모만 저장하면 cascade로 자식도 저장
         return reviewRepository.save(review);
     }
 
-    // ========================= 수정 =========================
+    // ========================= 수정/삭제 =========================
 
-    /**
-     * 리뷰 수정(작성자 또는 관리자)
-     * - 내용/별점/이미지 전체 교체 (orphanRemoval 작동)
-     * - 이미지 교체 시 Review.removeImage(...) 사용 (img.review = null 세팅)
-     */
+    /** 리뷰 수정 */
     public Review updateReview(Long reviewId,
                                SiteUser editor,
                                Double newRating,
@@ -116,31 +106,16 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        boolean isAuthor = review.getAuthor() != null && review.getAuthor().getId().equals(editor.getId());
-        boolean isAdmin = "ADMIN".equalsIgnoreCase(editor.getRole())
-                || "ROLE_ADMIN".equalsIgnoreCase(editor.getRole());
-        if (!isAuthor && !isAdmin) {
-            throw new SecurityException("작성자 또는 관리자만 수정할 수 있습니다.");
-        }
+        boolean isAuthor = review.getUser() != null && review.getUser().getId().equals(editor.getId());
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(editor.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(editor.getRole());
+        if (!isAuthor && !isAdmin) throw new SecurityException("작성자 또는 관리자만 수정할 수 있습니다.");
 
         validateRatingAndContent(newRating, newContent);
 
+        List<ReviewImage> copy = new ArrayList<>(review.getImages());
+        for (ReviewImage img : copy) review.removeImage(img);
+
         List<String> urls = sanitizeAndLimitImageUrls(newImageUrls);
-
-        // 본문/별점 교체
-        review.setRating(newRating);
-        review.setContent(newContent.trim());
-
-        // 기존 이미지 전량 제거 (orphanRemoval=true 전제)
-        if (review.getImages() != null && !review.getImages().isEmpty()) {
-            // 복사본에서 안전하게 순회
-            List<ReviewImage> copy = new ArrayList<>(review.getImages());
-            for (ReviewImage img : copy) {
-                review.removeImage(img); // 내부에서 images.remove + img.setReview(null)
-            }
-        }
-
-        // 새 이미지 추가
         int order = 0;
         for (String url : urls) {
             ReviewImage imgNew = new ReviewImage();
@@ -149,15 +124,12 @@ public class ReviewService {
             review.addImage(imgNew);
         }
 
+        review.setRating(newRating);
+        review.setContent(newContent.trim());
         return reviewRepository.save(review);
     }
 
-    // ========================= 삭제 =========================
-
-    /**
-     * 리뷰 삭제(작성자 또는 관리자)
-     * - Review 삭제 시, 자식 이미지들(orphanRemoval)도 함께 제거됨
-     */
+    /** 리뷰 삭제 */
     public void deleteReview(Long reviewId, SiteUser requester) {
         Objects.requireNonNull(requester, "requester is required");
         Objects.requireNonNull(reviewId, "reviewId is required");
@@ -165,82 +137,79 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        boolean isAuthor = review.getAuthor() != null && review.getAuthor().getId().equals(requester.getId());
-        boolean isAdmin = "ADMIN".equalsIgnoreCase(requester.getRole())
-                || "ROLE_ADMIN".equalsIgnoreCase(requester.getRole());
-        if (!isAuthor && !isAdmin) {
-            throw new SecurityException("작성자 또는 관리자만 삭제할 수 있습니다.");
-        }
+        boolean isAuthor = review.getUser() != null && review.getUser().getId().equals(requester.getId());
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(requester.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(requester.getRole());
+        if (!isAuthor && !isAdmin) throw new SecurityException("작성자 또는 관리자만 삭제할 수 있습니다.");
 
         reviewRepository.delete(review);
     }
 
-    // ========================= 좋아요 / 조회수 =========================
+    // ========================= 좋아요 토글(ReviewLike 사용) =========================
 
-    /** 좋아요 추가 (본인 리뷰 금지) */
-    public void likeReview(Long reviewId, SiteUser liker) {
-        Objects.requireNonNull(liker, "liker is required");
+    /** 좋아요 토글: 이번 클릭 후 상태와 현재 카운트를 반환 */
+    public ToggleResult toggleLike(Long reviewId, SiteUser user) {
+        Objects.requireNonNull(user, "user is required");
         Objects.requireNonNull(reviewId, "reviewId is required");
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
 
-        if (review.getAuthor() != null && review.getAuthor().getId().equals(liker.getId())) {
+        if (review.getUser() != null && review.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("자신의 리뷰에는 좋아요를 누를 수 없습니다.");
         }
 
-        review.addLike();              // 엔티티 규칙에 맞게 증감
+        boolean already = reviewLikeRepository.existsByReviewAndUser(review, user);
+        if (already) {
+            reviewLikeRepository.deleteByReviewAndUser(review, user);
+        } else {
+            ReviewLike rl = ReviewLike.builder().review(review).user(user).build();
+            reviewLikeRepository.save(rl);
+        }
+
+        long count = reviewLikeRepository.countByReview(review);
+        review.setLikeCount(count);          // 동기화
         reviewRepository.save(review);
+
+        return new ToggleResult(!already, count);
     }
 
-    /** 좋아요 취소(하한 0) */
-    public void unlikeReview(Long reviewId, SiteUser liker) {
-        Objects.requireNonNull(liker, "liker is required");
-        Objects.requireNonNull(reviewId, "reviewId is required");
-
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
-
-        review.removeLike();           // 엔티티 규칙에 맞게 증감
-        reviewRepository.save(review);
+    /** 컨트롤러에서 record처럼 result.liked() / result.count() 로 쓰도록 액세서 제공 */
+    public static class ToggleResult {
+        private final boolean liked;
+        private final long count;
+        public ToggleResult(boolean liked, long count) { this.liked = liked; this.count = count; }
+        public boolean liked() { return liked; }
+        public long count() { return count; }
     }
 
-    /** 조회수 증가 */
+    // ========================= 조회수 =========================
+
     public void increaseViewCount(Long reviewId) {
         Objects.requireNonNull(reviewId, "reviewId is required");
-
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + reviewId));
         review.increaseViewCount();
         reviewRepository.save(review);
     }
 
-    // ========================= 내부 유틸 =========================
+    // ========================= 유틸 =========================
 
     private void validateRatingAndContent(Double rating, String content) {
-        if (rating == null || rating < 1.0 || rating > 5.0) {
+        if (rating == null || rating < 1.0 || rating > 5.0)
             throw new IllegalArgumentException("별점은 1.0 ~ 5.0 사이여야 합니다.");
-        }
-        if (content == null || content.trim().length() < 5) {
+        if (content == null || content.trim().length() < 5)
             throw new IllegalArgumentException("리뷰 내용은 5자 이상이어야 합니다.");
-        }
     }
 
-    /**
-     * - null 안전
-     * - trim 후 빈 문자열 제거
-     * - 최대 5개로 제한
-     */
     private List<String> sanitizeAndLimitImageUrls(List<String> imageUrls) {
         List<String> urls = new ArrayList<>();
         if (imageUrls == null) return urls;
-
         for (String u : imageUrls) {
             if (u == null) continue;
             String t = u.trim();
             if (t.isEmpty()) continue;
             urls.add(t);
-            if (urls.size() >= MAX_IMAGES) break; // 최대 5개
+            if (urls.size() >= MAX_IMAGES) break;
         }
         return urls;
     }

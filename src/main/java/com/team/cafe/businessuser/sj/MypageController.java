@@ -4,8 +4,7 @@ import com.team.cafe.businessuser.sj.owner.cafe.CafeManageService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,185 +12,234 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
-import java.time.LocalDate;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Controller
 public class MypageController {
+
+    /** (과거 TTL 방식 키 — 사용 안 함) */
+    public static final String REAUTH_SESSION_KEY = "MYPAGE_REAUTH_AT";
+
+    /** 🔐 1회용 재인증 토큰 키 */
+    private static final String REAUTH_TOKEN_KEY = "MYPAGE_REAUTH_TOKEN";
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final CafeManageService cafeManageService;
     private final BusinessRepository businessRepository;
 
-    // 현재 로그인한 사용자 가져오기
+    /* ------------ 내부 record: 1회용 토큰 ------------ */
+    private record ReauthToken(String nonce, String allowPathPrefix) {}
+
+    /* ------------ 공통 유틸 ------------ */
+
     private SiteUser getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
-            return null; // 로그인 안 됨
-        }
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) return null;
 
         Object principal = auth.getPrincipal();
-        String username;
-
-        if (principal instanceof UserDetails userDetails) {
-            username = userDetails.getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        return userService.getUser(username); // DB에서 SiteUser 조회
+        String username = (principal instanceof UserDetails ud) ? ud.getUsername() : principal.toString();
+        return userService.getUser(username);
     }
 
-    // 마이페이지 메인
+    /** 캐시 금지(뒤로가기/BFCache 대응 도움) */
+    private void setNoCache(HttpServletResponse res) {
+        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+    }
+
+    private boolean isSafeInternalPath(String url) {
+        try {
+            URI u = URI.create(url);
+            return !u.isAbsolute() && url.startsWith("/");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String redirectToVerifyWithContinue(HttpServletRequest req) {
+        String target = req.getRequestURI();
+        if (req.getQueryString() != null) target += "?" + req.getQueryString();
+        String encoded = URLEncoder.encode(target, StandardCharsets.UTF_8);
+        return "redirect:/mypage/verify_password?continue=" + encoded;
+    }
+
+    // 🔸 이름도 consume → present 로 의미 명확화
+    private boolean requireReauthPresent(HttpServletRequest req, String requiredPathPrefix) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return false;
+
+        Object o = session.getAttribute(REAUTH_TOKEN_KEY);
+        if (!(o instanceof ReauthToken token)) return false;
+
+        // 경로 프리픽스 안전장치
+        if (requiredPathPrefix != null) {
+            if (token.allowPathPrefix() == null || !requiredPathPrefix.startsWith("/")) {
+                return false;
+            }
+            if (!requiredPathPrefix.startsWith(token.allowPathPrefix())) {
+                return false;
+            }
+        }
+
+        // 여기서는 '소모하지 않음'
+        return true;
+    }
+
+
+    /* ------------ 마이페이지 메인 ------------ */
     @GetMapping("/mypage")
     public String mypage(Model model) {
         SiteUser siteUser = getCurrentUser();
-        if (siteUser == null) {
-            return "redirect:/user/login";
-        }
+        if (siteUser == null) return "redirect:/user/login";
 
-        // ▼ 변경: 템플릿에서 user.businessUser 판별할 수 있게 user 객체를 모델에 넣기
         model.addAttribute("user", siteUser);
-        model.addAttribute("isBusiness", siteUser.getBusinessUser() != null); // ✅ 추가
-
-
-        // (username만 필요 없다면 아래 줄은 지워도 됩니다)
-        // model.addAttribute("username", siteUser.getUsername());
-
-        return "mypage/main";
+        model.addAttribute("isBusiness", siteUser.getBusinessUser() != null);
+        return "mypage/mypage-main";
     }
 
-
-    // 계정 관리 화면
+    /* ------------ 계정 관리(보호: 재인증 필요) ------------ */
     @GetMapping("/mypage/account")
-    public String accountPage(Model model) {
+    public String accountPage(HttpServletRequest request, HttpServletResponse response, Model model) {
         SiteUser siteUser = getCurrentUser();
-        if (siteUser == null) {
-            return "redirect:/user/login";
+        if (siteUser == null) return "redirect:/user/login";
+
+        // 존재 여부만 확인 (소모 X)
+        if (!requireReauthPresent(request, "/mypage")) {
+            return redirectToVerifyWithContinue(request);
         }
+        setNoCache(response);
 
         model.addAttribute("user", siteUser);
         return "mypage/account";
     }
 
 
-
-    // 계정 관리 진입 전 - 비밀번호 확인 페이지
+    /* ------------ 비밀번호 확인 ------------ */
     @GetMapping("/mypage/verify_password")
-    public String verifyPasswordPage() {
+    public String verifyPasswordPage(@RequestParam(value = "continue", required = false) String cont,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     Model model) {
         SiteUser siteUser = getCurrentUser();
-        if (siteUser == null) {
-            return "redirect:/user/login";
+        if (siteUser == null) return "redirect:/user/login";
+
+        //  여기서 기존 토큰을 지워서 '뒤→앞' 시 반드시 재로그인 유도
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.removeAttribute(REAUTH_TOKEN_KEY);
         }
-        return "mypage/verify_password"; // 비밀번호 입력 화면
+
+        setNoCache(response);
+        model.addAttribute("continueUrl", cont);
+        return "mypage/verify_password";
     }
 
-    // 비밀번호 확인 처리
+
     @PostMapping("/mypage/verify_password")
-    public String verifyPassword(@RequestParam String password, Model model) {
+    public String verifyPassword(@RequestParam String password,
+                                 @RequestParam(value = "continue", required = false) String cont,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 Model model) {
         SiteUser siteUser = getCurrentUser();
-        if (siteUser == null) {
-            return "redirect:/user/login";
-        }
+        if (siteUser == null) return "redirect:/user/login";
 
         if (!passwordEncoder.matches(password, siteUser.getPassword())) {
+            setNoCache(response);
             model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+            model.addAttribute("continueUrl", cont);
             return "mypage/verify_password";
         }
 
-        // 비밀번호 확인 성공 → 계정 관리 화면으로 이동
-        return "redirect:/mypage/account";
+        //  1회용 토큰 발급 (허용 범위: /mypage 하위)
+        HttpSession session = request.getSession(true);
+        session.setAttribute(REAUTH_TOKEN_KEY, new ReauthToken(UUID.randomUUID().toString(), "/mypage"));
+
+        String safe = (cont != null && isSafeInternalPath(cont)) ? cont : "/mypage/account";
+        return "redirect:" + safe;
     }
 
-
-    // 계정 관리 수정 처리
+    /* ------------ 계정 정보 수정(POST) ------------ */
     @PostMapping("/mypage/account/update")
     public String updateAccount(@RequestParam String nickname,
                                 @RequestParam String email) {
         SiteUser siteUser = getCurrentUser();
-        if (siteUser == null) {
-            return "redirect:/user/login";
-        }
+        if (siteUser == null) return "redirect:/user/login";
 
         siteUser.setNickname(nickname);
         siteUser.setEmail(email);
-        userService.save(siteUser); // 저장 메서드가 UserService에 필요합니다
+        userService.save(siteUser);
 
-        return "redirect:/mypage";
+        return "redirect:/mypage-main";
     }
 
-    // 비밀번호 변경
+    /* ------------ 비밀번호 변경(ajax) ------------ */
     @PostMapping("/mypage/account/update-password")
     @ResponseBody
     public String updatePassword(HttpServletRequest request, HttpServletResponse response,
                                  @RequestParam String newPassword) throws ServletException {
         SiteUser siteUser = getCurrentUser();
-        if (siteUser == null) {
-            return "fail"; // 로그인 안 됨
-        }
+        if (siteUser == null) return "fail";
 
-        // 비밀번호 암호화 후 저장
         siteUser.setPassword(passwordEncoder.encode(newPassword));
         userService.save(siteUser);
 
-        // 세션 종료 및 로그아웃 처리
-        request.logout(); // Spring Security가 처리하는 로그아웃
-
+        request.logout(); // 보안상 로그아웃
         return "success";
     }
 
-
-    // 휴대폰 번호 변경
+    /* ------------ 휴대폰 변경(ajax) ------------ */
     @PostMapping("/mypage/account/update-phone")
     @ResponseBody
     public String updatePhone(@RequestParam String phone) {
         SiteUser siteUser = getCurrentUser();
-        if (siteUser == null) {
-            return "fail"; // 로그인 안 됨
-        }
+        if (siteUser == null) return "fail";
 
-        // 휴대폰 번호 저장
         siteUser.setPhone(phone);
         userService.save(siteUser);
-
         return "success";
     }
 
-    // 사업자만 접근 가능한 가드
+    /* ------------ 사업자 가드 & 카페 관리 ------------ */
+
     @GetMapping("/mypage/cafe/manage")
-    public String cafeManage(Model model) {
+    public String cafeManage(HttpServletRequest request, HttpServletResponse response, Model model) {
         SiteUser user = getCurrentUser();
         if (user == null) return "redirect:/user/login";
         if (user.getBusinessUser() == null) return "redirect:/mypage?denied=biz";
 
-
-        // 서버 가드: 사업자만 통과
-        if (user.getBusinessUser() == null) {
-            return "redirect:/mypage?denied=biz";
+        if (!requireReauthPresent(request, "/mypage")) {
+            return redirectToVerifyWithContinue(request);
         }
+        setNoCache(response);
+
         Business business = businessRepository.findByUserId(user.getId()).orElse(null);
         model.addAttribute("user", user);
-        model.addAttribute("business", business);   // 헤더 버튼 분기에 사용
-        return "mypage/cafe_manage"; // 임시 페이지 뷰 이름
+        model.addAttribute("business", business);
+        return "mypage/cafe_manage";
     }
 
-    // GET: 등록 폼
     @GetMapping("/mypage/cafe/register")
-    public String cafeRegister(Model model) {
+    public String cafeRegister(HttpServletRequest request, HttpServletResponse response, Model model) {
         SiteUser user = getCurrentUser();
         if (user == null) return "redirect:/user/login";
         if (user.getBusinessUser() == null) return "redirect:/mypage?denied=biz";
 
-        // 이미 보유하면 관리로 돌리기
+        if (!requireReauthPresent(request, "/mypage")) {
+            return redirectToVerifyWithContinue(request);
+        }
+        setNoCache(response);
+
         if (businessRepository.existsByUserId(user.getId())) {
             return "redirect:/mypage/cafe/manage";
         }
@@ -199,7 +247,6 @@ public class MypageController {
         return "mypage/cafe_register";
     }
 
-    // POST: 저장
     @PostMapping("/mypage/cafe/register")
     public String saveCafeRegister(
             @RequestParam String companyName,
@@ -226,7 +273,4 @@ public class MypageController {
             return "redirect:/mypage/cafe/register";
         }
     }
-
-
-
 }

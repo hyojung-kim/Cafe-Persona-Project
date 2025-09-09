@@ -1,10 +1,11 @@
 package com.team.cafe.review.controller;
 
 import com.team.cafe.list.hj.CafeListService;
-import com.team.cafe.review.ImageStorageService;
+import com.team.cafe.review.service.ImageStorageService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.review.service.CurrentUserService;
+import com.team.cafe.review.service.ReviewLikeService;   // [ADDED]
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.validation.constraints.DecimalMax;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,44 +35,46 @@ public class ReviewController {
 
     private final ReviewService reviewService;
     private final CafeListService cafeService;
-    private final ReviewRepository reviewRepository;
     private final CurrentUserService currentUserService;
     private final ImageStorageService imageStorageService;
+    private final ReviewRepository reviewRepository;
+    private final ReviewLikeService reviewLikeService; // [ADDED]
 
     public ReviewController(ReviewService reviewService,
                             CafeListService cafeService,
-                            ReviewRepository reviewRepository,
                             CurrentUserService currentUserService,
-                            ImageStorageService imageStorageService) {
+                            ImageStorageService imageStorageService,
+                            ReviewRepository reviewRepository,
+                            ReviewLikeService reviewLikeService) {
         this.reviewService = reviewService;
         this.cafeService = cafeService;
-        this.reviewRepository = reviewRepository;
         this.currentUserService = currentUserService;
         this.imageStorageService = imageStorageService;
+        this.reviewRepository = reviewRepository;
+        this.reviewLikeService = reviewLikeService;
     }
 
-    /* 항상 th:object="${form}" 가 있도록 */
+    /** 항상 th:object="${form}" 제공 */
     @ModelAttribute("form")
-    public CreateReviewForm formBacking() {
-        return new CreateReviewForm();
-    }
+    public CreateReviewForm formBacking() { return new CreateReviewForm(); }
 
     /* =======================
-       리뷰 목록 (SSR 페이지)
+       리뷰 리스트 “페이지”
        ======================= */
     @GetMapping({"/cafes/{cafeId}/reviews", "/review/list/{cafeId}"})
     public String listPage(@PathVariable Long cafeId,
                            @RequestParam(name = "rpage", defaultValue = "0") int page,
                            @RequestParam(name = "rsize", defaultValue = "10") int size,
                            Model model) {
+
         var cafe = cafeService.getById(cafeId);
         double avgRating = cafeService.getActiveAverageRating(cafeId);
         long reviewCount = cafeService.getActiveReviewCount(cafeId);
 
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(cafeId, pageable);
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
-        // ✅ review/list.html 이 기대하는 키 이름들
+        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -80,41 +84,45 @@ public class ReviewController {
     }
 
     /* =======================
-       리뷰 목록 섹션 (fragment)
-       cafe/detail 화면에서 부분 갱신용
+       리뷰 리스트 “프래그먼트”
        ======================= */
-    @GetMapping("/cafe/detail/{id}/reviews/section")
-    public String reviewsSection(@PathVariable Long id,
-                                 @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
-                                 @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
-                                 Model model) {
+    @GetMapping(value = "/cafes/{cafeId}/reviews/section", produces = MediaType.TEXT_HTML_VALUE)
+    public String listSection(@PathVariable Long cafeId,
+                              @RequestParam(name = "rpage", defaultValue = "0") int page,
+                              @RequestParam(name = "rsize", defaultValue = "10") int size,
+                              Model model) {
 
-        var cafe = cafeService.getById(id);
-        double avgRating = cafeService.getActiveAverageRating(id);
-        long reviewCount = cafeService.getActiveReviewCount(id);
+        var cafe = cafeService.getById(cafeId);
+        double avgRating = cafeService.getActiveAverageRating(cafeId);
+        long reviewCount = cafeService.getActiveReviewCount(cafeId);
 
-        var pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithAuthorImages(id, pageable);
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
-        // ✅ review/list.html 의 fragment가 쓰는 키와 동일하게
+        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
         model.addAttribute("page", reviews);
 
-        // ✅ templates/review/list.html 안에 th:fragment="section" 이어야 함
         return "review/list :: section";
     }
 
     /* =======================
-       리뷰 상세
+       리뷰 상세 (GET)
        ======================= */
     @GetMapping("/reviews/{id}")
     public String detail(@PathVariable Long id, Model model) {
         reviewService.increaseViewCount(id);
-        Review review = reviewRepository.findWithAuthorAndImagesById(id)
+        Review review = reviewRepository.findWithUserAndImagesById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
+        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
         model.addAttribute("review", review);
+        boolean canEdit = currentUserService.getCurrentUser()
+                .map(me -> review.getUser() != null && review.getUser().getId().equals(me.getId())
+                        || "ADMIN".equalsIgnoreCase(me.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(me.getRole()))
+                .orElse(false);
+        model.addAttribute("canEdit", canEdit);
         return "review/detail";
     }
 
@@ -127,12 +135,12 @@ public class ReviewController {
         var cafe = cafeService.getById(cafeId);
         model.addAttribute("cafe", cafe);
         model.addAttribute("mode", "create");
-        model.addAttribute("author", me);
+        model.addAttribute("user", me);
         return "review/edit";
     }
 
     /* =======================
-       작성 처리 (파일 + URL)
+       작성 (일반 제출)
        ======================= */
     @PostMapping("/cafes/{cafeId}/reviews")
     public String create(@PathVariable Long cafeId,
@@ -160,7 +168,7 @@ public class ReviewController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("cafe", cafe);
             model.addAttribute("mode", "create");
-            model.addAttribute("author", me);
+            model.addAttribute("user", me);
             return "review/edit";
         }
 
@@ -186,7 +194,7 @@ public class ReviewController {
     }
 
     /* =======================
-       작성 처리 (AJAX, 파일 + URL)
+       작성 (AJAX)
        ======================= */
     @PostMapping(value = "/cafes/{cafeId}/reviews", headers = "X-Requested-With=XMLHttpRequest")
     @ResponseBody
@@ -235,54 +243,38 @@ public class ReviewController {
     }
 
     /* =======================
-       좋아요 / 취소 (기본 폼)
-       ======================= */
-    @PostMapping("/reviews/{id}/like")
-    public String like(@PathVariable Long id, RedirectAttributes ra) {
-        SiteUser me = currentUserService.getCurrentUserOrThrow();
-        reviewService.likeReview(id, me);
-        ra.addFlashAttribute("message", "좋아요를 눌렀습니다.");
-        return "redirect:/reviews/" + id;
-    }
-
-    @PostMapping("/reviews/{id}/unlike")
-    public String unlike(@PathVariable Long id, RedirectAttributes ra) {
-        SiteUser me = currentUserService.getCurrentUserOrThrow();
-        reviewService.unlikeReview(id, me);
-        ra.addFlashAttribute("message", "좋아요를 취소했습니다.");
-        return "redirect:/reviews/" + id;
-    }
-
-    /* =======================
-       수정 폼 / 수정 / 삭제
+       수정 폼
        ======================= */
     @GetMapping("/reviews/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
+    public String editForm(@PathVariable Long id, Model model) {
         SiteUser me = currentUserService.getCurrentUserOrThrow();
-        Review review = reviewRepository.findById(id)
+        Review review = reviewRepository.findWithUserAndImagesById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
 
-        boolean isAuthor = review.getAuthor() != null && review.getAuthor().getId().equals(me.getId());
+        boolean isAuthor = review.getUser() != null && review.getUser().getId().equals(me.getId());
         boolean isAdmin = "ADMIN".equalsIgnoreCase(me.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(me.getRole());
-        if (!isAuthor && !isAdmin) {
-            ra.addFlashAttribute("message", "작성자 또는 관리자만 수정할 수 있습니다.");
-            return "redirect:/reviews/" + id;
-        }
+        if (!isAuthor && !isAdmin) throw new SecurityException("작성자 또는 관리자만 수정할 수 있습니다.");
 
         CreateReviewForm form = new CreateReviewForm();
         form.setRating(review.getRating());
         form.setContent(review.getContent());
         if (review.getImages() != null) {
-            review.getImages().forEach(img -> form.getImageUrl().add(img.getImageUrl()));
+            List<String> urls = new ArrayList<>();
+            review.getImages().forEach(img -> urls.add(img.getImageUrl()));
+            form.setImageUrl(urls);
         }
 
-        model.addAttribute("mode", "edit");
         model.addAttribute("form", form);
         model.addAttribute("review", review);
         model.addAttribute("cafe", review.getCafe());
+        model.addAttribute("mode", "edit");
+        model.addAttribute("user", me);
         return "review/edit";
     }
 
+    /* =======================
+       수정 (POST)
+       ======================= */
     @PostMapping("/reviews/{id}")
     public String update(@PathVariable Long id,
                          @ModelAttribute("form") CreateReviewForm form,
@@ -291,6 +283,8 @@ public class ReviewController {
                          Model model,
                          @RequestParam(value = "images", required = false) List<MultipartFile> images) {
         SiteUser me = currentUserService.getCurrentUserOrThrow();
+        Review review = reviewRepository.findWithUserAndImagesById(id)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
 
         if (form.getContent() == null || form.getContent().trim().length() < 5) {
             bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
@@ -305,13 +299,11 @@ public class ReviewController {
             bindingResult.reject("images.tooMany", "이미지는 최대 " + MAX_IMAGES + "장까지만 가능합니다.");
         }
 
-        Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
-
         if (bindingResult.hasErrors()) {
-            model.addAttribute("mode", "edit");
             model.addAttribute("review", review);
             model.addAttribute("cafe", review.getCafe());
+            model.addAttribute("mode", "edit");
+            model.addAttribute("user", me);
             return "review/edit";
         }
 
@@ -333,23 +325,55 @@ public class ReviewController {
         return "redirect:/reviews/" + id;
     }
 
+    /* =======================
+       삭제
+       ======================= */
     @PostMapping("/reviews/{id}/delete")
-    public String delete(@PathVariable Long id, RedirectAttributes ra) {
+    public String delete(@PathVariable Long id,
+                         @RequestHeader(value = "Referer", required = false) String referer,
+                         RedirectAttributes ra) {
         SiteUser me = currentUserService.getCurrentUserOrThrow();
-
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
-        Long cafeId = (review.getCafe() != null && review.getCafe().getId() != null)
-                ? Long.valueOf(review.getCafe().getId())
-                : null;
-
+        Long cafeId = review.getCafe().getId();
         reviewService.deleteReview(id, me);
         ra.addFlashAttribute("message", "리뷰가 삭제되었습니다.");
-        return (cafeId != null) ? "redirect:/cafes/" + cafeId + "/reviews" : "redirect:/";
+        if (referer != null && !referer.isBlank()) {
+            return "redirect:" + referer;
+        }
+        return "redirect:/cafes/" + cafeId + "/reviews";
     }
 
     /* =======================
-       내부 DTO
+       좋아요 토글
+       ======================= */
+
+    /** AJAX 토글 */
+    @PostMapping(value = "/reviews/{id}/like", headers = "X-Requested-With=XMLHttpRequest")
+    @ResponseBody
+    public ResponseEntity<?> likeAjax(@PathVariable Long id) {
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+        var result = reviewLikeService.toggle(id, me);
+        return ResponseEntity.ok(java.util.Map.of(
+                "ok", true,
+                "liked", result.liked(),
+                "count", result.count()
+        ));
+    }
+
+    /** 폼 제출 폴백 */
+    @PostMapping("/reviews/{id}/like")
+    public String likeForm(@PathVariable Long id,
+                           @RequestHeader(value = "Referer", required = false) String referer,
+                           RedirectAttributes ra) {
+        SiteUser me = currentUserService.getCurrentUserOrThrow();
+        reviewLikeService.toggle(id, me);
+        ra.addFlashAttribute("message", "처리되었습니다.");
+        return (referer != null && !referer.isBlank()) ? "redirect:" + referer : "redirect:/reviews/" + id;
+    }
+
+    /* =======================
+       내부 DTO/헬퍼
        ======================= */
     public static class CreateReviewForm {
         @DecimalMin(value = "1.0", message = "별점은 1.0 이상이어야 합니다.")
@@ -371,9 +395,6 @@ public class ReviewController {
         public void setImageUrl(List<String> imageUrl) { this.imageUrl = imageUrl; }
     }
 
-    /* =======================
-       헬퍼
-       ======================= */
     private static int safeSize(List<?> list) {
         if (list == null) return 0;
         int c = 0;

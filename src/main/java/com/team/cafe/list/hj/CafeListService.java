@@ -143,7 +143,7 @@ public class CafeListService {
         if (hasKeyWord) {
             // ✅ 태그 모두일치 + 기존 필터 동시 적용
             pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1)); // 정렬은 쿼리 고정
-            Long selectedSize = (Long) keyList.stream().distinct().count();
+            Long selectedSize = keyList.stream().distinct().count();
             Page<Cafe> pageAll = cafeListRepository.findAllMatchAllWithFiltersCaseOrder(kw, parking, now, keyList, selectedSize, sort, dir, pageable);
             return pageAll.map(c -> new CafeMatchDto(c, selectedSize));
         } else {
