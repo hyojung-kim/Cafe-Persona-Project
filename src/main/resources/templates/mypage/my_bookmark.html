@@ -9,7 +9,9 @@
 
         <ul th:if="${!#lists.isEmpty(bookmark)}">
             <li th:each="bm : ${bookmark}">
-                <a th:href="@{|/cafe/detail/${bm.cafe.id}|}"
+                <!--                   ?from=bookmark-->
+<!--                <a th:href="@{|/cafe/detail/${bm.cafe.id}|}"-->
+                <a th:href="@{|/cafe/detail/${bm.cafe.id}?from=bookmark|}"
                    th:text="${bm.cafe.name}">카페명</a>
             </li>
         </ul>
