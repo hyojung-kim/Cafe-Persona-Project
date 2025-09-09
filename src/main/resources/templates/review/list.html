@@ -80,8 +80,7 @@
             <div class="d-flex justify-content-between">
               <h4 class="h6 mb-0">
                 <span class="badge bg-info text-dark"
-                      th:text="${rv.user != null ? rv.user.username : '알 수 없음'}">작성자</span>
-                <span class="ms-2">★ <span th:text="${#numbers.formatDecimal(rv.rating,1,1)}">4.0</span></span>
+                      th:text="${rv.user != null ? rv.user.nickname : '알 수 없음'}">작성자</span>                <span class="ms-2">★ <span th:text="${#numbers.formatDecimal(rv.rating,1,1)}">4.0</span></span>
               </h4>
               <time class="text-muted small"
                     th:text="${#temporals.format(rv.createdAt,'yyyy-MM-dd HH:mm')}">2025-09-01</time>

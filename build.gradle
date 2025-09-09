@@ -82,7 +82,7 @@ dependencies {
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0'
 
     // thymeleaf + spring security integration
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 }
 
 // 테스트 프레임워크 인데 주피터노트북이나 주피터랩 방식이라고 생각하면 됨

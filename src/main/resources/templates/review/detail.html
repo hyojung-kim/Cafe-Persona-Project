@@ -19,7 +19,7 @@
         <div class="text-muted small">
           작성자:
           <span class="badge bg-info text-dark"
-                th:text="${review.user != null ? review.user.username : '알 수 없음'}">작성자</span>
+                th:text="${review.user != null ? review.user.nickname : '알 수 없음'}">작성자</span>
           <span class="ms-2">
             작성일: <time th:text="${#temporals.format(review.createdAt,'yyyy-MM-dd HH:mm')}">-</time>
           </span>
