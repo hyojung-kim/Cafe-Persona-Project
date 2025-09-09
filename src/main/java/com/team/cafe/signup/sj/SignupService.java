@@ -16,7 +16,7 @@ public class SignupService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public String register(String username, String email, String password, String nickname, String phone, String rrnFront, String rrnBack) {
+    public String register(String username, String email, String password, String nickname, String phone) {
 
         // 아이디 중복 체크
         if (userRepository.existsByUsername(username)) {
@@ -45,7 +45,6 @@ public class SignupService {
         user.setNickname(nickname);
         user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
-        user.setRrn(rrnFront + rrnBack);
         user.setRole("USER");
         user.setCreateDate(LocalDateTime.now());
         userRepository.save(user);
