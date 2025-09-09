@@ -1,0 +1,52 @@
+/* 전체 컨테이너 중앙 정렬 */
+.container {
+    max-width: 400px; /* 폼 너비 제한 */
+    margin: 0 auto;   /* 화면 중앙 정렬 */
+    padding-top: 50px; /* 위쪽 여백 */
+}
+
+/* input 필드 스타일 */
+input.form-control {
+    width: 100%;
+    padding: 12px 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* 로그인 버튼 */
+button.btn-primary {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #ccc; /* 와이어프레임 회색 버튼 */
+    border: none;
+    font-size: 14px;
+}
+
+/* 카카오 로그인 버튼 */
+a img {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+/* 아이디/비밀번호 찾기, 회원가입 버튼 */
+div > a.btn {
+    width: 32%; /* 3개 버튼을 가로로 나란히 */
+    margin-right: 2%;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+div > a.btn:last-child {
+    margin-right: 0;
+}
+
+/* alert 스타일 */
+.alert {
+    font-size: 12px;
+    margin-bottom: 10px;
+}
