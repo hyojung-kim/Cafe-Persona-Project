@@ -5,7 +5,6 @@
 
   const csrfToken  = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
   const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-  const cafeId     = form.getAttribute('data-cafe-id');
 
   form.addEventListener('submit', async (e) => {
     if (!form.checkValidity()) {
@@ -40,8 +39,10 @@
       if (!data.ok) throw new Error(data.message || '등록 실패');
 
       // 2) 최신 리뷰 섹션 로드해서 교체
-      if (!cafeId) throw new Error('cafeId 누락');
-      const secRes = await fetch(`/cafe/detail/${encodeURIComponent(cafeId)}/reviews/section`, {
+      const oldSection = document.getElementById('reviewsSection');
+      const sectionUrl = oldSection?.getAttribute('data-review-section-url');
+      if (!oldSection || !sectionUrl) throw new Error('섹션 로드 URL을 찾을 수 없습니다.');
+      const secRes = await fetch(sectionUrl, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       });
       if (!secRes.ok) throw new Error(`섹션 로드 실패: HTTP ${secRes.status}`);
@@ -51,7 +52,6 @@
       wrapper.innerHTML = html.trim();
 
       const newSection = wrapper.querySelector('#reviewsSection');
-      const oldSection = document.getElementById('reviewsSection');
       if (!newSection || !oldSection) throw new Error('섹션 엘리먼트를 찾을 수 없습니다.');
 
       oldSection.replaceWith(newSection);
