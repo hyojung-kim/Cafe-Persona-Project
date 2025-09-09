@@ -58,7 +58,6 @@ public class CafeManageService {
         b.setRepresentativePhone(representativePhone);
         b.setAddress(address);
         b.setDescription(description);
-        b.setStatus(BusinessStatus.DRAFT); // 초기 상태
 
         return businessRepository.save(b);
     }
@@ -91,7 +90,6 @@ public class CafeManageService {
                     // 없으면 새로 생성(원치 않으면 예외로 변경)
                     Business nb = new Business();
                     nb.setUser(user);
-                    nb.setStatus(BusinessStatus.DRAFT);
                     return nb;
                 });
 
