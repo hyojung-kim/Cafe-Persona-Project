@@ -9,7 +9,7 @@ function validatePassword() {
     if (!pw) {
         msg.classList.remove("text-success");
         msg.classList.add("text-danger");
-        msg.innerText = "8자 이상, 특수문자 포함";
+        msg.innerText = "8자 이상, 특수문자 포함/^(?=.*[!@#$%^&*(),.?:{}|<>]).{8,}$/;";
         return false;
     }
 
