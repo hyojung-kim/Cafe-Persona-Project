@@ -164,42 +164,7 @@
         <div class="left">
             <strong th:text="|총 ${paging.totalElements}개 결과|">총 0개 결과</strong>
         </div>
-
-        <div class="right active-filters">
-            <!-- 검색어 -->
-            <span class="chip" th:if="${kw}">검색:<strong th:text="${kw}">키워드</strong>
-                <button type="button" class="chip__x" onclick="removeFilter('kw')">×</button>
-            </span>
-
-            <!-- 지역 -->
-            <span class="chip" th:if="${city}">도시:
-                <strong th:text="${city}">대전</strong>
-                <button type="button" class="chip__x" onclick="removeFilter('city')">×</button>
-            </span>
-            <span class="chip" th:if="${district}">구:
-                <strong th:text="${district}">서구</strong>
-                <button type="button" class="chip__x" onclick="removeFilter('district')">×</button>
-            </span>
-
-            <!-- 정렬 -->
-            <span class="chip" th:if="${sort}">정렬:
-                <strong th:text="${sort}">최신순</strong>
-                <button type="button" class="chip__x" onclick="removeFilter('sort')">×</button>
-            </span>
-            <span class="chip" th:if="${dir}">방향:
-                <strong th:text="${dir}">내림차순</strong>
-                <button type="button" class="chip__x" onclick="removeFilter('dir')">×</button>
-            </span>
-
-            <!-- 체크박스 필터 (Boolean) -->
-            <span class="chip" th:if="${parking}">주차 가능
-                <button type="button" class="chip__x" onclick="removeFilter('parking')">×</button>
-            </span>
-            <span class="chip" th:if="${openNow}">영업중
-                <button type="button" class="chip__x" onclick="removeFilter('openNow')">×</button>
-            </span>
-
-            <!-- 전체 초기화 -->
+        <div>    <!-- 전체 초기화 -->
             <button type="button" class="reset-btn" onclick="resetFilters()">필터 초기화</button>
         </div>
     </div>
