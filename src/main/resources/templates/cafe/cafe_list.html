@@ -3,7 +3,7 @@
     <link rel="stylesheet" th:href="@{/css/cafe_list.css}">
 </head>
 
-<div layout:fragment="content">
+<div class="content" layout:fragment="content">
 
     <div sec:authorize="isAuthenticated()">
         <!--        안녕하세요, <b sec:authentication="principal.nickname">사용자</b> 님!-->
@@ -62,7 +62,7 @@
     <!-- 필터 영역 -->
     <div class="filter-bar" >
         <!-- 총 건수 -->
-        <div class="filter-bar__count">총 <strong class="count" th:text="|총 ${paging.totalElements}개 결과|">총 0개 결과</strong></div>
+        <div class="filter-bar__count"><strong class="count" th:text="|${paging.totalElements}개 결과|">총 0개 결과</strong></div>
 
         <!-- 라디오 필터 (그룹) -->
         <fieldset class="filter-bar__radios">
@@ -194,24 +194,7 @@
            th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">다음</a>
     </div>
 
-    <!-- 결과 요약 + 활성 필터 칩 -->
-    <div class="results-bar">
-        <div class="left">
-            <strong th:text="|총 ${paging.totalElements}개 결과|">총 0개 결과</strong>
-        </div>
-    </div>
 
-    <form th:action="@{/cafe/list}" method="get" id="searchForm">
-        <input type="hidden" id="page" name="page" th:value="${paging.number}">
-        <input type="hidden" id="kw" name="kw" th:value="${kw}">
-        <input type="hidden" id="city" name="city" th:value="${city}">
-        <input type="hidden" id="district" name="district" th:value="${district}">
-        <input type="hidden" id="sort" name="sort" th:value="${sort}">
-        <input type="hidden" id="dir" name="dir" th:value="${dir}">
-        <!-- Boolean 필터는 값이 'true'거나 비어있는 방식 중 하나를 선택해 사용하세요 -->
-        <input type="hidden" id="parking" name="parking" th:value="${parking}">
-        <input type="hidden" id="openNow" name="openNow" th:value="${openNow}">
-    </form>
 
     <script src="/js/filter-chip.js"></script>
     <script src="/js/keyword-reset.js"></script>

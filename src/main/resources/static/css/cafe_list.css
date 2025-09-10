@@ -1,6 +1,8 @@
 
-body{
-    background-color : #F9F6F2;
+.content{
+  max-width: 1280px;                            /* 최대 너비 제한 주석!*/
+  margin: 1rem auto;                           /* 화면 중앙에 배치 주석!*/
+  font-family: "Noto Sans KR", sans-serif;     /* 한글 친화 폰트 */
 }
 
 /* ===============================
@@ -10,9 +12,7 @@ body{
   border-radius: 30px;                         /* 컨테이너 모서리를 둥글게 */
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);     /* 은은한 그림자 */
   padding: 1.5rem;                             /* 내부 여백 */
-  max-width: 1280px;                            /* 최대 너비 제한 주석!*/
-  margin: 2rem auto;                           /* 화면 중앙에 배치 주석!*/
-  font-family: "Noto Sans KR", sans-serif;     /* 한글 친화 폰트 */
+
 }
 
 /* ===============================
@@ -163,9 +163,14 @@ body{
    /* 바 전체 */
    .filter-bar {
      display: flex; align-items: center; gap: 16px;
-     padding: 8px 12px;
+     /*padding: 8px 12px;
      border: 1px solid #e5e5e5; border-radius: 6px;
-     background: #fff; font-size: 14px; color: #333;
+     background: #fff; font-size: 14px; color: #333;*/
+
+      font-size: 14px;
+      border-radius: 30px;                         /* 컨테이너 모서리를 둥글게 */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);     /* 은은한 그림자 */
+      padding: 1.5rem;
    }
 
    /* 총 건수 */
