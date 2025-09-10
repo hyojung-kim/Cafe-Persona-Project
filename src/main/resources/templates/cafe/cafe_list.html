@@ -35,7 +35,7 @@
 
             <!-- 업종 -->
             <div class="filter-group" th:each="entry : ${keywordsByType}">
-                <legend class="filter-group__title" th:text="${entry.key.typeName}">>선택 타입</legend>
+                <legend class="filter-group__title" th:text="${entry.key.typeName}">>키워드 타입</legend>
                 <ul class="filter-list">
                     <li th:each="k : ${entry.value}" >
                         <label th:classappend="${selectedKeys != null and #lists.contains(selectedKeys, k.id)} ? ' active' : null"
@@ -55,7 +55,7 @@
                     </button>
                 </div>
                 <div>
-                    <button type="reset" class="filter-btn filter-btn--ghost" form="filterForm">초기화</button>
+                    <button type="button" class="filter-btn filter-btn--ghost" form="filterForm" id="resetBtn">초기화</button>
                     <button type="submit" class="filter-btn filter-btn--primary" form="filterForm">적용하기</button>
                 </div>
             </footer>
@@ -211,5 +211,6 @@
     </form>
 
     <script src="/js/filter-chip.js"></script>
+    <script src="/js/keyword-reset.js"></script>
 </div>
 </html>
