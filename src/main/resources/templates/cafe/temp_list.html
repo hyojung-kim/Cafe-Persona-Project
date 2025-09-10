@@ -18,84 +18,59 @@
     <h2>카페 목록</h2>
 
     <!-- 검색 + 정렬 폼 -->
-    <form th:action="@{/cafe/list}" id="filterForm" method="get" class="filter-form"></form>
+    <form th:action="@{/cafe/list}" method="get" class="filter-form">
+        <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}">
 
-        <!-- 키워드 태그: 버튼 눌러야 제출 -->
-        <!-- 필터 영역 -->
-        <section class="filter-panel" aria-labelledby="filterTitle">
-            <!-- 상단: 제목 / 필터 없이 보기 -->
-            <header class="filter-panel__header">
-                <h2 id="filterTitle" class="filter-panel__title">원하시는 정보를 선택해주세요.</h2>
-            </header>
-
-            <!-- 선택된 태그 미리보기 (JS로 chip 추가) -->
-<!--            <div class="filter-panel__selected" aria-live="polite">-->
-<!--                &lt;!&ndash; 예: <span class="chip" data-key="meat">고기/구이</span> &ndash;&gt;-->
-<!--            </div>-->
-
-            <!-- 업종 -->
-            <div class="filter-group" th:each="entry : ${keywordsByType}">
-                <legend class="filter-group__title" th:text="${entry.key.typeName}">>선택 타입</legend>
-                <ul class="filter-list">
-                    <li th:each="k : ${entry.value}" >
-                        <label th:classappend="${selectedKeys != null and #lists.contains(selectedKeys, k.id)} ? ' active' : null"
-                               class="list_label">
-                            <input type="checkbox" name="keyList" th:value="${k.id}" th:checked="${selectedKeys != null and #lists.contains(selectedKeys, k.id)}" form="filterForm">
-                            <span th:text="${k.name}">태그명</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- 하단: 선택 수 / 초기화 / 적용 -->
-            <footer class="filter-panel__footer">
-                <div>
-                    <button type="button" class="filter-btn filter-btn--pill" disabled>
-                        <span id="selectedCount">0</span>개 선택
-                    </button>
-                </div>
-                <div>
-                    <button type="reset" class="filter-btn filter-btn--ghost" form="filterForm">초기화</button>
-                    <button type="submit" class="filter-btn filter-btn--primary" form="filterForm">적용하기</button>
-                </div>
-            </footer>
-        </section>
-
-        <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}" form="filterForm">
-
-        <select name="sort" th:value="${sort}" form="filterForm">
+        <select name="sort" th:value="${sort}">
             <option value="createdAt">기본순</option>
             <option value="name">이름순</option>
             <option value="hit">인기순</option>
         </select>
 
-        <select name="dir" th:value="${dir}" form="filterForm">
+        <select name="dir" th:value="${dir}">
             <option value="DESC">내림차순</option>
             <option value="ASC">오름차순</option>
         </select>
 
-        <input type="hidden" name="size" th:value="${size}" form="filterForm">
+        <input type="hidden" name="size" th:value="${size}">
 
         <!-- ✅ 이 두 개만 즉시 제출 -->
-
-
         <div>
             <label>
                 <input type="checkbox" name="parking" value="true"
                        th:checked="${parking != null and parking}"
-                       onchange="this.form.submit()" form="filterForm"> 주차 가능만
+                       onchange="this.form.submit()"> 주차 가능만
             </label>
 
             <label>
                 <input type="checkbox" name="openNow" value="true"
                        th:checked="${openNow != null and openNow}"
-                       onchange="this.form.submit()" form="filterForm"> 지금 영업중만
+                       onchange="this.form.submit()"> 지금 영업중만
             </label>
         </div>
 
-    <button type="submit" form="filterForm">적용하기</button>
+        <!-- 키워드 태그: 버튼 눌러야 제출 -->
+        <div>
+            <div th:each="entry : ${keywordsByType}">
+                <div th:text="${entry.key.typeName}">
+                    키워드 타입
+                </div>
 
+                <div>
+                    <label th:each="k : ${entry.value}"
+                           th:classappend="${selectedKeys != null and #lists.contains(selectedKeys, k.id)} ? ' active' : null">
+                        <input type="checkbox"
+                               name="keyList"
+                               th:value="${k.id}"
+                               th:checked="${selectedKeys != null and #lists.contains(selectedKeys, k.id)}">
+                        <span th:text="${k.name}">태그명</span>
+                    </label>
+                </div>
+            </div>
+        </div>
 
+        <button type="submit">적용</button>
+    </form>
 
     <table>
         <thead>
