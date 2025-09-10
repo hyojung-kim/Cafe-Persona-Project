@@ -145,18 +145,18 @@
     <!-- 페이징: 모든 파라미터 유지 -->
     <div style="margin-top:20px; text-align:center" th:if="${paging != null and !paging.isEmpty()}">
         <a th:if="${!paging.first}"
-           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">이전</a>
+           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">이전</a>
 
         <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
               th:if="${p >= paging.number-5 and p <= paging.number+5}">
             <a th:if="${p != paging.number}"
                th:text="${p+1}"
-               th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}"></a>
+               th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}"></a>
             <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
         </span>
 
         <a th:if="${!paging.last}"
-           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow})}">다음</a>
+           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">다음</a>
     </div>
 
     <!-- 결과 요약 + 활성 필터 칩 -->
