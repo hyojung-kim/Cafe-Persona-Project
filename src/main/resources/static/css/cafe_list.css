@@ -137,3 +137,28 @@ body{
   color: #4B3621;
   background-color:#F9F6F2;
 }
+
+.disable-text{
+  color: #aaa;                /* 기본: 흐린 회색 */
+  font-weight: normal;
+  transition: all 0.2s ease;  /* 부드럽게 전환 */
+}
+
+.disable-text.active{
+   color: #d94d4d;             /* 강조: 포인트 컬러 */
+   font-weight: 700;           /* 두껍게 */
+   transform: scale(1.1);      /* 살짝 커지는 효과 */
+}
+
+
+.count-label {
+  color: #aaa;                /* 기본: 흐린 회색 */
+  font-weight: normal;
+  transition: all 0.2s ease;  /* 부드럽게 전환 */
+}
+
+.count-label.active {
+  color: #d94d4d;             /* 강조: 포인트 컬러 */
+  font-weight: 700;           /* 두껍게 */
+  transform: scale(1.1);      /* 살짝 커지는 효과 */
+}

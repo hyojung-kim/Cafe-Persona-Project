@@ -49,10 +49,8 @@
 
             <!-- 하단: 선택 수 / 초기화 / 적용 -->
             <footer class="filter-panel__footer">
-                <div>
-                    <button type="button" class="filter-btn filter-btn--pill" disabled>
-                        <span id="selectedCount">0</span>개 선택
-                    </button>
+                <div id="disable-text">
+                    <span id="selectedCount" class="count-label">0</span> 개 선택
                 </div>
                 <div>
                     <button type="button" class="filter-btn filter-btn--ghost" form="filterForm" id="resetBtn">초기화</button>
@@ -207,5 +205,6 @@
 
     <script src="/js/filter-chip.js"></script>
     <script src="/js/keyword-reset.js"></script>
+    <script src="/js/keyword-count.js"></script>
 </div>
 </html>
