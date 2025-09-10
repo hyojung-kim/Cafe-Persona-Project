@@ -68,8 +68,8 @@
         </select>
 
         <select name="dir" th:value="${dir}" form="filterForm" onchange="this.form.submit()">
-            <option value="DESC" th:selected="${#strings.equalsIgnoreCase(dir, 'DESC')}">내림차순</option>
-            <option value="ASC" th:selected="${#strings.equalsIgnoreCase(dir, 'ASC')}">오름차순</option>
+            <option value="DESC" th:selected="${#strings.equalsIgnoreCase(dir, 'DESC')}">최신순</option>
+            <option value="ASC" th:selected="${#strings.equalsIgnoreCase(dir, 'ASC')}">오래된순</option>
         </select>
 
         <input type="hidden" name="size" th:value="${size}" form="filterForm">
@@ -137,7 +137,7 @@
             <td>
                 <!-- 둘 다 있을 때만 시간 표시 -->
                 <span th:if="${cafeList.openTime != null and cafeList.closeTime != null}"
-                      th:text="|${#temporals.format(cafeList.openTime,'HH:mm')} ~ ${#temporals.format(cafeList.closeTime,'HH:mm')}|">
+                      th:text="|${#temporals.format(cafeList.openTime,'HH시:mm분')} ~ ${#temporals.format(cafeList.closeTime,'HH시:mm분')}|">
           09:00 ~ 22:00
         </span>
                 <span th:unless="${cafeList.openTime != null and cafeList.closeTime != null}" class="muted">미등록</span>
@@ -151,7 +151,7 @@
                    th:href="${cafeList.siteUrl}" target="_blank" rel="noopener">바로가기</a>
                 <span th:unless="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}" class="muted">없음</span>
             </td>
-            <td th:text="${#temporals.format(cafeList.createdAt, 'yyyy-MM-dd HH:mm')}">
+            <td th:text="${#temporals.format(cafeList.createdAt, 'yyyy-MM-dd HH시mm분')}">
                 등록일
             </td>
             <td th:text="${cafeList.hitCount}">
