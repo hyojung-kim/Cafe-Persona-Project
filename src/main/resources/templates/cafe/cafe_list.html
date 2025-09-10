@@ -1,4 +1,8 @@
 <html layout:decorate="~{layout}">
+    <head>
+        <link rel="stylesheet" th:href="@{/css/cafe_list.css}">
+    </head>
+
 <div layout:fragment="content">
 
     <div sec:authorize="isAuthenticated()">
@@ -31,7 +35,7 @@
         <input type="hidden" name="size" th:value="${size}">
 
         <!-- ✅ 이 두 개만 즉시 제출 -->
-        <div style="display:flex; gap:12px; align-items:center;">
+        <div>
             <label>
                 <input type="checkbox" name="parking" value="true"
                        th:checked="${parking != null and parking}"
@@ -46,14 +50,14 @@
         </div>
 
         <!-- 키워드 태그: 버튼 눌러야 제출 -->
-        <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+        <div>
             <div th:each="entry : ${keywordsByType}">
-                <div style="font-weight:600; margin:8px 0 4px;"
-                     th:text="${entry.key.typeName}">키워드 타입</div>
+                <div th:text="${entry.key.typeName}">
+                     키워드 타입
+                </div>
 
-                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <div>
                     <label th:each="k : ${entry.value}"
-                           style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid #ddd; border-radius:999px; cursor:pointer; user-select:none;"
                            th:classappend="${selectedKeys != null and #lists.contains(selectedKeys, k.id)} ? ' active' : null">
                         <input type="checkbox"
                                name="keyList"
@@ -81,7 +85,7 @@
             <th>웹사이트</th>
             <th>날짜</th>
             <th>조회수</th>
-            <th style="width:120px;">이미지</th>
+            <th>이미지</th>
         </tr>
         </thead>
         <tbody>
@@ -143,7 +147,7 @@
     </table>
 
     <!-- 페이징: 모든 파라미터 유지 -->
-    <div style="margin-top:20px; text-align:center" th:if="${paging != null and !paging.isEmpty()}">
+    <div  th:if="${paging != null and !paging.isEmpty()}">
         <a th:if="${!paging.first}"
            th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">이전</a>
 
@@ -152,7 +156,7 @@
             <a th:if="${p != paging.number}"
                th:text="${p+1}"
                th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}"></a>
-            <span th:if="${p == paging.number}" th:text="${p+1}" style="font-weight:bold; color:#d33;"></span>
+            <span th:if="${p == paging.number}" th:text="${p+1}"></span>
         </span>
 
         <a th:if="${!paging.last}"
