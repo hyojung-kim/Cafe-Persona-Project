@@ -1,142 +1,83 @@
 /* ===============================
-   Global 12-Column Grid System
-   - 기본: 12컬럼, 데스크탑 기준 gap 30px
-   - 반응형: md(≥768), lg(≥1200), xl(≥1440)
-   - 컨테이너는 가운데 정렬, 최대폭 80rem (~1280px)
+   Bootstrap-visual Shim for Custom Grid
+   - Keep your API: .g-container, .grid, .col-*, .md-col-*, .lg-col-*, .xl-col-*
+   - Visual parity with Bootstrap 5 (gutters, breakpoints, container widths)
    =============================== */
 
-/* 기본 리셋 */
+/* Reset (box-sizing) */
 *,
 *::before,
 *::after { box-sizing: border-box; }
 
-/* 전역 변수 */
+/* Bootstrap-equivalent variables */
 :root{
-  --grid-cols: 12;
-  --grid-gap: 30px;         /* 기본 간격 */
-  --container-max: 80rem;   /* 가운데 너비 80rem ≈ 1280px */
-  --container-pad: 1rem;    /* 좌우 여백 */
+  --bs-gutter-x: 1.5rem; /* 24px */
+  --bs-gutter-y: 0;
 }
 
-/* 컨테이너: 가운데 정렬 + 최대폭 제한 */
-.container{
-  width: min(var(--container-max), 100% - (var(--container-pad) * 2));
-  margin-inline: auto;
-  padding-inline: var(--container-pad);
+/* --------------------------------
+   Containers (Bootstrap .container)
+-----------------------------------*/
+.g-container{
+  width: 100%;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  margin-right: auto;
+  margin-left:  auto;
 }
 
-/* 그리드 기본 */
+/* Max widths by breakpoint */
+@media (min-width: 576px){  .g-container { max-width: 540px; } }   /* sm */
+@media (min-width: 768px){  .g-container { max-width: 720px; } }   /* md */
+@media (min-width: 992px){  .g-container { max-width: 960px; } }   /* lg */
+@media (min-width: 1200px){ .g-container { max-width: 1140px; } }  /* xl */
+@media (min-width: 1400px){ .g-container { max-width: 1320px; } }  /* xxl */
+
+/* Fluid container (like .container-fluid) */
+.g-container-fluid{
+  width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left:  calc(var(--bs-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left:  auto;
+  max-width: 100%;
+}
+
+/* --------------------------------
+   Rows / Gutters (Bootstrap .row)
+-----------------------------------*/
 .grid{
-  display: grid;
-  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
-  gap: var(--grid-gap);
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: calc(var(--bs-gutter-x) * -0.5);
+  margin-left:  calc(var(--bs-gutter-x) * -0.5);
+  /* vertical gutter behavior: opt-in via .g-gy-* utilities below */
 }
 
-/* 스팬 유틸 (모바일 퍼스트: 기본 스팬) */
-.col-1{grid-column: span 1;}
-.col-2{grid-column: span 2;}
-.col-3{grid-column: span 3;}
-.col-4{grid-column: span 4;}
-.col-5{grid-column: span 5;}
-.col-6{grid-column: span 6;}
-.col-7{grid-column: span 7;}
-.col-8{grid-column: span 8;}
-.col-9{grid-column: span 9;}
-.col-10{grid-column: span 10;}
-.col-11{grid-column: span 11;}
-.col-12{grid-column: span 12;}
-
-/* 시작 위치 유틸 (필요할 때 사용) */
-.start-1{grid-column-start: 1;}
-.start-2{grid-column-start: 2;}
-.start-3{grid-column-start: 3;}
-.start-4{grid-column-start: 4;}
-.start-5{grid-column-start: 5;}
-.start-6{grid-column-start: 6;}
-.start-7{grid-column-start: 7;}
-.start-8{grid-column-start: 8;}
-.start-9{grid-column-start: 9;}
-.start-10{grid-column-start: 10;}
-.start-11{grid-column-start: 11;}
-.start-12{grid-column-start: 12;}
-
-/* 중앙 배치 보조 유틸 */
-.justify-center{ justify-items: center; }
-.items-center{ align-items: center; }
-.self-center{ justify-self: center; }
-
-/* gap 유틸 (페이지별로 손쉽게 변경) */
-.gap-8 { --grid-gap: 8px; }
-.gap-12{ --grid-gap: 12px; }
-.gap-16{ --grid-gap: 16px; }
-.gap-20{ --grid-gap: 20px; }
-.gap-24{ --grid-gap: 24px; }
-.gap-30{ --grid-gap: 30px; } /* 기본 */
-.gap-40{ --grid-gap: 40px; }
-
-/* 컨테이너 폭 유틸 (페이지 성격에 맞게 선택) */
-.container--narrow{ --container-max: 64rem; } /* ~1024px */
-.container--wide  { --container-max: 90rem; } /* ~1440px */
-.container--fluid { --container-max: 100vw; } /* 풀폭 느낌 */
-
-/* 반응형: 브레이크포인트 */
-@media (max-width: 1199.98px){ /* <1200 (lg 미만) */
-  :root { --grid-gap: 24px; }
+.grid > *{
+  box-sizing: border-box;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left:  calc(var(--bs-gutter-x) * 0.5);
+  margin-top: var(--bs-gutter-y);
 }
 
-@media (max-width: 767.98px){  /* <768 (md 미만, 모바일) */
-  :root { --grid-gap: 16px; }
-  /* 모바일에선 컬럼을 크게 차지하도록 기본을 12로 쓰는 게 보통이라
-     필요 시 여기에 .grid 템플릿 변경을 넣을 수도 있음 */
+/* Remove top margin on first "row" line to mimic Bootstrap */
+.grid > *:first-child{ margin-top: 0; }
+
+/* --------------------------------
+   Columns (Bootstrap .col, .col-*)
+-----------------------------------*/
+.col{ /* auto growing column */
+  flex: 1 0 0%;
+  max-width: 100%;
 }
 
-/* md 이상에서 적용하는 스팬 유틸 */
-@media (min-width: 768px){
-  .md-col-1{grid-column: span 1;}
-  .md-col-2{grid-column: span 2;}
-  .md-col-3{grid-column: span 3;}
-  .md-col-4{grid-column: span 4;}
-  .md-col-5{grid-column: span 5;}
-  .md-col-6{grid-column: span 6;}
-  .md-col-7{grid-column: span 7;}
-  .md-col-8{grid-column: span 8;}
-  .md-col-9{grid-column: span 9;}
-  .md-col-10{grid-column: span 10;}
-  .md-col-11{grid-column: span 11;}
-  .md-col-12{grid-column: span 12;}
-}
-
-/* lg 이상에서 적용하는 스팬 유틸 */
-@media (min-width: 1200px){
-  .lg-col-1{grid-column: span 1;}
-  .lg-col-2{grid-column: span 2;}
-  .lg-col-3{grid-column: span 3;}
-  .lg-col-4{grid-column: span 4;}
-  .lg-col-5{grid-column: span 5;}
-  .lg-col-6{grid-column: span 6;}
-  .lg-col-7{grid-column: span 7;}
-  .lg-col-8{grid-column: span 8;}
-  .lg-col-9{grid-column: span 9;}
-  .lg-col-10{grid-column: span 10;}
-  .lg-col-11{grid-column: span 11;}
-  .lg-col-12{grid-column: span 12;}
-}
-
-/* xl 이상에서 적용하는 스팬 유틸 (넓은 화면 미세 조정) */
-@media (min-width: 1440px){
-  .xl-col-1{grid-column: span 1;}
-  .xl-col-2{grid-column: span 2;}
-  .xl-col-3{grid-column: span 3;}
-  .xl-col-4{grid-column: span 4;}
-  .xl-col-5{grid-column: span 5;}
-  .xl-col-6{grid-column: span 6;}
-  .xl-col-7{grid-column: span 7;}
-  .xl-col-8{grid-column: span 8;}
-  .xl-col-9{grid-column: span 9;}
-  .xl-col-10{grid-column: span 10;}
-  .xl-col-11{grid-column: span 11;}
-  .xl-col-12{grid-column: span 12;}
-}
-
-/* 접근성/편의 유틸 (프로젝트 전반에서 이미 쓰고 있어서 포함) */
-.hidden{ display:none !important; }
+/* Fixed fraction columns (12-grid) */
+.col-1  { flex: 0 0 auto; width: 8.333333%; }
+.col-2  { flex: 0 0 auto; width: 16.666667%; }
+.col-3  { flex: 0 0 auto; width: 25%; }
+.col-4  { flex: 0 0 auto; width: 33.333333%; }
+.col-5  { flex: 0 0 auto; width: 41.666667%; }
+.col-6  { flex: 0 0 auto; width: 50%; }
+.col-7  { flex: 0 0 auto; width: 58.333333%; }
+.col-8  { flex: 0 0 auto; width: 66.666667%;

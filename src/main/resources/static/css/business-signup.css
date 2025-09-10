@@ -1,0 +1,21 @@
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .form-row label {
+            width: 120px;
+            text-align: right;
+            margin-right: 80px;
+        }
+        .form-row input {
+            width: 250px;
+        }
+        .validation-message {
+            margin-left: 10px;
+            font-size: 0.875rem;
+        }
+        .text-danger { color: #dc3545; }
+        .text-success { color: #28a745; }
+        .hidden { display: none; }

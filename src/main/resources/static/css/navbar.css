@@ -25,80 +25,57 @@
 .navbar{
   background:var(--brown) !important;
   color:#fff;
-  height: 80px;
+  height:80px;
   border-bottom:1px solid rgba(255,255,255,.12) !important;
-  position:sticky; top:0; z-index:1000;  /* 필요 없으면 제거 */
-}
-
-/* 가운데 정렬 + 12컬럼 그리드 */
-.navbar .container-fluid{
-  width:var(--container-width);
-  max-width:calc(100% - 40px); /* 좌우 마진 여유 */
-  margin:0 auto;
-
-  display:grid;
-  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  display: flex;
   align-items:center;
-  gap:var(--grid-gap);
+  position:sticky; top: 0;
+  z-index:1000;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
+.navbar > * {
+    height: 100%;
+}
+
+.navbar .nav-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* 왼쪽-가운데-오른쪽 */
+    width: 100%;
+    min-height: 80px;
+    align-items: center;
+}
 /* 브랜드 */
 .navbar .navbar-brand{
-  grid-column: 1 / span 3; /* desktop 기준 좌측 3칸 */
-  color:var(--cream) !important;
+  grid-column:2;
+  justify-self:center;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  line-height:1;
   text-decoration:none;
-  font-weight:700;
-  letter-spacing:.08em;
-  padding:0;
+  color:var(--cream) !important;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
-/* 토글 버튼: 데스크톱 감추고, 태블릿/모바일에서 표시 */
-.navbar .navbar-toggler{
-  grid-column: -2 / -1;
-  justify-self:end;
-  border:0;
-  background:transparent;
-  padding:.25rem .5rem;
-  display:none;            /* ≥992px 숨김 */
-}
-@media (max-width: 991px){
-  .navbar .navbar-toggler{ display:block; }
-}
 
-/* 햄버거 아이콘(bootstrap 아이콘 없을 때 대비) */
-.navbar .navbar-toggler-icon{
-  position:relative; width:1.75rem; height:1.25rem; background:none;
-}
-.navbar .navbar-toggler-icon::before,
-.navbar .navbar-toggler-icon::after{
-  content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px;
-}
-.navbar .navbar-toggler-icon::before{ top:0; }
-.navbar .navbar-toggler-icon::after{ bottom:0; }
-.navbar .navbar-toggler-icon span{
-  content:""; position:absolute; left:0; right:0; top:50%; height:2px; transform:translateY(-50%); background:#fff; border-radius:2px;
-}
+
+
 
 /* 접히는 영역 */
 .navbar .collapse.navbar-collapse{
-  grid-column: 6 / -1;      /* 데스크톱: 우측 영역 */
+  grid-column: 3;    /* 데스크톱: 우측 영역 */
   justify-self:end;
 }
-@media (max-width: 1279px){
-  .navbar .collapse.navbar-collapse{ grid-column: 7 / -1; }
-}
-@media (max-width: 991px){
-  .navbar .collapse.navbar-collapse{
-    grid-column: 1 / -1;    /* 태블릿/모바일: 다음 행 전체 폭 */
-    justify-self:stretch;
-    width:100%;
-  }
-}
+
 
 /* 메뉴 리스트 */
 .navbar .navbar-nav{
   display:flex; align-items:center; gap:12px;
   margin:0; padding:0; list-style:none;
+
 }
 @media (max-width: 991px){
   .navbar .navbar-nav{
@@ -110,16 +87,29 @@
   }
 }
 
+
 .navbar .nav-item{ display:flex; align-items:center; }
 .navbar .nav-link,
 .navbar .nav-item button.nav-link{
-  color:#fff !important; opacity:.9; text-decoration:none;
-  padding:8px 12px; border-radius:10px; background:transparent;
-  border:0; cursor:pointer; display:inline-block;
+  color:#fff !important;
+  text-decoration:none;
+  cursor:pointer;
+  display:inline-block;
 }
+
+/* nav-link 좌우 패딩 제거 */
+.navbar.navbar-expand-lg .navbar-nav .nav-link,
+.navbar .navbar-nav .nav-link {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 5px !important;
+}
+
+
 .navbar .nav-link:hover,
 .navbar .nav-item button.nav-link:hover{
-  background:rgba(255,255,255,.08); opacity:1;
+    color: #ffb347 !important;
 }
 
 /* 내부 로그아웃 폼 여백 제거 */
@@ -132,61 +122,18 @@
   outline-offset:2px;
 }
 
-/* 부트스트랩 색 클래스 오버라이드(우리 팔레트 유지) */
-.navbar-light{ color:#fff !important; }
-.bg-light{ background:var(--brown) !important; }
-.border-bottom{ border-bottom:1px solid rgba(255,255,255,.12) !important; }
 
 
 
-/* 브랜드를 아이콘+텍스트로 정렬 */
-/* ====== Center the brand horizontally ====== */
-/* ====== Center the brand horizontally ====== */
-.navbar .container-fluid{
-  position: relative; /* 절대 위치 기준 */
-}
 
-/* 데스크톱: 브랜드를 수평 절대 중앙 */
-.navbar .navbar-brand{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  z-index: 2;            /* 토글/메뉴 위로 */
-  display: inline-flex;  /* 로고 이미지 + 텍스트 정렬 유지 */
-  align-items: center;
-  gap: 10px;
-}
 
-/* 기존 그리드 배치가 있다면 무력화(필요 시) */
-@media (min-width: 992px){
-  .navbar .navbar-brand{
-    grid-column: auto !important;
-    justify-self: initial !important;
-  }
-}
 
-/* 모바일/태블릿: 자연스러운 흐름 + 중앙 정렬 */
-@media (max-width: 991px){
-  .navbar .navbar-brand{
-    position: static;
-    transform: none;
-    grid-column: 1 / -1;       /* 그리드 전체 폭 */
-    justify-self: center;      /* 중앙 정렬 */
-  }
 
-  /* 접힌 메뉴는 다음 행 전체로 */
-  .navbar .collapse.navbar-collapse{
-    grid-column: 1 / -1;
-    justify-self: stretch;
-    width: 100%;
-  }
-}
 
-/* 토글 버튼은 우측 정렬 유지(참고) */
-.navbar .navbar-toggler{
-  justify-self: end;
-}
+
+
+
+
 
 
 
@@ -205,4 +152,5 @@
   -webkit-font-smoothing: antialiased;
   font-size: 32px;
   letter-spacing: 0.6em; /* 자간 60 */
+  color: white;
 }
