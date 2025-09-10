@@ -1,11 +1,11 @@
-/* ===============================
-   필터 패널 레이아웃 (전체 컨테이너)
-   =============================== */
+
 body{
     background-color : #F9F6F2;
 }
 
-
+/* ===============================
+   키워드 영역
+   =============================== */
 .filter-panel {
   border-radius: 30px;                         /* 컨테이너 모서리를 둥글게 */
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);     /* 은은한 그림자 */
@@ -32,9 +32,6 @@ body{
 }
 
 
-/* ===============================
-   선택된 칩 영역 (사용자가 고른 태그 미리보기)
-   =============================== */
 .filter-panel__selected {
   display: flex;
   flex-wrap: wrap;                             /* 여러 줄 배치 */
@@ -42,9 +39,7 @@ body{
   margin-bottom: 1rem;                         /* 아래쪽 여백 */
 }
 
-/* ===============================
-   필터 그룹 (업종 / 방문 목적 / 편의)
-   =============================== */
+
 .filter-group {
   margin-bottom: 1.5rem;                       /* 그룹 간격 */
 }
@@ -57,9 +52,6 @@ body{
 
 }
 
-/* ===============================
-   리스트 (체크박스 + 라벨)
-   =============================== */
 .filter-list {
   display: flex;
   flex-wrap: wrap;                             /* 여러 줄로 배치 */
@@ -83,16 +75,13 @@ body{
   transition: all 0.2s;                        /* hover/active 부드러운 전환 */
 }
 
-/* 선택된 상태 스타일 */
 .filter-list label:has(input[type="checkbox"]:checked) {
   border: 2px solid #E5734A; /* 체크되면 라벨 테두리 주황색 */
   color: #E5734A;            /* 글자색 주황 */
   font-weight: 600;          /* 글자 굵게 */
 }
 
-/* ===============================
-   하단 푸터 (선택 개수 + 초기화/적용 버튼)
-   =============================== */
+
 .filter-panel__footer {
   display: flex;
   justify-content: space-between;              /* 좌측: 선택 개수 / 우측: 버튼 */
@@ -101,9 +90,7 @@ body{
   padding-top: 1rem;                           /* 구분선과 간격 */
 }
 
-/* ===============================
-   버튼 (Bootstrap .btn 대신 .filter-btn 사용)
-   =============================== */
+
 .filter-btn {
   padding: 0.6rem 1.2rem;                      /* 버튼 크기 */
   font-size: 0.95rem;
@@ -114,13 +101,12 @@ body{
   background-color: #FFFFFF;
 }
 
-/* pill 형태 (선택 개수 표시용) */
+
 .filter-btn--pill {
   border-radius: 20px;                         /* 동그란 pill */
   padding: 0.4rem 1rem;
   cursor: default;                             /* 비활성 느낌 */
 }
-
 /* 초기화 버튼 */
 .filter-btn--ghost {
   color: #555;                                 /* 무난한 회색 글자 */
@@ -162,3 +148,76 @@ body{
   font-weight: 700;           /* 두껍게 */
   transform: scale(1.1);      /* 살짝 커지는 효과 */
 }
+
+
+/* ===============================
+   검색필터 영역
+   =============================== */
+
+   /* 접근성용 숨김 텍스트 */
+   .sr-only {
+     position: absolute; width: 1px; height: 1px;
+     padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+   }
+
+   /* 바 전체 */
+   .filter-bar {
+     display: flex; align-items: center; gap: 16px;
+     padding: 8px 12px;
+     border: 1px solid #e5e5e5; border-radius: 6px;
+     background: #fff; font-size: 14px; color: #333;
+   }
+
+   /* 총 건수 */
+   .filter-bar__count { white-space: nowrap; color: #666; }
+   .filter-bar__count .count { color: #2b6cb0; font-weight: 600; }
+
+   /* 라디오 그룹 */
+   .filter-bar__radios {
+     display: flex; gap: 14px; border: 0; padding: 0; margin: 0;
+   }
+   .chkBox {
+     display: inline-flex; align-items: center; gap: 6px; color: #666; cursor: pointer;
+   }
+   .chkBox input[type="radio"] {
+     width: 14px; height: 14px;
+     accent-color: #2b6cb0; /* 최신 브라우저 */
+   }
+
+   /* 정렬 셀렉트 */
+   .filter-bar__sort select {
+     height: 32px; padding: 0 28px 0 10px;
+     border: 1px solid #ddd; border-radius: 4px; background: #fff;
+     appearance: none;
+     background-image:
+       linear-gradient(45deg, transparent 50%, #666 50%),
+       linear-gradient(135deg, #666 50%, transparent 50%),
+       linear-gradient(#fff, #fff);
+     background-position:
+       calc(100% - 16px) 50%,
+       calc(100% - 10px) 50%,
+       100% 0;
+     background-size: 6px 6px, 6px 6px, 2.5em 100%;
+     background-repeat: no-repeat;
+   }
+
+   /* 검색창 */
+   .filter-bar__search {
+     margin-left: auto; /* 오른쪽 정렬 */
+     display: inline-flex; align-items: center; gap: 6px;
+     border: 1px solid #ddd; border-radius: 4px; padding: 0 6px 0 8px; height: 32px;
+     background: #fff;
+   }
+   .filter-bar__search input {
+     border: 0; outline: 0; height: 100%; min-width: 220px;
+   }
+   .filter-bar__search button {
+     border: 0; background: transparent; cursor: pointer; font-size: 16px; line-height: 1;
+   }
+
+   /* 반응형: 좁은 화면에서 줄바꿈 */
+   @media (max-width: 720px) {
+     .filter-bar { flex-wrap: wrap; gap: 10px; }
+     .filter-bar__search { order: 3; width: 100%; margin-left: 0; }
+     .filter-bar__search input { min-width: 0; width: 100%; }
+   }

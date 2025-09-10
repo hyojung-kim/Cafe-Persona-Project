@@ -1,4 +1,4 @@
-<html layout:decorate="~{layout}">
+<html layout:decorate="~{layout}" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <link rel="stylesheet" th:href="@{/css/cafe_list.css}">
 </head>
@@ -59,39 +59,49 @@
             </footer>
         </section>
 
-        <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}" form="filterForm">
+    <!-- 필터 영역 -->
+    <div class="filter-bar" >
+        <!-- 총 건수 -->
+        <div class="filter-bar__count">총 <strong class="count" th:text="|총 ${paging.totalElements}개 결과|">총 0개 결과</strong></div>
 
-        <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
-            <option value="createdAt" th:selected="${sort} == 'createdAt'">기본순</option>
-            <option value="name" th:selected="${sort} == 'name'">이름순</option>
-            <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
-        </select>
-
-        <select name="dir" th:value="${dir}" form="filterForm" onchange="this.form.submit()">
-            <option value="DESC" th:selected="${#strings.equalsIgnoreCase(dir, 'DESC')}">최신순</option>
-            <option value="ASC" th:selected="${#strings.equalsIgnoreCase(dir, 'ASC')}">오래된순</option>
-        </select>
-
-        <input type="hidden" name="size" th:value="${size}" form="filterForm">
-
-        <!-- ✅ 이 두 개만 즉시 제출 -->
-
-
-        <div>
-            <label>
+        <!-- 라디오 필터 (그룹) -->
+        <fieldset class="filter-bar__radios">
+            <legend class="sr-only">상태 필터</legend>
+            <label class="chkBox">
                 <input type="checkbox" name="parking" value="true"
                        th:checked="${parking != null and parking}"
-                       onchange="this.form.submit()" form="filterForm"> 주차 가능만
+                       onchange="this.form.submit()" form="filterForm">
+                <span>주차가능</span>
             </label>
-
-            <label>
+            <label class="chkBox">
                 <input type="checkbox" name="openNow" value="true"
                        th:checked="${openNow != null and openNow}"
-                       onchange="this.form.submit()" form="filterForm"> 지금 영업중만
+                       onchange="this.form.submit()" form="filterForm">
+                <span>지금 영업중</span>
             </label>
-        </div>
+        </fieldset>
 
+        <!-- 정렬 -->
+        <label class="filter-bar__sort">
+            <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
+                <option value="createdAt" th:selected="${sort} == 'createdAt'">기본순</option>
+                <option value="name" th:selected="${sort} == 'name'">이름순</option>
+                <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
+            </select>
+            <select name="dir" th:value="${dir}" form="filterForm" onchange="this.form.submit()">
+                <option value="DESC" th:selected="${#strings.equalsIgnoreCase(dir, 'DESC')}">최신순</option>
+                <option value="ASC" th:selected="${#strings.equalsIgnoreCase(dir, 'ASC')}">오래된순</option>
+            </select>
+        </label>
 
+        <!-- 검색 -->
+        <label class="filter-bar__search">
+            <span class="sr-only">검색어</span>
+            <input type="text" name="kw" placeholder="이름, 주소 검색" th:value="${kw}" form="filterForm" />
+            <label aria-label="검색">🔍</label>
+        </label>
+    </div>
+    <input type="hidden" name="size" th:value="${size}" form="filterForm">
 
     <table>
         <thead>
