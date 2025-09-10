@@ -158,11 +158,12 @@ public class FindController {
                                  Model model,
                                  HttpSession session) {
         String username = (String) session.getAttribute("verifiedUsername");
-        if (username == null) {
-            // 세션에 username이 없으면, 비정상적인 접근이므로 리다이렉트
-            // 이 기능이 없으면 url접속만으로 마음대로 다른사람의 비밀번호를 바꿀 수 있음.
-            return "redirect:/user/findPassword";
-        }
+        ////css 위해 잠시 주석 !!!!!!!!!!!!!!1 꼭 풀기!!!!!!!!!!!!!!
+//        if (username == null) {
+//            // 세션에 username이 없으면, 비정상적인 접근이므로 리다이렉트
+//            // 이 기능이 없으면 url접속만으로 마음대로 다른사람의 비밀번호를 바꿀 수 있음.
+//            return "redirect:/user/findPassword";
+//        }
 
 //        try {
 //            findService.updatePassword(username, password);

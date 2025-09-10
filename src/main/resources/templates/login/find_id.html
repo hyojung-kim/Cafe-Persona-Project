@@ -4,17 +4,17 @@
         <style>
             /* 전체 컨테이너 중앙 정렬 */
             .container {
-                max-width: 400px; /* 폼 너비 제한 */
+                max-width: 500px; /* 폼 너비 제한 */
                 margin: 0 auto;   /* 화면 중앙 정렬 */
                 padding-top: 50px; /* 위쪽 여백 */
                 font-family: 'Noto Sans KR'
             }
 
-            .container.my-3 div a {
+            .container.my-3 .show-id a {
                 text-decoration:none;
                 color: inherit;
 				width: 40%;
-                padding: 12px;
+                padding: 12px 24px;
                 margin-top: 5px;
                 border-radius: 12px;
                 background-color: #9A887B;
@@ -22,7 +22,6 @@
                 border: none;
                 font-size: 16px;
                 letter-spacing: 0.1em;
-
             }
             .container .find-id-header-text {
                     text-align: center;
@@ -32,7 +31,7 @@
                     font-weight: bold;
             }
              /* email 필드 스타일 */
-            input.form-control {
+            .email-box > .form-control {
                 width: 100%;
                 padding: 12px 10px;
                 margin-bottom: 21px;
@@ -42,9 +41,14 @@
                 letter-spacing: normal;
             }
 
-            input.form-control::placeholder {
+            .email-box > .form-control::placeholder {
                 letter-spacing: 0.3em;
                 color: #ccc;
+            }
+
+            .email-box > .email-text {
+                font-size: 13px;
+                color: #5f5f5f;
             }
 
             button.btn-primary, button.btn-success {
@@ -67,7 +71,7 @@
             input.form-control-num {
                 width: 100%;
                 padding: 12px 10px;
-                margin-bottom: 21px;
+                margin-bottom: 5px;
                 border-radius: 12px;
                 border: 1px solid #ccc;
                 font-size: 16px;
@@ -90,8 +94,8 @@
         <div th:if="${emailError}" class="alert alert-danger">
             <p th:text="${emailError}"></p>
         </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">회원 정보에 등록된 이메일 주소를 입력해주세요. </label>
+        <div class="email-box">
+            <label for="email" class="form-label email-text">회원 정보에 등록된 이메일 주소를 입력해주세요. </label>
             <input type="text" name="email" id="email" placeholder="EMAIL" class="form-control">
         </div>
         <div>
