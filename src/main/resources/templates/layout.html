@@ -14,14 +14,13 @@
           crossorigin="anonymous">
 
 
-    <!-- (선택) 로컬 백업: static/lib/bootstrap/bootstrap.min.css 가 있을 때 -->
-  <!--  <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css"
-          th:href="@{/lib/bootstrap/bootstrap.min.css}"> -->
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <!-- 프로젝트 공통 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/grid.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 
     <title th:text="${pageTitle} ?: 'Cafe Project'">Cafe Project</title>
@@ -41,10 +40,7 @@
                 integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
                 crossorigin="anonymous"></script>
         <script th:src="@{/lib/bootstrap/bootstrap.bundle.min.js}"></script>
-        <!-- (선택) 로컬 백업 -->
-       <!-- <script src="/lib/bootstrap/bootstrap.bundle.min.js"
-                th:src="@{/lib/bootstrap/bootstrap.bundle.min.js}"></script>
-                -->
+
 
     </body>
 </html>

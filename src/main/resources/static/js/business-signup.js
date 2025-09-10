@@ -179,34 +179,34 @@ function attachNicknameCheck() {
 
 /* ================= 비밀번호 검증 ================= */
 function validatePassword() {
-    const pw = document.getElementById("password").value;
-    const msg = document.getElementById("passwordError");
-    const regex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  const pw = document.getElementById("password").value || "";
+  const msg = document.getElementById("passwordError");
+  const ok = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/.test(pw);
 
-    if (!pw) {
-        msg.classList.remove("text-success");
-        msg.classList.add("text-danger");
-        msg.innerText = "8자 이상, 특수문자 포함";
-        return false;
-    }
-
-    if (!regex.test(pw)) {
-        msg.classList.remove("text-success");
-        msg.classList.add("text-danger");
-        msg.innerText = "조건을 만족하지 않는 비밀번호입니다.";
-        return false;
-    } else {
+      if (ok) {
+        // 조건 만족 시에만 성공 문구/초록색
         msg.classList.remove("text-danger");
         msg.classList.add("text-success");
         msg.innerText = "사용 가능한 비밀번호입니다.";
         return true;
-    }
+      } else {
+        // 조건 미달일 땐 항상 기본 가이드만 붉은색으로 유지
+        msg.classList.remove("text-success");
+        msg.classList.add("text-danger");
+        msg.innerText = "8자 이상, 특수문자 포함";
+        return false;
+      }
+
+
 }
 
 function validatePasswordConfirm() {
     const pw = document.getElementById("password").value;
     const pw2 = document.getElementById("passwordConfirm").value;
     const msg = document.getElementById("passwordConfirmError");
+
+
+
 
     if (!pw2) {
         msg.classList.add("hidden");
