@@ -63,15 +63,15 @@
 
         <input type="text" name="kw" placeholder="이름/도시/구/주소 검색" th:value="${kw}" form="filterForm">
 
-        <select name="sort" th:value="${sort}" form="filterForm">
-            <option value="createdAt">기본순</option>
-            <option value="name">이름순</option>
-            <option value="hit">인기순</option>
+        <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
+            <option value="createdAt" th:selected="${sort} == 'createdAt'">기본순</option>
+            <option value="name" th:selected="${sort} == 'name'">이름순</option>
+            <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
         </select>
 
-        <select name="dir" th:value="${dir}" form="filterForm">
-            <option value="DESC">내림차순</option>
-            <option value="ASC">오름차순</option>
+        <select name="dir" th:value="${dir}" form="filterForm" onchange="this.form.submit()">
+            <option value="DESC" th:selected="${#strings.equalsIgnoreCase(dir, 'DESC')}">내림차순</option>
+            <option value="ASC" th:selected="${#strings.equalsIgnoreCase(dir, 'ASC')}">오름차순</option>
         </select>
 
         <input type="hidden" name="size" th:value="${size}" form="filterForm">
@@ -92,8 +92,6 @@
                        onchange="this.form.submit()" form="filterForm"> 지금 영업중만
             </label>
         </div>
-
-    <button type="submit" form="filterForm">적용하기</button>
 
 
 
@@ -192,9 +190,6 @@
     <div class="results-bar">
         <div class="left">
             <strong th:text="|총 ${paging.totalElements}개 결과|">총 0개 결과</strong>
-        </div>
-        <div>    <!-- 전체 초기화 -->
-            <button type="button" class="reset-btn" onclick="resetFilters()">필터 초기화</button>
         </div>
     </div>
 
