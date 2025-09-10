@@ -86,7 +86,10 @@ public class FindController {
         try {
             String username = findService.verifyCodeAndFindId(email, code);
             model.addAttribute("username", username);
-            return "login/show_id";
+            model.addAttribute("idFound", true);
+            model.addAttribute("showVerification", true);
+            model.addAttribute("email", email);
+            return "login/find_id";
         } catch (RuntimeException e) {
             model.addAttribute("codeError", e.getMessage());
             model.addAttribute("email", email);
