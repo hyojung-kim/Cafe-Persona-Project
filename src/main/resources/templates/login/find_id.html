@@ -141,7 +141,7 @@
         </form>
 
         <!-- 인증 메일 발송 알림 수정하기-->
-        <div th:if="${showAlert}" id="alertBox" class="alert alert-success mt-3">
+        <div th:if="${showAlert}" id="alertBox" class="alert alert-warning mt-3">
             인증 메일이 발송되었습니다.
         </div>
 
@@ -174,7 +174,18 @@
     <!--    <form th:if="${showVerification}" th:action="@{/user/resendEmail}" method="post" class="mt-2">-->
     <!--        <button type="submit" class="btn btn-warning">인증번호 재전송</button>-->
     <!--    </form>-->
-
-    <!--  인증 메일 발송되었습니다 5초 뒤 사라짐  -->
+    <!-- 공통 알림 모달 -->
+    <div class="modal fade" id="alertModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">알림</h5></div>
+                <div class="modal-body"><p id="alertMessage"></p></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/find-id.js" defer></script>
 </div>
 </html>
