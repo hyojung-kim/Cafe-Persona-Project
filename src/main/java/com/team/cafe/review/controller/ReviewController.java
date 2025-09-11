@@ -207,8 +207,8 @@ public class ReviewController {
         if (form.getContent() == null || form.getContent().trim().length() < 5) {
             bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
         }
-        if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
-            bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
+        if (form.getRating() == null || form.getRating() < 0.5 || form.getRating() > 5.0) {
+            bindingResult.reject("rating.range", "별점은 0.5 ~ 5.0 사이여야 합니다.");
         }
 
         int urlCount = safeSize(form.getImageUrl());
@@ -258,8 +258,8 @@ public class ReviewController {
         if (form.getContent() == null || form.getContent().trim().length() < 5) {
             bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
         }
-        if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
-            bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
+        if (form.getRating() == null || form.getRating() < 0.5 || form.getRating() > 5.0) {
+            bindingResult.reject("rating.range", "별점은 0.5 ~ 5.0 사이여야 합니다.");
         }
         int urlCount = safeSize(form.getImageUrl());
         int fileCount = safeSize(images);
@@ -341,8 +341,8 @@ public class ReviewController {
         if (form.getContent() == null || form.getContent().trim().length() < 5) {
             bindingResult.reject("content.tooShort", "리뷰 내용은 5자 이상이어야 합니다.");
         }
-        if (form.getRating() == null || form.getRating() < 1.0 || form.getRating() > 5.0) {
-            bindingResult.reject("rating.range", "별점은 1.0 ~ 5.0 사이여야 합니다.");
+        if (form.getRating() == null || form.getRating() < 0.5 || form.getRating() > 5.0) {
+            bindingResult.reject("rating.range", "별점은 0.5 ~ 5.0 사이여야 합니다.");
         }
 
         int urlCount = safeSize(form.getImageUrl());
@@ -400,7 +400,7 @@ public class ReviewController {
        내부 DTO/헬퍼
        ======================= */
     public static class CreateReviewForm {
-        @DecimalMin(value = "1.0", message = "별점은 1.0 이상이어야 합니다.")
+        @DecimalMin(value = "0.5", message = "별점은 0.5 이상이어야 합니다.")
         @DecimalMax(value = "5.0", message = "별점은 5.0 이하여야 합니다.")
         private Double rating;
 

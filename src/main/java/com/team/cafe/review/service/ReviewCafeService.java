@@ -52,8 +52,8 @@ public class ReviewCafeService {
         Cafe cafe = cafeListRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("카페를 찾을 수 없습니다. id=" + cafeId));
 
-        if (rating == null || rating < 1.0 || rating > 5.0) {
-            throw new IllegalArgumentException("별점은 1.0 ~ 5.0 사이여야 합니다.");
+        if (rating == null || rating < 0.5 || rating > 5.0) {
+            throw new IllegalArgumentException("별점은 0.5 ~ 5.0 사이여야 합니다.");
         }
         if (content == null || content.trim().length() < 5) {
             throw new IllegalArgumentException("리뷰 내용은 5자 이상이어야 합니다.");
