@@ -46,38 +46,37 @@
                             <label for="companyName">상호명(회사명) <span class="required">*</span></label>
                             <input id="companyName" name="companyName" type="text" required
                                    placeholder="예) 빈스팟 커피"
-                                   th:value="${param.companyName}" />
+                                   th:value="${biz != null ? biz.companyName : ''}" />
                         </div>
 
                         <div class="form-group">
                             <label for="representativeName">대표자 이름</label>
                             <input id="representativeName" name="representativeName" type="text"
                                    placeholder="예) 홍길동"
-                                   th:value="${param.representativeName}" />
+                                   th:value="${biz != null ? biz.representativeName : ''}" />
                         </div>
 
                         <div class="form-group">
                             <label for="representativeEmail">대표자 이메일</label>
                             <input id="representativeEmail" name="representativeEmail" type="email"
                                    placeholder="you@example.com"
-                                   th:value="${param.representativeEmail}" />
+                                   th:value="${biz != null ? biz.representativeEmail : ''}" />
                         </div>
 
                         <div class="form-group">
                             <label for="representativePhone">대표자 연락처</label>
                             <input id="representativePhone" name="representativePhone" type="tel"
                                    placeholder="010-1234-5678"
-                                   th:value="${param.representativePhone}" />
+                                   th:value="${biz != null ? biz.representativePhone : ''}" />
                         </div>
                     </div>
 
-                    <!-- 우측 칼럼 -->
-                    <div class="col">
+                                        <div class="col">
                         <div class="form-group">
                             <label for="address">사업장 주소</label>
                             <input id="address" name="address" type="text"
-                                   placeholder="예) 서울특별시 강남구 테헤란로 00길 0, 3층"
-                                   th:value="${param.address}" />
+                                   placeholder="예) 서울특별시 강남구 테헤란로..."
+                                   th:value="${biz != null ? biz.address : ''}" />
                         </div>
 
                         <div class="form-group">
