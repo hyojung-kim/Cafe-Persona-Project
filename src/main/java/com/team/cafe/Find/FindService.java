@@ -7,6 +7,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import jakarta.mail.MessagingException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +35,10 @@ public class FindService {
         // 6자리 랜덤 코드 생성
         String code = String.valueOf((int) (Math.random() * 900000) + 100000);
         verificationCodes.put(email, code);
+
+        // MimeMessage를 사용하여 HTML 메일 발송 준비
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
         // 메일 작성
         SimpleMailMessage message = new SimpleMailMessage();
