@@ -22,13 +22,13 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CafeManageService {
 
-    private final BusinessRepository businessRepository;
+    private final BusinessUserRepository businessUserRepository;
 
     /**
      * 사업장 신규 등록
      */
     @Transactional
-    public Business createBusiness(
+    public BusinessUser createBusiness(
             SiteUser user,
             String companyName,
             String businessNumber,
@@ -39,17 +39,17 @@ public class CafeManageService {
             String description
     ) {
         // 사용자당 1개 제한(원치 않으면 제거)
-        if (businessRepository.existsByUserId(user.getId())) {
+        if (businessUserRepository.existsByUserId(user.getId())) {
             throw new IllegalStateException("이미 등록된 사업장이 있습니다.");
         }
 
         // 사업자번호 중복
         if (businessNumber != null && !businessNumber.isBlank()
-                && businessRepository.existsByBusinessNumber(businessNumber)) {
+                && businessUserRepository.existsByBusinessNumber(businessNumber)) {
             throw new DuplicateBusinessNumberException("중복 사업자번호: " + businessNumber);
         }
 
-        Business b = new Business();
+        BusinessUser b = new BusinessUser();
         b.setUser(user);
         b.setCompanyName(companyName);
         b.setBusinessNumber(businessNumber);
@@ -59,7 +59,7 @@ public class CafeManageService {
         b.setAddress(address);
         b.setDescription(description);
 
-        return businessRepository.save(b);
+        return businessUserRepository.save(b);
     }
 
     /**
@@ -70,7 +70,7 @@ public class CafeManageService {
      *       실제로 저장하려면 Business 엔티티에 필드를 추가하고 setter를 호출하도록 확장하세요.
      */
     @Transactional
-    public Business saveProfile(
+    public BusinessUser saveProfile(
             SiteUser user,
             String companyName,
             String address,
@@ -85,17 +85,17 @@ public class CafeManageService {
             String representativeName,
             String representativeEmail
     ) {
-        Business biz = businessRepository.findByUserId(user.getId())
+        BusinessUser biz = businessUserRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     // 없으면 새로 생성(원치 않으면 예외로 변경)
-                    Business nb = new Business();
+                    BusinessUser nb = new BusinessUser();
                     nb.setUser(user);
                     return nb;
                 });
 
         // 사업자번호 중복 체크(자기 자신 제외)
         if (businessNumber != null && !businessNumber.isBlank()) {
-            Optional<Business> existing = businessRepository.findByBusinessNumber(businessNumber);
+            Optional<BusinessUser> existing = businessUserRepository.findByBusinessNumber(businessNumber);
             if (existing.isPresent() && (biz.getId() == null || !existing.get().getId().equals(biz.getId()))) {
                 throw new DuplicateBusinessNumberException("중복 사업자번호: " + businessNumber);
             }
@@ -117,6 +117,6 @@ public class CafeManageService {
         // biz.setOutlet(outlet);
         // biz.setParking(parking);
 
-        return businessRepository.save(biz);
+        return businessUserRepository.save(biz);
     }
 }

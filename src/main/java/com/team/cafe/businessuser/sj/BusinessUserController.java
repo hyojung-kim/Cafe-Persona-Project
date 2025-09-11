@@ -33,11 +33,27 @@ public class BusinessUserController {
     /* ---------- 회원가입 처리 ---------- */
     @PostMapping("/register")
     public String register(@ModelAttribute("form") BusinessUserDto form,
+                           @RequestParam(value = "phone",  required = false) String phone,   // hidden phone
+                           @RequestParam(value = "phone1", required = false) String phone1,  // 분할 입력
+                           @RequestParam(value = "phone2", required = false) String phone2,
+                           @RequestParam(value = "phone3", required = false) String phone3,
                            RedirectAttributes ra) {
+        // 1) 대표자 전화 보정: representativePhone이 비어 있으면 phone/phone1~3에서 합성
+        if (isBlank(form.getRepresentativePhone())) {
+            String normalized = normalizePhone(phone, phone1, phone2, phone3);
+            form.setRepresentativePhone(normalized);
+        }
+
+        // 2) 대표자 이메일 보정: 입력 필드가 없으므로 회원 이메일로 대체
+        if (isBlank(form.getRepresentativeEmail())) {
+            form.setRepresentativeEmail(form.getEmail());
+        }
+
+
         try {
-            businessUserService.register(form); // 실제 저장
+            businessUserService.register(form);
             ra.addAttribute("success", 1);
-            return "redirect:/user/login";     // ★ 성공 시 로그인 화면으로
+            return "redirect:/user/login";
         } catch (DuplicateBusinessNumberException e) {
             ra.addAttribute("error", "businessNumberExists");
         } catch (DuplicateUsernameException e) {
@@ -45,15 +61,27 @@ public class BusinessUserController {
         } catch (DuplicateEmailException e) {
             ra.addAttribute("error", "emailExists");
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            // NOT NULL/유니크/외래키 등 DB 제약 위반
             ra.addAttribute("error", "db");
         } catch (Exception e) {
             ra.addAttribute("error", "unknown");
         }
-        ra.addFlashAttribute("form", form); // 입력값 유지
-        System.out.println("[REGISTER][END:FAIL]");
-        return "redirect:/businessuser/register"; // ★ 실패 시 폼으로
+        ra.addFlashAttribute("form", form);
+        return "redirect:/businessuser/register";
     }
+
+    private static boolean isBlank(String s){
+        return s == null || s.trim().isEmpty();
+    }
+
+    private static String normalizePhone(String phone, String p1, String p2, String p3){
+        if (!isBlank(phone)) return phone.trim();
+        String a = p1 == null ? "" : p1.trim();
+        String b = p2 == null ? "" : p2.trim();
+        String c = p3 == null ? "" : p3.trim();
+        if (!a.isEmpty() && !b.isEmpty() && !c.isEmpty()) return a + "-" + b + "-" + c;
+        return null; // 없으면 null 저장(검증 원하면 여기서 예외 던져도 됨)
+    }
+
 
 
     /* ---------- 실시간 중복 체크 API ---------- */

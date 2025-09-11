@@ -14,10 +14,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.team.cafe.businessuser.sj.BusinessUserRepository;
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +35,8 @@ public class MypageController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final CafeManageService cafeManageService;
-    private final BusinessRepository businessRepository;
+    private final BusinessUserRepository businessUserRepository;
+    private final BusinessUserService businessUserService;
 
     /* ------------ 토큰 모델 ------------ */
     private record ReauthToken(String nonce, String allowExactUrl) {}
@@ -259,7 +262,7 @@ public class MypageController {
         }
         setNoCache(response);
 
-        Business business = businessRepository.findByUserId(user.getId()).orElse(null);
+        BusinessUser business = businessUserRepository.findByUserId(user.getId()).orElse(null);
         model.addAttribute("business", business);
 
         return "mypage/cafe_manage";
@@ -268,22 +271,22 @@ public class MypageController {
 
     // ✅ 카페 등록(예외 경로): 재인증 요구 금지! (로그인/사업자만 확인)
     @GetMapping("/mypage/cafe/register")
-    public String cafeRegister(HttpServletRequest request, HttpServletResponse response, Model model) {
-        SiteUser user = getCurrentUser();
-        if (user == null) return "redirect:/user/login";
-        if (user.getBusinessUser() == null) return "redirect:/mypage?denied=biz";
+    public String showCafeRegister(
+            @RequestParam(value = "reauth", required = false) String reauth,
+            Principal principal,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Model model
+    ) {
+        // (필요 시) 재인증 소모 로직
+        // if (!requireReauthConsume(request)) return redirectToVerifyWithContinue(request);
+        // setNoCache(response);
 
-        // ⛔ 절대 requireReauthConsume 호출하지 마세요 (여기가 계속 verify로 가는 원인이었음)
-        setNoCache(response);
+        var username = principal.getName();
+        var biz = businessUserService.getMyBusinessByUsername(username).orElse(null);
 
-//        // 사업장 이미 있으면 관리로 보냄(원래 로직 유지)
-//        if (businessRepository.existsByUserId(user.getId())) {
-//            return "redirect:/mypage/cafe/manage";
-//        }
-
-        // 파일명이 mypage/cafe-register.html 이면 뷰 이름도 하이픈 그대로
+        model.addAttribute("biz", biz);
         return "mypage/cafe-register";
-
     }
 
     @PostMapping("/mypage/cafe/register")
@@ -321,4 +324,6 @@ public class MypageController {
             return "redirect:/mypage/cafe/register";
         }
     }
+
+
 }

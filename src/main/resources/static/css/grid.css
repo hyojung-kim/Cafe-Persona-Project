@@ -13,18 +13,29 @@
 :root{
   --bs-gutter-x: 1.5rem; /* 24px */
   --bs-gutter-y: 0;
+  --g-container-padding-x: 0;
 }
 
 /* --------------------------------
    Containers (Bootstrap .container)
 -----------------------------------*/
-.g-container{
+.g-container {
   width: 100%;
-  padding-right: 0 !important;
-  padding-left: 0 !important;
   margin-right: auto;
   margin-left:  auto;
+  padding-left:  var(--g-container-padding-x);
+  padding-right: var(--g-container-padding-x);
 }
+
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left:  auto;
+  padding-left:  var(--g-container-padding-x);
+  padding-right: var(--g-container-padding-x);
+  }
+
+
 
 /* Max widths by breakpoint */
 @media (min-width: 576px){  .g-container { max-width: 540px; } }   /* sm */
