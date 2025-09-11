@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 
 <html lang="ko" layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-    <meta charset="UTF-8">
-    <title>마이 페이지</title>
-    <link rel="stylesheet" th:href="@{/css/mypage-main.css}">
-</head>
-<body>
 <div layout:fragment="content">
-    <div class="g-container">
+    <head>
+        <meta charset="UTF-8">
+        <title>마이 페이지</title>
+        <link rel="stylesheet" th:href="@{/css/mypage-main.css}">
+    </head>
+    <body>
+
+    <div class="wrapper">
         <div class="card">
             <header>
                 <h1>마이 페이지</h1>
                 <div class="controls">
-                    <span th:text="${user.username} + '님'"></span>
+                    <!--    username -> nickname으로 바꿨어요 hy    -->
+                    <span th:text="${user.nickname} + '님 안녕하세요'"></span>
                     <span th:text="${user.businessUser != null ? '사업자회원' : '일반회원'}"></span>
 
+                    <form th:action="@{/user/logout}" method="post">
+                        <button type="submit">로그아웃</button>
+                    </form>
                 </div>
             </header>
 
             <main>
                 <section>
                     <a th:href="@{/mypage/verify_password}">
-                        <button type="button" class="link-row">계정 관리</button>
+                        <button type="button">계정 관리</button>
                     </a>
                 </section>
             </main>
@@ -33,31 +37,31 @@
                 사업자 전용 메뉴입니다. 사업자 등록 후 이용해주세요.
             </div>
 
-
             <!-- 사업자 회원일 때만 노출 -->
             <div class="mt-3" th:if="${isBusiness}">
-                <a class="btn btn-brown w-100 link-row"
-                   th:href="@{/mypage/cafe/manage}">카페 관리</a>
-                <small class="text-muted d-block mt-1">
-                    사업장 정보, 메뉴, 영업시간, 사진을 관리할 수 있어요.
-                </small>
+                <a class="btn btn-brown w-100" th:href="@{/mypage/cafe/manage}">
+                    <!-- 아이콘 쓰면 좋지만 없으면 텍스트만 -->
+                    카페 관리
+                </a>
+                <small class="text-muted d-block mt-1">사업장 정보, 메뉴, 영업시간, 사진을 관리할 수 있어요.</small>
             </div>
-
 
             <!-- 일반 회원일 때는 숨기고, 대신 사업자 등록 CTA 노출 (옵션) -->
             <div class="mt-2" th:if="${!isBusiness}">
-                <a class="btn btn-outline-brown w-100 link-row" th:href="@{/businessuser/register}">
+                <a class="btn btn-outline-brown w-100" th:href="@{/businessuser/register}">
                     사업자 등록하기
                 </a>
             </div>
 
-
-        </div>
-        <div class="right-console right-console--overlay">
-            <div class="right-console-son">
-                메뉴를 선택해 주세요.
-            </div>
+            <!--    hy    -->
+            <header>
+                <h3>나만의 카페</h3>
+                <div class="myBookmark">
+                    북마크
+                    <a class="btn btn-primary" th:href="@{/mypage/my/bookmark}">자세히 보기 ></a>
+                </div>
+            </header>
         </div>
     </div>
-</body>
+    </body>
 </html>
