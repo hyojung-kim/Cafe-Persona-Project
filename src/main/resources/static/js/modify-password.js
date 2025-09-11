@@ -122,64 +122,6 @@ function showAlert(message) {
 	modal.show();
 }
 
-// 비밀번호 보이기 토글
-//const pwInput = document.getElementById("password");
-//const toggleBtn = document.querySelector(".toggle-btn");
-//
-//pwInput.addEventListener("input", () => {
-//	if (pwInput.value.length > 0) {
-//		toggleBtn.style.display = "block";
-//	} else {
-//		toggleBtn.style.display = "none";
-//	}
-//});
-//
-//// 버튼 클릭 시 보이기/숨기기 토글
-//toggleBtn.addEventListener("click", () => {
-//	if (pwInput.type === "password") {
-//		pwInput.type = "text";
-//		toggleBtn.classList.replace("bi-eye", "bi-eye-slash");
-//	} else {
-//		pwInput.type = "password";
-//		toggleBtn.classList.replace("bi-eye-slash", "bi-eye");
-//	}
-//});
-
-//document.addEventListener("DOMContentLoaded", () => {
-//  const toggleWrappers = document.querySelectorAll(".input-with-toggle");
-//
-//  toggleWrappers.forEach(wrapper => {
-//    const input = wrapper.querySelector("input");
-//    const toggleBtn = wrapper.querySelector(".toggle-btn");
-//
-//    // 입력 시 버튼 표시/숨김
-//    input.addEventListener("input", () => {
-//      if (input.value.length > 0) {
-//        toggleBtn.style.display = "block";
-//      } else {
-//        toggleBtn.style.display = "none";
-//        // 입력값이 없어지면 항상 비밀번호 타입으로 되돌림
-//        input.type = "password";
-//        toggleBtn.classList.remove("bi-eye-slash");
-//        toggleBtn.classList.add("bi-eye");
-//      }
-//    });
-//
-//    // 버튼 클릭 시 보이기/숨기기 토글
-//    toggleBtn.addEventListener("click", () => {
-//      if (input.type === "password") {
-//        input.type = "text";
-//        toggleBtn.classList.remove("bi-eye");
-//        toggleBtn.classList.add("bi-eye-slash");
-//      } else {
-//        input.type = "password";
-//        toggleBtn.classList.remove("bi-eye-slash");
-//        toggleBtn.classList.add("bi-eye");
-//      }
-//    });
-//  });
-//});
-
 /* ================= 이벤트 등록 ================= */
 document.addEventListener("DOMContentLoaded", function () {
     const toggleWrappers = document.querySelectorAll(".input-with-toggle");
