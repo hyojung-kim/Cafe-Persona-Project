@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 리뷰 엔티티.
@@ -57,10 +59,6 @@ public class Review extends BaseEntity {
     @Column(name = "view_count", nullable = false)
     private long viewCount = 0L;
 
-    /** 좋아요 수 */
-    @Column(name = "like_count", nullable = false)
-    private long likeCount = 0L;
-
     /** 노출/활성 여부 */
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
@@ -69,6 +67,15 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
     private List<ReviewImage> images = new ArrayList<>();
+
+    /** 좋아요를 누른 회원들 */
+    @ManyToMany
+    @JoinTable(
+            name = "review_likes",
+            joinColumns = @JoinColumn(name = "review_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<SiteUser> likedUsers = new HashSet<>();
 
     protected Review() { }
 
@@ -97,15 +104,13 @@ public class Review extends BaseEntity {
     public long getViewCount() { return viewCount; }
     public void increaseViewCount() { this.viewCount += 1; }
 
-    public long getLikeCount() { return likeCount; }
-    public void setLikeCount(long likeCount) { this.likeCount = Math.max(0, likeCount); }
-    public void addLike() { this.likeCount += 1; }
-    public void removeLike() { this.likeCount = Math.max(0, this.likeCount - 1); }
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 
     public List<ReviewImage> getImages() { return images; }
+
+    public Set<SiteUser> getLikedUsers() { return likedUsers; }
 
     /** 이미지 추가 (최대 5장) */
     public void addImage(ReviewImage image) {

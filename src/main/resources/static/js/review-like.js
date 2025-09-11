@@ -1,48 +1,45 @@
-// src/main/resources/static/js/review-like.js
-(function(){
-  const csrfToken  = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-  const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+// /js/review-like.js
+$(function () {
+  const csrfToken  = $('meta[name="_csrf"]').attr('content');
+  const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
-  async function toggle(form) {
-    const fd = new FormData();
-    const hidden = form.querySelector('input[name="_csrf"]');
-    if (hidden?.value) fd.append(hidden.name, hidden.value);
-
-    const headers = { 'X-Requested-With': 'XMLHttpRequest' };
-    if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
-
-    let resp;
-    try {
-      resp = await fetch(form.action, { method: 'POST', headers, body: fd });
-    } catch {
-      form.submit(); // 네트워크 이슈 → 폴백
-      return;
-    }
-
-    if (resp.status === 401 || resp.status === 403) { form.submit(); return; }
-    const data = await resp.json().catch(()=>null);
-    if (!data || !data.ok) { form.submit(); return; }
-
-    // UI 갱신
-    const box = form.closest('[data-review-box]');
-    const btn = form.querySelector('.like-btn');
-    const cnt = box?.querySelector('.like-count');
-    if (btn) {
-      if (data.liked) {
-        btn.classList.remove('btn-outline-success');
-        btn.classList.add('btn-success');
-      } else {
-        btn.classList.add('btn-outline-success');
-        btn.classList.remove('btn-success');
-      }
-    }
-    if (cnt) cnt.textContent = String(data.count);
+  function setLikedUI(box, btn, liked) {
+    box.attr('data-liked', liked ? 'true' : 'false');
+    btn.html(
+      liked ? '<span class="label-liked">♥ 좋아요 취소</span>'
+            : '<span class="label-unliked">♡ 좋아요</span>'
+    );
   }
 
-  document.addEventListener('submit', function(e){
-    const form = e.target.closest('form.review-like-form');
-    if (!form) return;
-    e.preventDefault();
-    toggle(form);
+  $(document).on('click', '.review-like-btn', function () {
+    const btn = $(this);
+    const box = btn.closest('.review-like-box');
+    const reviewId = box.data('review-id');
+    const countEl = box.find('.review-like-count');
+
+    btn.prop('disabled', true);
+
+    $.ajax({
+      url: '/reviews/' + reviewId + '/like',
+      type: 'POST',
+      dataType: 'json',
+      headers: csrfToken && csrfHeader ? { [csrfHeader]: csrfToken } : {},
+      cache: false
+    })
+    .done(function (res) {
+      countEl.text(String(res.count));
+      setLikedUI(box, btn, !!res.liked);
+    })
+    .fail(function (xhr) {
+      if (xhr.status === 401 || xhr.status === 403) {
+        window.location.href = '/user/login';
+      } else {
+        console.error('리뷰 좋아요 오류:', xhr.status, xhr.responseText);
+        alert('좋아요 처리 중 오류가 발생했어요.');
+      }
+    })
+    .always(function () {
+      btn.prop('disabled', false);
+    });
   });
-})();
+});
