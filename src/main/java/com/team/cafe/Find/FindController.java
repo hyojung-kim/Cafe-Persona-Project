@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -37,15 +38,45 @@ public class FindController {
 
         try {
             findService.sendVerificationCode(email);
+
+            // 이메일을 세션에 저장 (재전송 기능 만들때)
+//            session.setAttribute("verificationEmail", email);
+
             model.addAttribute("email", email);
             // 인증번호 입력창 보여줄지 여부
             model.addAttribute("showVerification", true);
+            // 인증 메일 발송 알림
+            model.addAttribute("showAlert", true);
         } catch (RuntimeException e) {
             model.addAttribute("emailError",
                     e.getMessage());
         }
         return "login/find_id";
     }
+
+    // 아이디 찾기 인증메일 재전송
+//    @PostMapping("/user/resendEmail")
+//    public String resendEmail(Model model, HttpSession session) {
+//        String email = (String) session.getAttribute("verificationEmail");
+//
+//        if (email != null) {
+//            try {
+//                findService.sendVerificationCode(email);
+//
+//                model.addAttribute("email", email);
+//                // 인증번호 입력창 보여줄지 여부
+//                model.addAttribute("showVerification", true);
+//                // 인증 메일 발송 알림
+//                model.addAttribute("showAlert", true);
+//            } catch (RuntimeException e) {
+//                model.addAttribute("emailError",
+//                        e.getMessage());
+//            }
+//        } else {
+//            model.addAttribute("emailError", "이메일 정보가 없습니다. 다시 입력해주세요.");
+//        }
+//        return "login/find_id";
+//    }
 
     // 인증번호 확인 및 아이디 출력
     @PostMapping("/user/verifyIdCode")
@@ -55,7 +86,10 @@ public class FindController {
         try {
             String username = findService.verifyCodeAndFindId(email, code);
             model.addAttribute("username", username);
-            return "login/show_id";
+            model.addAttribute("idFound", true);
+            model.addAttribute("showVerification", true);
+            model.addAttribute("email", email);
+            return "login/find_id";
         } catch (RuntimeException e) {
             model.addAttribute("codeError", e.getMessage());
             model.addAttribute("email", email);
@@ -75,6 +109,8 @@ public class FindController {
             model.addAttribute("email", email);
             // 임시 비밀번호 입력창 보여줄지 여부
             model.addAttribute("showVerification", true);
+            // 인증 메일 발송 알림
+            model.addAttribute("showAlert", true);
         } catch (RuntimeException e) {
             model.addAttribute("emailError",
                     e.getMessage());
@@ -122,11 +158,12 @@ public class FindController {
                                  Model model,
                                  HttpSession session) {
         String username = (String) session.getAttribute("verifiedUsername");
-        if (username == null) {
-            // 세션에 username이 없으면, 비정상적인 접근이므로 리다이렉트
-            // 이 기능이 없으면 url접속만으로 마음대로 다른사람의 비밀번호를 바꿀 수 있음.
-            return "redirect:/user/findPassword";
-        }
+        ////css 위해 잠시 주석 !!!!!!!!!!!!!!1 꼭 풀기!!!!!!!!!!!!!!
+//        if (username == null) {
+//            // 세션에 username이 없으면, 비정상적인 접근이므로 리다이렉트
+//            // 이 기능이 없으면 url접속만으로 마음대로 다른사람의 비밀번호를 바꿀 수 있음.
+//            return "redirect:/user/findPassword";
+//        }
 
 //        try {
 //            findService.updatePassword(username, password);

@@ -33,7 +33,9 @@ public class Bookmark extends BaseEntity {
     @Comment("북마크한 사용자")
     private SiteUser user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // 임시로 변경(LAZY -> EAGER)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cafe_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_bookmark_cafe"))
     @Comment("북마크된 카페")
