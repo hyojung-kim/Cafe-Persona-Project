@@ -200,8 +200,8 @@ function registerVisit(category, id) {
             alert("방문 기록 저장 완료");
         })
         .catch(error => {
-        alert("방문 기록 저장 완료");
             console.error('Error registering visit:', error);
+            alert("방문 기록 저장 실패: " + error.message);
         });
     });
 }
@@ -248,7 +248,7 @@ function loadLocationsAndDisplayMarkers(category) {
                 console.error(`${category} locations data is not an array:`, data);
             }
         })
-        .catch(error => {xzz
+        .catch(error => {
             console.error(`Error fetching ${category} locations:`, error);
         });
 }
