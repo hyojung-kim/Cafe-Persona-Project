@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,17 +41,17 @@ public class CafeListService {
 //    }
 
      //허용된 정렬 키만 사용
-    private Sort buildSort(String sort, String dir) {
-        String key = (sort == null || sort.isBlank()) ? "createdAt" : sort;
-        Sort.Direction direction = "asc".equalsIgnoreCase(dir) ? Sort.Direction.ASC : Sort.Direction.DESC;
-
-        return switch (key) {
-            case "name" -> Sort.by(direction, "name");
-            case "hit" -> Sort.by(direction, "hitCount");
-            case "createdAt" -> Sort.by(direction, "createdAt");
-            default -> Sort.by(Sort.Direction.DESC, "createdAt");
-        };
-    }
+//    private Sort buildSort(String sort, String dir) {
+//        String key = (sort == null || sort.isBlank()) ? "createdAt" : sort;
+//        Sort.Direction direction = "asc".equalsIgnoreCase(dir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+//
+//        return switch (key) {
+//            case "likeCount" -> Sort.by(direction, "likeCount");
+//            case "hit" -> Sort.by(direction, "hitCount");
+//            case "createdAt" -> Sort.by(direction, "createdAt");
+//            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+//        };
+//    }
 
     /**
      * PK 타입 Long 통일
@@ -121,12 +120,6 @@ public class CafeListService {
                                        Boolean parking,
                                        Boolean openNow,
                                        List<Long> keyList) {
-
-        //var pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1)); // 정렬은 쿼리 고정
-
-        // 기존 필터만 (종전 로직 그대로)
-        Sort sortSpec = buildSort(sort, dir);
-        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), sortSpec);
         String kwTrim = (kw == null) ? null : kw.trim();
 
         // 현재 시간(한국)
@@ -134,23 +127,16 @@ public class CafeListService {
         if (Boolean.TRUE.equals(openNow)) {
             now = LocalTime.now(java.time.ZoneId.of("Asia/Seoul"));
         }
-
-
-
-        boolean hasKeyWord = keyList != null && !keyList.isEmpty();
-        //java.time.LocalTime now = Boolean.TRUE.equals(openNow) ? java.time.LocalTime.now() : null;
-
-        if (hasKeyWord) {
-            // ✅ 태그 모두일치 + 기존 필터 동시 적용
-            pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1)); // 정렬은 쿼리 고정
-            Long selectedSize = keyList.stream().distinct().count();
-            Page<Cafe> pageAll = cafeListRepository.findAllMatchAllWithFiltersCaseOrder(kw, parking, now, keyList, selectedSize, sort, dir, pageable);
-            return pageAll.map(c -> new CafeMatchDto(c, selectedSize));
-        } else {
-
-            Page<Cafe> pageOnlyFilters = cafeListRepository.searchWithFilters(kw, parking, now, pageable);
-            return pageOnlyFilters.map(c -> new CafeMatchDto(c, 0L));
+        if (keyList == null || keyList.isEmpty()) {
+            keyList = null;
         }
+
+
+        // ✅ 태그 모두일치 + 기존 필터 동시 적용
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1)); // 정렬은 쿼리로
+        Long selectedSize = (keyList == null) ? 0L : keyList.stream().distinct().count();
+        Page<Cafe> pageAll = cafeListRepository.findAllMatchAllWithFiltersCaseOrder(kw, parking, now, keyList, selectedSize, sort, dir, pageable);
+        return pageAll.map(c -> new CafeMatchDto(c, selectedSize));
     }
 
 
