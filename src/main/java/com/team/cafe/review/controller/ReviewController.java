@@ -5,7 +5,7 @@ import com.team.cafe.review.service.ImageStorageService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.review.service.CurrentUserService;
-import com.team.cafe.review.service.ReviewLikeService;   // [ADDED]
+import com.team.cafe.review.service.ReviewLikeService;
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.validation.constraints.DecimalMax;
@@ -27,6 +27,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class ReviewController {
@@ -38,7 +40,7 @@ public class ReviewController {
     private final CurrentUserService currentUserService;
     private final ImageStorageService imageStorageService;
     private final ReviewRepository reviewRepository;
-    private final ReviewLikeService reviewLikeService; // [ADDED]
+    private final ReviewLikeService reviewLikeService;
 
     public ReviewController(ReviewService reviewService,
                             CafeListService cafeService,
@@ -74,11 +76,22 @@ public class ReviewController {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
-        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
+        var meOpt = currentUserService.getCurrentUser();
+        meOpt.ifPresent(me -> model.addAttribute("me", me));
+
+        Map<Long, Boolean> likedMap = new HashMap<>();
+        Map<Long, Long> likeCountMap = new HashMap<>();
+        for (Review rv : reviews.getContent()) {
+            likeCountMap.put(rv.getId(), reviewLikeService.getLikeCount(rv.getId()));
+            meOpt.ifPresent(me -> likedMap.put(rv.getId(), reviewLikeService.isLiked(rv.getId(), me.getId())));
+        }
+
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
         model.addAttribute("page", reviews);
+        model.addAttribute("likedMap", likedMap);
+        model.addAttribute("likeCountMap", likeCountMap);
 
         return "review/list";
     }
@@ -99,11 +112,22 @@ public class ReviewController {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
-        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
+        var meOpt = currentUserService.getCurrentUser();
+        meOpt.ifPresent(me -> model.addAttribute("me", me));
+
+        Map<Long, Boolean> likedMap = new HashMap<>();
+        Map<Long, Long> likeCountMap = new HashMap<>();
+        for (Review rv : reviews.getContent()) {
+            likeCountMap.put(rv.getId(), reviewLikeService.getLikeCount(rv.getId()));
+            meOpt.ifPresent(me -> likedMap.put(rv.getId(), reviewLikeService.isLiked(rv.getId(), me.getId())));
+        }
+
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
         model.addAttribute("page", reviews);
+        model.addAttribute("likedMap", likedMap);
+        model.addAttribute("likeCountMap", likeCountMap);
 
         return "review/list :: section";
     }
@@ -116,14 +140,42 @@ public class ReviewController {
         reviewService.increaseViewCount(id);
         Review review = reviewRepository.findWithUserAndImagesById(id)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id=" + id));
-        currentUserService.getCurrentUser().ifPresent(me -> model.addAttribute("me", me));
-        model.addAttribute("review", review);
-        boolean canEdit = currentUserService.getCurrentUser()
+
+        var meOpt = currentUserService.getCurrentUser();
+        meOpt.ifPresent(me -> model.addAttribute("me", me));
+
+        boolean canEdit = meOpt
                 .map(me -> review.getUser() != null && review.getUser().getId().equals(me.getId())
                         || "ADMIN".equalsIgnoreCase(me.getRole()) || "ROLE_ADMIN".equalsIgnoreCase(me.getRole()))
                 .orElse(false);
+
+        boolean liked = meOpt.map(me -> reviewLikeService.isLiked(id, me.getId())).orElse(false);
+        long likeCount = reviewLikeService.getLikeCount(id);
+
+        model.addAttribute("review", review);
         model.addAttribute("canEdit", canEdit);
+        model.addAttribute("liked", liked);
+        model.addAttribute("likeCount", likeCount);
         return "review/detail";
+    }
+
+    /* =======================
+       좋아요 토글 (AJAX)
+       ======================= */
+    @PostMapping(value = "/reviews/{id}/like", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> toggleLike(@PathVariable Long id) {
+        var meOpt = currentUserService.getCurrentUser();
+        if (meOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        SiteUser me = meOpt.get();
+        boolean liked = reviewLikeService.toggle(id, me.getId());
+        long count = reviewLikeService.getLikeCount(id);
+        return ResponseEntity.ok(Map.of(
+                "liked", liked,
+                "count", count
+        ));
     }
 
     /* =======================
@@ -342,34 +394,6 @@ public class ReviewController {
             return "redirect:" + referer;
         }
         return "redirect:/cafes/" + cafeId + "/reviews";
-    }
-
-    /* =======================
-       좋아요 토글
-       ======================= */
-
-    /** AJAX 토글 */
-    @PostMapping(value = "/reviews/{id}/like", headers = "X-Requested-With=XMLHttpRequest")
-    @ResponseBody
-    public ResponseEntity<?> likeAjax(@PathVariable Long id) {
-        SiteUser me = currentUserService.getCurrentUserOrThrow();
-        var result = reviewLikeService.toggle(id, me);
-        return ResponseEntity.ok(java.util.Map.of(
-                "ok", true,
-                "liked", result.liked(),
-                "count", result.count()
-        ));
-    }
-
-    /** 폼 제출 폴백 */
-    @PostMapping("/reviews/{id}/like")
-    public String likeForm(@PathVariable Long id,
-                           @RequestHeader(value = "Referer", required = false) String referer,
-                           RedirectAttributes ra) {
-        SiteUser me = currentUserService.getCurrentUserOrThrow();
-        reviewLikeService.toggle(id, me);
-        ra.addFlashAttribute("message", "처리되었습니다.");
-        return (referer != null && !referer.isBlank()) ? "redirect:" + referer : "redirect:/reviews/" + id;
     }
 
     /* =======================

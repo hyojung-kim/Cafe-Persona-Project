@@ -36,12 +36,19 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     /* ========== 단건 상세/통계 ========== */
 
-    /** 상세: user + images 함께 로딩 */
-    @EntityGraph(attributePaths = {"user", "images"})
+    /**
+     * 상세: 연관된 user, cafe, images를 즉시 로딩하여 지연 초기화 예외 방지
+     */
+    @EntityGraph(attributePaths = {"user", "cafe", "images"})
     @Query("SELECT r FROM Review r WHERE r.id = :id")
     Optional<Review> findWithUserAndImagesById(@Param("id") Long id);
 
     /** 활성 리뷰 평균 평점 */
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.cafe.id = :cafeId AND r.active = true")
     Double calculateAverageRating(@Param("cafeId") Long cafeId);
+
+    boolean existsByIdAndLikedUsers_Id(Long reviewId, Long userId);
+
+    @Query("select count(u) from Review r join r.likedUsers u where r.id = :reviewId")
+    long countLikes(@Param("reviewId") Long reviewId);
 }

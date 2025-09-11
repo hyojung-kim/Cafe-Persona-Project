@@ -13,6 +13,7 @@ import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,9 @@ public class CafeListController {
     private final LikeBookmarkFacade likeBookmarkFacade;
     private final BookmarkService bookmarkService;
     private final KeywordService keywordService;
+
+    @Value("{kakao.api.key}")
+    private String kakaoApiKey;
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
@@ -148,6 +152,13 @@ public class CafeListController {
         return "cafe/cafe_detail";
     }
 
+    @GetMapping("/map/{cafeId}")
+    public String map(@PathVariable Long cafeId, Model model) {
+        Cafe cafe = cafeListService.getById(cafeId);
+        model.addAttribute("cafe", cafe);
+        model.addAttribute("kakaoApiKey", kakaoApiKey);
+        return "cafe/cafe_map";
+    }
 
     // Ajax 컨트롤러
     // @PreAuthorize("isAuthenticated()")
