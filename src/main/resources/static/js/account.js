@@ -106,11 +106,9 @@ document.getElementById("updatePhoneBtn")?.addEventListener("click", async () =>
 });
 
   // BFCache로 돌아온 경우(뒤/앞 이동), 서버로 다시 요청 보내도록 강제
-  window.addEventListener('pageshow', function (e) {
-    const isBFCache = e.persisted || (performance.getEntriesByType?.('navigation')[0]?.type === 'back_forward');
-    if (isBFCache) {
-      // replace로 히스토리 쌓이지 않게
-      location.replace(location.href);
+  window.addEventListener('pageshow', async (evt) => {
+    if (evt.persisted) {
+      location.replace('/mypage/verify_password?continue=' + encodeURIComponent(location.pathname + location.search));
     }
   });
 
