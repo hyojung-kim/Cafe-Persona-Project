@@ -51,4 +51,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("select count(u) from Review r join r.likedUsers u where r.id = :reviewId")
     long countLikes(@Param("reviewId") Long reviewId);
+
+    // 리뷰를 최신순 3개 가져오기 hy
+    List<Review> findTop3ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(Long cafeId);
 }
