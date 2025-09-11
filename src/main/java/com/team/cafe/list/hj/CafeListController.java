@@ -77,6 +77,8 @@ public class CafeListController {
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
 
+
+
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
         model.addAttribute("size", size);

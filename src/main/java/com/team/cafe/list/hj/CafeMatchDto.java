@@ -46,7 +46,7 @@ public class CafeMatchDto {
     private Long selectedCount;
 
     //선택한 키워드 카운트, Cafe > CAfeMatchDto 변환위해서 오버로딩 사용함
-    public CafeMatchDto(Cafe c, Long selectedCount) {
+    public CafeMatchDto(Cafe c, Long selectedCount, LocalTime viewNow) {
         // 엔티티 스칼라/감사 필드 풀 매핑
         this.id = c.getId();
         this.name = c.getName();
@@ -64,8 +64,22 @@ public class CafeMatchDto {
         this.hitCount = c.getHitCount();
         this.createdAt = c.getCreatedAt();   // BaseEntity에 맞게 이름 다르면 수정
         this.updatedAt = c.getUpdatedAt();
+        this.computeOpenNow(viewNow);
+
+    }
 
 
+    public void computeOpenNow(LocalTime now) {
+        if (openTime == null || closeTime == null) { this.openNow = null; return; }
 
+        // 24시간 처리(동일 시각) – 필요에 따라 false로 바꿔도 됨
+        if (openTime.equals(closeTime)) { this.openNow = true; return; }
+
+        // 일반(당일 마감) vs 심야(자정 넘김) 처리
+        if (openTime.isBefore(closeTime)) { // 예: 09:00~21:00
+            this.openNow = !now.isBefore(openTime) && !now.isAfter(closeTime);
+        } else {                            // 예: 22:00~02:00
+            this.openNow = !now.isBefore(openTime) || !now.isAfter(closeTime);
+        }
     }
 }
