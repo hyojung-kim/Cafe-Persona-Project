@@ -1,96 +1,163 @@
+/* ===========================================
+   Cafe Manage Page (grid.css / navbar.css 정합)
+   - grid.css의 .container, .grid, 변수/브레이크포인트에 맞춤
+   - navbar(80px 고정)와 겹침 방지 옵션 제공
+   =========================================== */
+
+/* (선택) 고정 네브바와 겹치면 페이지 레벨에서 다음 유틸을 body 또는 최상단 래퍼에 붙여줘요.
+   .page--with-navbar { padding-top: 80px; } */
+
+/* ----------------- 기본 톤 ----------------- */
 :root{
-  --brand:#8F6B53;           /* 메인 원두톤 */
-  --brand-ink:#5c3f30;       /* 진한 잉크톤 */
-  --bg:#FAF7F5;              /* 옅은 배경 */
-  --card:#ffffff;
-  --text:#222;
-  --muted:#7a7a7a;
-  --line:#eee;
-  --chip:#f0e7e1;
-  --ok:#2e7d32;
-  --warn:#b26a00;
-}
-*{box-sizing:border-box}
-body{
-  margin:0; background:var(--bg); color:var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
-}
-a{ color:inherit; text-decoration:none }
-.container{ max-width:1200px; margin:0 auto; padding:24px 16px; }
+  --cm-bg: #f7f7f7;
+  --cm-card-bg: #fff;
+  --cm-text: #1f2937;
+  --cm-muted: #6b7280;
+  --cm-border: #eee;
+  --cm-shadow: 0 4px 14px rgba(0,0,0,.06);
 
-.header{
-  background:linear-gradient(180deg, #8F6B53 0%, #A5806B 100%);
-  color:#fff; padding:22px; border-radius:18px;
-  display:flex; gap:16px; align-items:flex-start; justify-content:space-between;
-}
-.header .title{ font-size:20px; font-weight:700; margin:0 0 6px }
-.header .subtitle{ opacity:.9; font-size:14px; }
-.badge{
-  display:inline-block; padding:6px 10px; border-radius:999px;
-  background:rgba(255,255,255,.2); backdrop-filter:saturate(1.2);
-  font-size:12px; font-weight:600;
+  /* 버튼/강조 (navbar 팔레트와 조화) */
+  --cm-brown: var(--brown, #6b4f3b);
+  --cm-brown-600: var(--brown-600, #5e4634);
+  --cm-cream: var(--cream, #f6efe9);
+
+  /* 상태 칩 */
+  --cm-ok-bg: #def7ec;
+  --cm-ok-fg: #0b5f41;
+  --cm-warn-bg: #fef3c7;
+  --cm-warn-fg: #92400e;
+  --cm-chip-bg: #eef2ff;
+  --cm-chip-fg: #4338ca;
+  --cm-star: #f59e0b;
 }
 
-/* 그리드 */
-.grid{ display:grid; gap:16px; }
-@media (min-width: 992px){
-  .grid-cols-3{
-    grid-template-columns: 2fr 1fr;
-    grid-template-areas:
-      "stats ctas"
-      "lists ctas";
-  }
-  .stats-area{ grid-area:stats; }
-  .lists-area{ grid-area:lists; }
-  .ctas-area{ grid-area:ctas; }
+/* 페이지 기본 */
+body {
+  background: var(--cm-bg);
+  color: var(--cm-text);
+  -webkit-font-smoothing: antialiased;
 }
-@media (max-width: 991.98px){ .grid-cols-3{ grid-template-columns:1fr; } }
 
-/* 카드 */
-.card{
-  background:var(--card); border-radius:16px; padding:16px;
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
+/* ----------------- 헤더 ----------------- */
+.container > .header{
+  background: var(--cm-card-bg);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  box-shadow: var(--cm-shadow);
+  margin-top: 20px;
 }
-.card h3{ margin:0 0 12px; font-size:16px; font-weight:700; color:var(--brand-ink); }
-.muted{ color:var(--muted); }
-.divider{ height:1px; background:var(--line); margin:12px 0; }
+.container > .header .title{
+  font-size: 24px; font-weight: 800; margin: 0 0 4px 0;
+}
+.container > .header .subtitle{
+  margin: 0; color: var(--cm-muted); font-size: 14px;
+}
+.container > .header .badge{
+  display:inline-block; margin-top:8px; font-size:12px;
+  padding:4px 8px; border-radius:999px; color: var(--cm-ok-fg); background: var(--cm-ok-bg);
+  font-weight:700;
+}
 
-/* 지표 카드 */
-.stat-grid{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
-@media (max-width: 991.98px){ .stat-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-.stat{
-  background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px;
-  transition:transform .12s ease, box-shadow .12s ease;
-}
-.stat:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.08); }
-.stat .k{ font-size:12px; color:var(--muted); margin-bottom:8px; }
-.stat .v{ font-size:22px; font-weight:800; color:var(--brand-ink); }
-
-/* CTA 카드 */
-.cta-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
-.cta{
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  border:1px solid var(--line); border-radius:14px; padding:14px 16px;
-  background:var(--card);
-  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
-}
-.cta:hover{ transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,0,0,.08) }
-.cta .meta{ font-size:12px; color:var(--muted) }
+/* ----------------- 버튼 ----------------- */
 .btn{
-  display:inline-flex; align-items:center; gap:8px;
-  background:var(--brand); color:#fff; border:none; border-radius:999px;
-  padding:10px 14px; font-weight:700; cursor:pointer;
+  background: var(--cm-brown); color:#fff; border:0; border-radius:10px;
+  padding:10px 14px; font-size:14px; font-weight:700; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px;
+  transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+  text-decoration:none;
 }
-.btn:focus{ outline:3px solid rgba(143,107,83,.35); outline-offset:2px; }
-.btn.secondary{ background:#e7dcd5; color:#4a382e; }
+.btn:hover{ background: var(--cm-brown-600); box-shadow:10px 6px 16px rgba(0,0,0,.12); color: white; }
+.btn:active{ transform: translateY(1px); }
+.btn.secondary{ background: white; }
+.btn.secondary:hover{ background:#e5e5e5; }
+a.btn:hover { text-decoration: none !important; }
+/* ----------------- 페이지 그리드 ----------------- */
+/* grid.css의 .grid를 그대로 사용. 여기에 페이지별 컬럼 정의만 추가 */
+.grid { gap: var(--grid-gap); }
 
-/* 리스트 카드 (최근 리뷰, 프로모션 등) */
-.item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px dashed var(--line); }
-.item:last-child{ border-bottom:none; }
-.chip{
-  display:inline-block; padding:4px 8px; border-radius:999px; background:var(--chip);
-  font-size:11px; color:#5a4337; font-weight:600;
+/* html에서 사용한 .grid-cols-3 보조 클래스 제공 */
+.grid-cols-3{ grid-template-columns: 2fr 1fr 1fr; }
+
+/* lg 미만( <1200px ): 2열로 줄이기 */
+@media (max-width: 1199.98px){
+  .grid-cols-3{ grid-template-columns: 1.5fr 1fr; }
 }
-.star{ color:#e5a100; font-weight:700; }
-.ok{ color:var(--ok); }
-.warn{ color:var(--warn); }
+
+/* md 미만( <768px ): 1열 */
+@media (max-width: 767.98px){
+  .grid-cols-3{ grid-template-columns: 1fr; }
+}
+
+/* 섹션 간 기본 간격 */
+.stats-area .card + .card,
+.lists-area .card + .card{ margin-top:16px; }
+
+/* ----------------- 카드 공통 ----------------- */
+.card{
+  background: var(--cm-card-bg);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--cm-shadow);
+}
+.card > h3{
+  margin: 0 0 12px 0; font-size: 16px; font-weight: 800;
+}
+
+/* ----------------- 핵심 지표 ----------------- */
+.stat-grid{
+  display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+}
+@media (max-width: 767.98px){
+  .stat-grid{ grid-template-columns: 1fr 1fr; }
+}
+.stat{
+  background:#fafafa; border:1px solid var(--cm-border); border-radius:12px; padding:12px;
+}
+.stat .k{ color: var(--cm-muted); font-size:12px; margin-bottom:4px; }
+.stat .v{ font-weight:800; font-size:18px; }
+
+/* ----------------- 리스트 / 라인 ----------------- */
+.item{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 0; border-bottom:1px dashed var(--cm-border);
+}
+.item:last-child{ border-bottom:0; }
+
+.muted{ color:#9ca3af; font-size:12px; }
+.divider{ height:1px; background: var(--cm-border); margin:12px 0; }
+
+/* ----------------- 상태/칩 ----------------- */
+.chip{
+  display:inline-block; font-size:12px; padding:4px 8px; border-radius:999px;
+  background: var(--cm-chip-bg); color: var(--cm-chip-fg); font-weight:700;
+}
+.ok{ color: var(--cm-ok-fg); background: var(--cm-ok-bg); font-size:12px; font-weight:800; padding:4px 8px; border-radius:999px; }
+.warn{ color: var(--cm-warn-fg); background: var(--cm-warn-bg); font-size:12px; font-weight:800; padding:4px 8px; border-radius:999px; }
+.star{ color: var(--cm-star); font-weight:800; }
+
+
+
+/* ----------------- 갤러리 샘플 ----------------- */
+.lists-area .card .gallery3{
+  display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;
+}
+.lists-area .card .gallery3 > div{
+  background:#ddd; aspect-ratio:1/1; border-radius:12px;
+}
+@media (max-width: 767.98px){
+  .lists-area .card .gallery3{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ----------------- 접근성/포커스 ----------------- */
+a.btn:focus, button.btn:focus,
+.cta:focus{
+  outline: 2px solid #c7d2fe; outline-offset: 2px;
+}
+
+/* ----------------- 안전 여백 유틸(선택) ----------------- */
+/* 네브바 80px와 겹칠 수 있는 페이지에서 래퍼에 클래스만 추가해서 해결 */
+.page--with-navbar{ padding-top: 80px; }

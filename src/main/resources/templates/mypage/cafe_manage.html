@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8" />
     <title>사업장 관리</title>
@@ -7,7 +7,8 @@
     <link rel="stylesheet" th:href="@{/css/cafe-manage.css}">
 </head>
 <body>
-<div class="container" th:with="biz=${user != null and user.businessUser != null ? user.businessUser : null}">
+<div layout:fragment="content">
+<div class="g-container" th:with="biz=${user != null and user.businessUser != null ? user.businessUser : null}">
     <!-- 헤더 -->
     <div class="header">
         <div>
@@ -16,16 +17,12 @@
             <span class="badge">사업자 회원 전용</span>
         </div>
 
+        <!-- cafe_manage.html 일부 -->
         <div style="display:flex; gap:10px; align-items:center">
-            <!-- 사업장이 없는 경우에만 '사업장 등록하기' 보이기 -->
-            <a class="btn" th:if="${business == null}" th:href="@{/mypage/cafe/register}">
-                사업장 등록하기
-            </a>
-            <!-- 이미 사업장이 있으면 바로 프로필/메뉴 등으로 가는 숏컷 -->
-            <a class="btn secondary" th:if="${business != null}" th:href="@{/mypage/cafe/profile}">
-                프로필 관리
-            </a>
+            <!-- 사업장이 아직 없으면 등록 버튼 노출 (지금은 조건 빼고 사용해도 OK) -->
+            <a class="btn" th:href="@{/mypage/cafe/register}">사업장 등록하기</a>
         </div>
+
     </div>
 
 
@@ -106,69 +103,7 @@
             </div>
         </section>
 
-        <!-- CTA 영역 -->
-        <aside class="ctas-area">
-            <div class="card">
-                <h3>빠른 작업</h3>
-                <div class="cta-grid">
-                    <a class="cta" th:href="@{/mypage/cafe/menu}">
-                        <div>
-                            <div style="font-weight:700">메뉴 관리</div>
-                            <div class="meta">메뉴/카테고리/가격 추가·수정</div>
-                        </div>
-                        <button class="btn">이동</button>
-                    </a>
 
-                    <a class="cta" th:href="@{/mypage/cafe/hours}">
-                        <div>
-                            <div style="font-weight:700">영업시간 설정</div>
-                            <div class="meta">요일별 개점/마감 · 브레이크타임</div>
-                        </div>
-                        <button class="btn">이동</button>
-                    </a>
-
-                    <a class="cta" th:href="@{/mypage/cafe/photos}">
-                        <div>
-                            <div style="font-weight:700">사진 관리</div>
-                            <div class="meta">대표/갤러리 이미지 업로드</div>
-                        </div>
-                        <button class="btn">이동</button>
-                    </a>
-
-                    <a class="cta" th:href="@{/mypage/cafe/reviews}">
-                        <div>
-                            <div style="font-weight:700">리뷰 관리</div>
-                            <div class="meta">리뷰 확인 · 사장님 답글</div>
-                        </div>
-                        <button class="btn">이동</button>
-                    </a>
-
-                    <a class="cta" th:href="@{/mypage/cafe/promotions}">
-                        <div>
-                            <div style="font-weight:700">프로모션</div>
-                            <div class="meta">쿠폰/이벤트 · 공지</div>
-                        </div>
-                        <button class="btn">이동</button>
-                    </a>
-
-                    <a class="cta" th:href="@{/mypage/cafe/analytics}">
-                        <div>
-                            <div style="font-weight:700">분석</div>
-                            <div class="meta">조회수/찜/전환 간단 리포트</div>
-                        </div>
-                        <button class="btn">이동</button>
-                    </a>
-
-                    <a class="cta" th:href="@{/mypage/cafe/inquiries}">
-                        <div>
-                            <div style="font-weight:700">문의함 / 예약</div>
-                            <div class="meta">메시지/예약 확인 (선택 기능)</div>
-                        </div>
-                        <button class="btn">이동</button>
-                    </a>
-                </div>
-            </div>
-        </aside>
 
         <!-- 리스트/미리보기 기타 영역 -->
         <section class="lists-area">
@@ -212,5 +147,8 @@
 
     </div>
 </div>
+
+<!-- JS 연결 -->
+<script src="/js/cafe_manage.js?v=DEV1"></script>
 </body>
 </html>
