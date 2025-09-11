@@ -121,8 +121,8 @@
               <time class="text-muted small"
                     th:text="${#temporals.format(rv.createdAt,'yyyy-MM-dd HH:mm')}">2025-09-01</time>
             </div>
-
-            <p class="mt-2 mb-2" th:text="${rv.content}">리뷰 내용</p>
+            <!-- 리뷰 내용이 너무 많이 표시 돼서 타임리프 문법으로 리스트에서만 줄여버림 -->
+            <p class="mt-2 mb-2" th:text="${#strings.abbreviate(rv.content, 300)}">리뷰 내용</p>
 
             <div class="row g-2 mt-1" th:if="${rv.images != null and !rv.images.isEmpty()}">
               <div class="col-4" th:each="img : ${rv.images}">
