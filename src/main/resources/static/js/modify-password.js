@@ -43,24 +43,6 @@ function validatePasswordConfirm() {
 
 	console.log("pw:", pw, "pw2:", pw2); // 실제 값 확인
 
-	//    if (!pw2) {
-	//        msg.classList.add("d-none");
-	//        return false;
-	//    }
-	//
-	//    if (pw !== pw2) {
-	//        msg.classList.remove("d-none");
-	//        msg.classList.remove("text-success");
-	//        msg.classList.add("text-danger");
-	//        msg.innerText = "비밀번호가 일치하지 않습니다.";
-	//        return false;
-	//    } else {
-	//        msg.classList.remove("d-none");
-	//        msg.classList.remove("text-danger");
-	//        msg.classList.add("text-success");
-	//        msg.innerText = "비밀번호가 일치합니다.";
-	//        return true;
-	//    }
 	if (pw !== pw2) {
 		msg.innerText = "비밀번호가 일치하지 않습니다.";
 		msg.classList.remove("text-success");
@@ -92,12 +74,6 @@ function validateForm(e) {
 		showAlert("비밀번호를 확인해주세요.");
 		return;
 	}
-
-	// 인증된 아이디인지 체크
-	//    if (!verifiedId || username !== verifiedId) {
-	//        showAlert("인증을 완료한 아이디만 비밀번호를 변경할 수 있습니다.");
-	//        return;
-	//    }
 
 	// 검증 통과하면 폼 제출
 	e.target.submit();

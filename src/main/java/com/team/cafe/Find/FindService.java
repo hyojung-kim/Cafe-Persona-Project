@@ -30,7 +30,7 @@ public class FindService {
     public void sendVerificationCode(String email) {
         // 사용자 존재 여부 확인
         SiteUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("입력하신 정보와 일치하는 회원 정보가 없습니다. 다시 한 번 입력해주세요."));
+                .orElseThrow();
 
         // 6자리 랜덤 코드 생성
         String code = String.valueOf((int) (Math.random() * 900000) + 100000);

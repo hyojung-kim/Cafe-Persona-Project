@@ -48,8 +48,8 @@ public class FindController {
             // 인증 메일 발송 알림
             model.addAttribute("showAlert", true);
         } catch (RuntimeException e) {
-            model.addAttribute("emailError",
-                    e.getMessage());
+            model.addAttribute("emailError",true);
+
         }
         return "login/find_id";
     }
@@ -112,8 +112,7 @@ public class FindController {
             // 인증 메일 발송 알림
             model.addAttribute("showAlert", true);
         } catch (RuntimeException e) {
-            model.addAttribute("emailError",
-                    e.getMessage());
+            model.addAttribute("emailError", true);
         }
         return "login/find_password";
     }
@@ -131,7 +130,7 @@ public class FindController {
             session.setAttribute("verifiedUsername", username);
             return "redirect:/user/modifyPassword";
         } catch (RuntimeException e) {
-            model.addAttribute("codeError", e.getMessage());
+            model.addAttribute("codeError", true);
             model.addAttribute("username", username);
             model.addAttribute("email", email);
             model.addAttribute("showVerification", true); // 다시 인증번호 입력 폼 표시
