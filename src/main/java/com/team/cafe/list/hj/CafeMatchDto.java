@@ -65,7 +65,7 @@ public class CafeMatchDto {
         this.createdAt = c.getCreatedAt();   // BaseEntity에 맞게 이름 다르면 수정
         this.updatedAt = c.getUpdatedAt();
         this.computeOpenNow(viewNow);
-
+        // 엔티티에서 좋아요 수 가져오기
     }
 
 

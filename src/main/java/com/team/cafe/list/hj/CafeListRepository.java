@@ -45,9 +45,7 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
 //                                 @Param("now") java.time.LocalTime now,
 //                                 Pageable pageable);
 
-    // 이 카페를 좋아요한 유저 수
-    @Query("select count(u) from Cafe c join c.likedUsers u where c.id = :cafeId")
-    long countLikes(@Param("cafeId") Long cafeId); // ⬅️ Integer → Long
+
 
     // 해당 유저가 이 카페를 좋아요 했는지 여부
     boolean existsByIdAndLikedUsers_Id(Long cafeId, Long userId); // ⬅️ Integer → Long

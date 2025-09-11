@@ -120,7 +120,7 @@
                    th:text="|${#temporals.format(cafeList.openTime,'HH시:mm분')} ~ ${#temporals.format(cafeList.closeTime,'HH시:mm분')}|"></p>
                 <div class="card-meta">
                     <span class="rating">⭐ 4.5</span>
-                    <span class="likes">♥ 87</span>
+                    <span class="likes" th:text="${likeCountMap[cafeList.id]} ?: 0">♥ 0</span>
                     <span class="views" th:text="|👁${cafeList.hitCount}|">👁 1,234</span>
                 </div>
             </div>

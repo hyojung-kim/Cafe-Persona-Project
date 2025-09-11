@@ -6,6 +6,7 @@ import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.keyword.hj.Keyword;
 import com.team.cafe.keyword.hj.KeywordService;
 import com.team.cafe.keyword.hj.KeywordType;
+import com.team.cafe.like.CafeLikeCount;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.service.ReviewService;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -76,8 +78,10 @@ public class CafeListController {
 
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
+        List<CafeLikeCount> likeCount = likeService.findLikeCountsByCafeIds(ids);
 
-
+        Map<Long, Long> likeCountMap = likeCount.stream()
+                .collect(Collectors.toMap(CafeLikeCount::getCafeId, CafeLikeCount::getCnt));
 
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
@@ -87,6 +91,7 @@ public class CafeListController {
         model.addAttribute("parking", parking);
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
+        model.addAttribute("likeCountMap", likeCountMap);
         //키워드 모델
         model.addAttribute("keywordsByType", keywordsByType);
         model.addAttribute("selectedKeys", keyList);
