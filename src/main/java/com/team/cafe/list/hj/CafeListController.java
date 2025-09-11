@@ -46,7 +46,7 @@ public class CafeListController {
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "3") int size,
+                       @RequestParam(defaultValue = "8") int size,
                        @RequestParam(required = false) String kw,
                        @RequestParam(defaultValue = "createdAt") String sort,
                        @RequestParam(defaultValue = "desc") String dir,
