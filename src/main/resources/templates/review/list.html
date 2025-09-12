@@ -39,9 +39,13 @@
       <div class="text-end">
         <a th:href="@{|/cafe/detail/${cafe.id}|}" class="btn btn-outline-secondary btn-sm">카페 상세</a>
         <a sec:authorize="isAuthenticated()" th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn btn-outline-success btn-sm ms-1">위치 인증</a>
-    </div>
+      </div>
     </div>
   </section>
+
+  <div id="certifySuccessMessage" class="alert alert-success d-none" role="alert">
+    위치 인증이 완료되었습니다. 이제 리뷰를 작성할 수 있습니다.
+  </div>
 
   <!-- 작성 폼 -->
   <section class="card shadow-sm mb-3" sec:authorize="isAuthenticated()">
@@ -127,8 +131,17 @@
             <p class="mt-2 mb-2" th:text="${#strings.abbreviate(rv.content, 300)}">리뷰 내용</p>
 
             <div class="row g-2 mt-1" th:if="${rv.images != null and !rv.images.isEmpty()}">
-              <div class="col-4" th:each="img : ${rv.images}">
-                <img th:src="${img.imageUrl}" alt="review image" class="img-fluid rounded">
+              <div class="col-auto">
+                <a th:href="@{|/reviews/${rv.id}|}" class="d-block">
+                  <div class="review-image-wrapper">
+                    <img th:src="@{${rv.images[0].imageUrl}}" alt="review image" class="review-image">
+                  </div>
+                </a>
+              </div>
+              <div class="col-auto">
+                <a th:href="@{|/reviews/${rv.id}|}" class="d-block">
+                  <div class="review-image-more">이미지 더보기...</div>
+                </a>
               </div>
             </div>
 

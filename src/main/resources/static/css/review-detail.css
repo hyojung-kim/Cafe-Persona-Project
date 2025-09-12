@@ -52,3 +52,43 @@
 .rate.read-only > label:before {
   cursor: default;
 }
+
+.review-image-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.review-image-slider .slider-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.review-image-slider .slide {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  padding: 0 4px;
+}
+
+.review-image-slider .review-image {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+}
+
+.review-image-slider .slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  padding: 0.25rem 0.5rem;
+}
+
+.review-image-slider .prev-btn {
+  left: 0;
+}
+
+.review-image-slider .next-btn {
+  right: 0;
+}

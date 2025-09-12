@@ -100,6 +100,8 @@ public class ImageStorageService {
 
         // 공개 URL 생성: /uploads/2025-09-07/uuid.jpg
         String url = joinUrl(publicUrlPrefix, dateFolder, filename);
+        // joinUrl의 결과가 슬래시로 시작하지 않는 경우 보정
+        url = ensureStartsWithSlash(url);
         return url;
     }
 
