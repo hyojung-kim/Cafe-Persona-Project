@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -103,14 +104,55 @@ public class ReviewController {
     public String listSection(@PathVariable Long cafeId,
                               @RequestParam(name = "rpage", defaultValue = "0") int page,
                               @RequestParam(name = "rsize", defaultValue = "10") int size,
+                              // hy 추가
+                              @RequestParam(name = "sort", defaultValue = "latest") String sort,
                               Model model) {
 
         var cafe = cafeService.getById(cafeId);
         double avgRating = cafeService.getActiveAverageRating(cafeId);
         long reviewCount = cafeService.getActiveReviewCount(cafeId);
 
-        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
+        // 정성님 기존 코드
+//        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+//        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
+
+        /// hy 추가 1번
+        Page<Review> reviews;
+
+//        if ("popular".equals(sort)) {
+//            // 인기순: 좋아요 수 기준 정렬 (Repository에서 처리)
+//            var pageable = PageRequest.of(page, size); // 정렬은 쿼리에서 처리
+//            reviews = reviewService.getReviewsSortedByLikes(cafeId, pageable);
+//        } else {
+//            // 최신순 기존 코드 그대로
+//            var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+//            reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
+//        }
+        /// / hy 2번
+        if ("popular".equals(sort)) {
+            reviews = reviewService.getReviewsSortedByLikes(cafeId, PageRequest.of(page, size));
+        } else {
+            reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        }
+
+        model.addAttribute("latestReviews", reviews.getContent());
+        model.addAttribute("sort", sort); // 선택 상태 유지
+
+        /// / hy 3번
+        if ("popular".equals(sort)) {
+            // 인기순 리뷰 목록을 가져와서 'popularReviews'라는 이름으로 모델에 추가
+            reviews = reviewService.getReviewsSortedByLikes(cafeId, PageRequest.of(page, size));
+            model.addAttribute("popularReviews", reviews.getContent());
+        } else {
+            // 최신순 리뷰 목록을 가져와서 'latestReviews'라는 이름으로 모델에 추가
+            reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+            model.addAttribute("latestReviews", reviews.getContent());
+        }
+
+        model.addAttribute("sort", sort); // 선택 상태 유지
+
+
+        /// hy 추가 끝
 
         var meOpt = currentUserService.getCurrentUser();
         meOpt.ifPresent(me -> model.addAttribute("me", me));

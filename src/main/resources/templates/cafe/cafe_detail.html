@@ -62,32 +62,33 @@
     <script src="/js/cafe-like.js"></script>
 
 
-    <!-- mybookmark페이지에서 이동해 왔을 때 뒤로가기 버튼 생성 -->
-    <div th:if="${param.from != null and param.from[0] == 'bookmark'}" style="margin-top: 16px;">
-        <a th:href="@{/mypage/my/bookmark}" class="btn btn-secondary">
-            내 북마크로 돌아가기
-        </a>
-    </div>
     <div style="margin-top:8px;">
         <a class="btn" th:href="@{/cafe/map/{cafeId}(cafeId=${cafe.id})}">카페 위치 보기</a>
     </div>
     <!-- 하단: 리뷰 리스트 페이지로 이동 (스타일 없음) -->
     <!--  기본순 - 최신순 , 인기순 - 리뷰 좋아요 갯수 순  -->
     <div style="margin-top:16px;">
-        <a th:href="@{/cafes/{id}/reviews(id=${cafe.id})}"
-           style="display: block; text-decoration: none; color: inherit;">
+
         <div>
             <!--  총 등록 리뷰수  -->
             <p>등록된 리뷰 수 : <span th:text="${reviewCount}"></span></p>
             <p>평균 별점 : <span th:text="${avgRating}"></span></p>
+
+                <select onchange="location.href='?sort='+this.value">
+                    <option value="latest" th:selected="${sort == null or sort == 'latest'}">최신순</option>
+                    <option value="popular" th:selected="${sort=='popular'}">인기순</option>
+            </select>
+            <a th:href="@{/cafes/{id}/reviews(id=${cafe.id})}"
+               style="display: block; text-decoration: none; color: inherit;">
             <div th:each="review : ${latestReviews}">
                 <span th:text="${review.content}"></span>
                 <span th:text="${review.rating}"></span>
+<!--                <span th:text="${likeCountMap[review.id]}">0</span>-->
             </div>
+            </a>
         </div>
         <!-- 더보기 버튼 -->
-        <span>더보기</span>
-        </a>
+        <button type="button" th:onclick="location.href='/cafes/' + [[${cafe.id}]] + '/reviews'">더보기</button>
     </div>
 </div>
 </html>

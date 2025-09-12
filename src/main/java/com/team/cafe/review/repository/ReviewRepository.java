@@ -34,6 +34,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /** 활성 리뷰 개수 */
     long countByCafe_IdAndActiveTrue(Long cafeId);
 
+    ///  hy 리뷰 좋아요 순으로 정렬하기
+    @Query("""
+       SELECT r FROM Review r
+       LEFT JOIN r.likedUsers lu
+       WHERE r.cafe.id = :cafeId AND r.active = true
+       GROUP BY r
+       ORDER BY COUNT(lu) DESC
+       """)
+    @EntityGraph(attributePaths = {"user", "images"})
+    Page<Review> findByCafeIdOrderByLikesDesc(@Param("cafeId") Long cafeId, Pageable pageable);
+
     /* ========== 단건 상세/통계 ========== */
 
     /**
