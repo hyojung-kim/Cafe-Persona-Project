@@ -40,7 +40,7 @@
                     <li th:each="k : ${entry.value}" >
                         <label th:classappend="${selectedKeys != null and #lists.contains(selectedKeys, k.id)} ? ' active' : null"
                                class="list_label">
-                            <input type="checkbox" name="keyList" th:value="${k.id}" th:checked="${selectedKeys != null and #lists.contains(selectedKeys, k.id)}" form="filterForm">
+                            <input type="checkbox" name="keyList" th:value="${k.id}" th:checked="${selectedKeys != null and #lists.contains(selectedKeys, k.id)}" form="filterForm" th:data-label="${k.name}">
                             <span th:text="${k.name}">태그명</span>
                         </label>
                     </li>
@@ -50,7 +50,13 @@
             <!-- 하단: 선택 수 / 초기화 / 적용 -->
             <footer class="filter-panel__footer">
                 <div id="disable-text">
-                    <span id="selectedCount" class="count-label">0</span> 개 선택
+                    <div id="selectedFilters" class="selected-filters"></div>
+                    <span id="selectedCount" class="count-label">0</span>개 선택
+
+                    <!--<span id="selectedCount" class="count-label">0</span> 개 선택-->
+                    <div class="selected-filters" id="selectedFilters" aria-live="polite">
+                        <!-- JS에서 선택된 값이 chip 형태로 추가됨 -->
+                    </div>
                 </div>
                 <div>
                     <button type="button" class="filter-btn filter-btn--ghost" form="filterForm" id="resetBtn">초기화</button>

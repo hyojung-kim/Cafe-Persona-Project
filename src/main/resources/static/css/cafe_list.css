@@ -396,3 +396,38 @@
 .btn-primary{ background:#ffb86b; border-color:#ffb86b; color:#fff; }
 .btn-ghost{ background:#fff; color:#444; }
 .btn:hover{ filter:brightness(0.98); }
+
+
+/* ===============================
+        필터칩 부분
+=============================== */
+
+.selected-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin: 1rem 0;
+}
+
+.selected-filters .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  background: #fff;
+  border: 1px solid #f15a24; /* 포인트 컬러 */
+  color: #f15a24;
+  padding: .35rem .75rem;
+  border-radius: 20px;
+  font-size: .85rem;
+  font-weight: 500;
+  cursor: default;
+}
+
+.selected-filters .chip button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+}
