@@ -1,12 +1,20 @@
-// /js/cafe-list.js
+// /js/review-list.js
 (function () {
   const form = document.getElementById('reviewCreateForm');
   if (!form) return;
 
+  const cafeId = form.getAttribute('data-cafe-id');
   const csrfToken  = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
   const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
   form.addEventListener('submit', async (e) => {
+    if (cafeId && localStorage.getItem('certifiedCafe_' + cafeId) !== 'true') {
+      e.preventDefault();
+      if (confirm('위치인증을 먼저 해주세요. 위치 인증 페이지로 이동하시겠습니까?')) {
+        window.location.href = '/cafes/' + cafeId + '/reviews/location';
+      }
+      return;
+    }
     if (!form.checkValidity()) {
       e.preventDefault();
       e.stopPropagation();
@@ -59,6 +67,9 @@
       // 3) 폼 리셋
       form.reset();
       form.classList.remove('was-validated');
+      if (cafeId) {
+        localStorage.removeItem('certifiedCafe_' + cafeId);
+      }
     } catch (err) {
       console.error(err);
       alert('리뷰 등록에 실패했어요. 잠시 후 다시 시도해 주세요.');

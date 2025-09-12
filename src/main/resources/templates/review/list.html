@@ -38,6 +38,7 @@
       </div>
       <div class="text-end">
         <a th:href="@{|/cafe/detail/${cafe.id}|}" class="btn btn-outline-secondary btn-sm">카페 상세</a>
+        <a th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn btn-outline-success btn-sm ms-1">위치 인증</a>
       </div>
     </div>
   </section>
@@ -48,6 +49,7 @@
       <h3 class="h6 mb-3">리뷰 작성</h3>
       <form id="reviewCreateForm"
             th:action="@{/cafes/{id}/reviews(id=${cafe.id})}"
+            th:data-cafe-id="${cafe.id}"
             method="post"
             enctype="multipart/form-data"
             class="needs-validation" novalidate>

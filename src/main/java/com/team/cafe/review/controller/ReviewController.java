@@ -12,6 +12,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -41,6 +42,9 @@ public class ReviewController {
     private final ImageStorageService imageStorageService;
     private final ReviewRepository reviewRepository;
     private final ReviewLikeService reviewLikeService;
+
+    @Value("${kakao.api.key}")
+    private String kakaoApiKey;
 
     public ReviewController(ReviewService reviewService,
                             CafeListService cafeService,
@@ -130,6 +134,20 @@ public class ReviewController {
         model.addAttribute("likeCountMap", likeCountMap);
 
         return "review/list :: section";
+    }
+
+    /* =======================
+       위치 인증 폼
+       ======================= */
+    @GetMapping("/cafes/{cafeId}/reviews/location")
+    public String locationCertify(@PathVariable Long cafeId, Model model) {
+        var cafe = cafeService.getById(cafeId);
+        model.addAttribute("cafe", cafe);
+        model.addAttribute("kakaoApiKey", kakaoApiKey);
+        // location_certify.html expects the address under the name "address1"
+        // so expose the cafe's primary address using that key
+        model.addAttribute("address1", cafe.getAddress1());
+        return "review/location_certify";
     }
 
     /* =======================
