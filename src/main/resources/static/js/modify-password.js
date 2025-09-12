@@ -43,24 +43,6 @@ function validatePasswordConfirm() {
 
 	console.log("pw:", pw, "pw2:", pw2); // 실제 값 확인
 
-	//    if (!pw2) {
-	//        msg.classList.add("d-none");
-	//        return false;
-	//    }
-	//
-	//    if (pw !== pw2) {
-	//        msg.classList.remove("d-none");
-	//        msg.classList.remove("text-success");
-	//        msg.classList.add("text-danger");
-	//        msg.innerText = "비밀번호가 일치하지 않습니다.";
-	//        return false;
-	//    } else {
-	//        msg.classList.remove("d-none");
-	//        msg.classList.remove("text-danger");
-	//        msg.classList.add("text-success");
-	//        msg.innerText = "비밀번호가 일치합니다.";
-	//        return true;
-	//    }
 	if (pw !== pw2) {
 		msg.innerText = "비밀번호가 일치하지 않습니다.";
 		msg.classList.remove("text-success");
@@ -93,12 +75,6 @@ function validateForm(e) {
 		return;
 	}
 
-	// 인증된 아이디인지 체크
-	//    if (!verifiedId || username !== verifiedId) {
-	//        showAlert("인증을 완료한 아이디만 비밀번호를 변경할 수 있습니다.");
-	//        return;
-	//    }
-
 	// 검증 통과하면 폼 제출
 	e.target.submit();
 }
@@ -122,67 +98,9 @@ function showAlert(message) {
 	modal.show();
 }
 
-// 비밀번호 보이기 토글
-//const pwInput = document.getElementById("password");
-//const toggleBtn = document.querySelector(".toggle-btn");
-//
-//pwInput.addEventListener("input", () => {
-//	if (pwInput.value.length > 0) {
-//		toggleBtn.style.display = "block";
-//	} else {
-//		toggleBtn.style.display = "none";
-//	}
-//});
-//
-//// 버튼 클릭 시 보이기/숨기기 토글
-//toggleBtn.addEventListener("click", () => {
-//	if (pwInput.type === "password") {
-//		pwInput.type = "text";
-//		toggleBtn.classList.replace("bi-eye", "bi-eye-slash");
-//	} else {
-//		pwInput.type = "password";
-//		toggleBtn.classList.replace("bi-eye-slash", "bi-eye");
-//	}
-//});
-
-//document.addEventListener("DOMContentLoaded", () => {
-//  const toggleWrappers = document.querySelectorAll(".input-with-toggle");
-//
-//  toggleWrappers.forEach(wrapper => {
-//    const input = wrapper.querySelector("input");
-//    const toggleBtn = wrapper.querySelector(".toggle-btn");
-//
-//    // 입력 시 버튼 표시/숨김
-//    input.addEventListener("input", () => {
-//      if (input.value.length > 0) {
-//        toggleBtn.style.display = "block";
-//      } else {
-//        toggleBtn.style.display = "none";
-//        // 입력값이 없어지면 항상 비밀번호 타입으로 되돌림
-//        input.type = "password";
-//        toggleBtn.classList.remove("bi-eye-slash");
-//        toggleBtn.classList.add("bi-eye");
-//      }
-//    });
-//
-//    // 버튼 클릭 시 보이기/숨기기 토글
-//    toggleBtn.addEventListener("click", () => {
-//      if (input.type === "password") {
-//        input.type = "text";
-//        toggleBtn.classList.remove("bi-eye");
-//        toggleBtn.classList.add("bi-eye-slash");
-//      } else {
-//        input.type = "password";
-//        toggleBtn.classList.remove("bi-eye-slash");
-//        toggleBtn.classList.add("bi-eye");
-//      }
-//    });
-//  });
-//});
-
 /* ================= 이벤트 등록 ================= */
 document.addEventListener("DOMContentLoaded", function () {
-    const toggleWrappers = document.querySelectorAll(".input-with-toggle");
+	const toggleWrappers = document.querySelectorAll(".input-with-toggle");
 	const password = document.getElementById("password");
 	const passwordConfirm = document.getElementById("passwordConfirm");
 	const form = document.getElementById("resetPasswordForm");
@@ -192,34 +110,44 @@ document.addEventListener("DOMContentLoaded", function () {
 		passwordConfirm.addEventListener("keyup", validatePasswordConfirm);
 	if (form) form.addEventListener("submit", validateForm);
 
-	 toggleWrappers.forEach(wrapper => {
-        const input = wrapper.querySelector("input");
-        const toggleBtn = wrapper.querySelector(".toggle-btn");
+	toggleWrappers.forEach((wrapper) => {
+		const input = wrapper.querySelector("input");
+		const toggleBtn = wrapper.querySelector(".toggle-btn");
 
-        // 입력 시 버튼 표시/숨김
-        input.addEventListener("input", () => {
-          if (input.value.length > 0) {
-            toggleBtn.style.display = "block";
-          } else {
-            toggleBtn.style.display = "none";
-            // 입력값이 없어지면 항상 비밀번호 타입으로 되돌림
-            input.type = "password";
-            toggleBtn.classList.remove("bi-eye-slash");
-            toggleBtn.classList.add("bi-eye");
-          }
-        });
+		// 입력 시 버튼 표시/숨김
+		input.addEventListener("input", () => {
+			if (input.value.length > 0) {
+				toggleBtn.style.display = "block";
+			} else {
+				toggleBtn.style.display = "none";
+				// 입력값이 없어지면 항상 비밀번호 타입으로 되돌림
+				input.type = "password";
+				toggleBtn.classList.remove("bi-eye-slash");
+				toggleBtn.classList.add("bi-eye");
+			}
+		});
 
-        // 버튼 클릭 시 보이기/숨기기 토글
-        toggleBtn.addEventListener("click", () => {
-          if (input.type === "password") {
-            input.type = "text";
-            toggleBtn.classList.remove("bi-eye");
-            toggleBtn.classList.add("bi-eye-slash");
-          } else {
-            input.type = "password";
-            toggleBtn.classList.remove("bi-eye-slash");
-            toggleBtn.classList.add("bi-eye");
-          }
-        });
-      });
+		// 버튼 클릭 시 보이기/숨기기 토글
+		toggleBtn.addEventListener("click", () => {
+			if (input.type === "password") {
+				input.type = "text";
+				toggleBtn.classList.remove("bi-eye");
+				toggleBtn.classList.add("bi-eye-slash");
+			} else {
+				input.type = "password";
+				toggleBtn.classList.remove("bi-eye-slash");
+				toggleBtn.classList.add("bi-eye");
+			}
+		});
+	});
+
+	// 비밀번호 변경 성공 모달
+	function showSuccessModal(message) {
+		// 메시지 세팅
+		document.getElementById("비밀번호가 변경되었습니다.").textContent = message;
+
+		// 모달 띄우기
+		var modal = new bootstrap.Modal(document.getElementById("alertModal"));
+		modal.show();
+	}
 });
