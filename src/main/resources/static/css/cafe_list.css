@@ -235,9 +235,8 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr); /* 가로 4개 */
         gap: 1.5rem;                           /* 카드 간격 */
-        max-width: 1200px;
         margin: 2rem auto;
-        padding: 1rem;
+        /*padding: 1rem;*/
       }
 
       .card {
@@ -370,3 +369,30 @@
         outline-offset: 2px;
         border-radius: 999px;
       }
+
+
+
+/* ===============================
+        조회결과 없을 때
+=============================== */
+
+/* Empty state */
+.empty-state{
+  width:1280px;
+  min-height: 40vh;                  /* 화면 가운데로 */
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:.75rem; text-align:center;
+  color:#666;
+  padding:2rem 1rem;
+}
+.empty-state__img{ width: 220px; height:auto; }
+.empty-state__title{ font-size:1.05rem; font-weight:600; color:#444; }
+.empty-state__actions{ display:flex; gap:.5rem; margin-top:.25rem; }
+.empty-state__hint{ font-size:.9rem; color:#8a8a8a; }
+
+/* 버튼 예시(프로젝트 스타일에 맞게 대체) */
+.btn{ padding:.5rem .875rem; border-radius:10px; border:1px solid #e5e5e5; }
+.btn-primary{ background:#ffb86b; border-color:#ffb86b; color:#fff; }
+.btn-ghost{ background:#fff; color:#444; }
+.btn:hover{ filter:brightness(0.98); }

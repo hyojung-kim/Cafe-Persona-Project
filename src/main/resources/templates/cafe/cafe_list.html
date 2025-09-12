@@ -126,6 +126,24 @@
             </div>
         </div>
 
+        <!-- 결과가 없을 때 -->
+        <section class="empty-state" role="status" aria-live="polite"
+                 th:if="${paging == null || paging.empty}">
+            <h3 class="empty-state__title">힌트: 선택한 태그 수를 줄이거나, 검색어를 넓혀보세요.!</h3>
+
+            <div class="empty-state__actions">
+                <!-- 필터 초기화(쿼리스트링 제거) -->
+                <a class="btn btn-primary" th:href="@{/cafe/list}">필터 초기화</a>
+                <!-- 뒤로가기(있으면) -->
+                <button type="button" class="btn btn-ghost" onclick="history.back()">뒤로</button>
+            </div>
+        </section>
+
+        <!-- 결과가 있을 때 -->
+        <ul class="cafe-list" th:if="${paging != null && !paging.empty}">
+            <!-- 카드 렌더링 -->
+        </ul>
+
         <!-- 카드 반복 (총 12개) -->
     </section>
 
