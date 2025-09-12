@@ -6,6 +6,7 @@ import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.keyword.hj.Keyword;
 import com.team.cafe.keyword.hj.KeywordService;
 import com.team.cafe.keyword.hj.KeywordType;
+import com.team.cafe.like.CafeLikeCount;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.service.ReviewService;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -50,7 +52,7 @@ public class CafeListController {
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "3") int size,
+                       @RequestParam(defaultValue = "8") int size,
                        @RequestParam(required = false) String kw,
                        @RequestParam(defaultValue = "createdAt") String sort,
                        @RequestParam(defaultValue = "desc") String dir,
@@ -76,6 +78,16 @@ public class CafeListController {
 
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
+        // 좋아요 갯수 ids로 가져오기
+        List<CafeLikeCount> likeCount = likeService.findLikeCountsByCafeIds(ids);
+        // 별점평균 갸져오기 ids로
+        List<CafeLikeCount> ratingAvg = likeService.findLikeCountsByCafeIds(ids);
+        //map으로 리턴
+        Map<Long, Long> likeCountMap = likeCount.stream()
+                .collect(Collectors.toMap(CafeLikeCount::getCafeId, CafeLikeCount::getCnt));
+
+
+
 
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
@@ -85,6 +97,7 @@ public class CafeListController {
         model.addAttribute("parking", parking);
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
+        model.addAttribute("likeCountMap", likeCountMap);
         //키워드 모델
         model.addAttribute("keywordsByType", keywordsByType);
         model.addAttribute("selectedKeys", keyList);

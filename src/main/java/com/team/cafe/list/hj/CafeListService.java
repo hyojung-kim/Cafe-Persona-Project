@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -100,6 +101,7 @@ public class CafeListService {
         return !now.isBefore(cafe.getOpenTime()) && !now.isAfter(cafe.getCloseTime());
     }
 
+
     /** 같은 세션에서 같은 카페 상세는 1회만 카운트 */
     @Transactional
     public void increaseViewOncePerSession(Long cafeId, HttpSession session) {
@@ -131,12 +133,16 @@ public class CafeListService {
             keyList = null;
         }
 
+        // 표시용 now는 항상 동일 기준으로 계산 (필터와 무관)
+        LocalTime viewNow = LocalTime.now(ZoneId.of("Asia/Seoul"));
 
         // ✅ 태그 모두일치 + 기존 필터 동시 적용
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1)); // 정렬은 쿼리로
         Long selectedSize = (keyList == null) ? 0L : keyList.stream().distinct().count();
         Page<Cafe> pageAll = cafeListRepository.findAllMatchAllWithFiltersCaseOrder(kw, parking, now, keyList, selectedSize, sort, dir, pageable);
-        return pageAll.map(c -> new CafeMatchDto(c, selectedSize));
+
+
+        return pageAll.map(c -> new CafeMatchDto(c, selectedSize, viewNow));
     }
 
 

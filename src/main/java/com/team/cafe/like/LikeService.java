@@ -7,11 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class LikeService {
     private final CafeListRepository cafeListRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
     /** 좋아요 여부 확인 (true=좋아요 상태, false=아님) */
     @Transactional(readOnly = true)
@@ -43,6 +46,13 @@ public class LikeService {
 
     @Transactional(readOnly = true)
     public long getLikeCount(Long cafeId) { // Integer -> Long
-        return cafeListRepository.countLikes(cafeId);
+        return likeRepository.countLikes(cafeId);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<CafeLikeCount> findLikeCountsByCafeIds(List<Long> cafeIds) {
+        if (cafeIds == null || cafeIds.isEmpty()) return List.of();
+        return likeRepository.findLikeCountsByCafeIds(cafeIds);
     }
 }

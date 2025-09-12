@@ -5,7 +5,7 @@
         <span th:text="${cafe.name}">카페명</span>
 
         <span th:if="${openNow != null}"
-              class="badge"
+              class=""
               th:classappend="${openNow} ? ' badge--open' : ' badge--closed'"
               th:text="${openNow} ? '[영업중]' : '[마감]'">영업중</span>
 

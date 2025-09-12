@@ -102,98 +102,58 @@
         </label>
     </div>
     <input type="hidden" name="size" th:value="${size}" form="filterForm">
+    <h2>카페리스트</h2>
+    <section class="cafe-list">
+        <div class="card" th:each="cafeList : ${paging}">
+            <a th:href="@{|/cafe/detail/${cafeList.id}|}">
+                <img th:src="${imageMap[cafeList.id]} ?: '/images/DBimg.PNG'"
+                     loading="lazy" class="thumb-img" alt="카페 대표 이미지">
+            </a>
 
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>이름</th>
-            <th>주소</th>
-            <th>도시/구</th>
-            <th>영업시간</th>
-            <th>주차</th>
-            <th>전화</th>
-            <th>웹사이트</th>
-            <th>날짜</th>
-            <th>조회수</th>
-            <th>이미지</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- 빈 목록 처리 -->
-        <tr th:if="${#lists.isEmpty(paging)}">
-            <td colspan="8" class="muted">등록된 카페가 없습니다.</td>
-        </tr>
+            <div class="card-body">
+                <div class="card-header">
+                    <a class="cafe-title" th:href="@{|/cafe/detail/${cafeList.id}|}" th:text="${cafeList.name}">카페 이름</a>
+                    <span class="status open" th:text="${cafeList.openNow} ? '영업중' : '마감'">영업중</span>
+                </div>
+                <p class="address" th:text="${cafeList.address1}"></p>
+                <p class="time" th:if="${cafeList.openTime != null and cafeList.closeTime != null}"
+                   th:text="|${#temporals.format(cafeList.openTime,'HH시:mm분')} ~ ${#temporals.format(cafeList.closeTime,'HH시:mm분')}|"></p>
+                <div class="card-meta">
+                    <span class="rating">⭐ 4.5</span>
+                    <span class="likes" th:text="|♥ ${likeCountMap[cafeList.id]}| ?: 0">♥ 0</span>
+                    <span class="views" th:text="|👁${cafeList.hitCount}|">👁 1,234</span>
+                </div>
+            </div>
+        </div>
 
-        <!-- 리스트 출력 -->
-        <tr th:each="cafeList : ${paging}">
-            <td th:text="${cafeList.id}">1</td>
-            <td>
-                <a th:href="@{|/cafe/detail/${cafeList.id}|}" th:text="${cafeList.name}">카페명</a>
-            </td>
+        <!-- 카드 반복 (총 12개) -->
+    </section>
+
+    <nav class="pagination" aria-label="페이지 이동" th:if="${paging != null and !paging.isEmpty()}">
+        <a class="page-btn" th:href="@{/cafe/list(page=0, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}" aria-label="첫 페이지">«</a>
+        <a class="page-btn" href="?page=0" aria-label="이전 페이지" th:if="${!paging.first}"
+           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">이전
+        </a>
 
 
-            <td>
-                <span th:text="${cafeList.address1}">주소1</span>
-                <span th:if="${cafeList.address2 != null and !#strings.isEmpty(cafeList.address2)}"
-                      th:text="' ' + ${cafeList.address2}"></span>
-            </td>
 
-            <td>
-                <span th:text="${cafeList.city}">도시</span> /
-                <span th:text="${cafeList.district}">구</span>
-            </td>
-
-            <td>
-                <!-- 둘 다 있을 때만 시간 표시 -->
-                <span th:if="${cafeList.openTime != null and cafeList.closeTime != null}"
-                      th:text="|${#temporals.format(cafeList.openTime,'HH시:mm분')} ~ ${#temporals.format(cafeList.closeTime,'HH시:mm분')}|">
-          09:00 ~ 22:00
-        </span>
-                <span th:unless="${cafeList.openTime != null and cafeList.closeTime != null}" class="muted">미등록</span>
-            </td>
-
-            <td th:text="${cafeList.parkingYn} ? '가능' : '불가'">가능</td>
-            <td th:text="${cafeList.phoneNum}">010-0000-0000</td>
-
-            <td>
-                <a th:if="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}"
-                   th:href="${cafeList.siteUrl}" target="_blank" rel="noopener">바로가기</a>
-                <span th:unless="${cafeList.siteUrl != null and !#strings.isEmpty(cafeList.siteUrl)}" class="muted">없음</span>
-            </td>
-            <td th:text="${#temporals.format(cafeList.createdAt, 'yyyy-MM-dd HH시mm분')}">
-                등록일
-            </td>
-            <td th:text="${cafeList.hitCount}">
-                0
-            </td>
-            <td class="thumb">
-                <a th:href="@{|/cafe/detail/${cafeList.id}|}">
-                    <img th:src="${imageMap[cafeList.id]} ?: '/images/DBimg.PNG'"
-                         alt="noImg" loading="lazy" class="thumb-img">
+        <ol class="page-list" role="list" >
+            <li th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
+            th:if="${p >= paging.number-1 and p <= paging.number+1}">
+                <a class="page-link" aria-current="page" href="?page=1"
+                   th:if="${p != paging.number}"
+                   th:text="${p+1}"
+                   th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">1
                 </a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                <span th:if="${p == paging.number}" th:text="${p+1}"></span>
+            </li>
+        </ol>
 
-    <!-- 페이징: 모든 파라미터 유지 -->
-    <div  th:if="${paging != null and !paging.isEmpty()}">
-        <a th:if="${!paging.first}"
-           th:href="@{/cafe/list(page=${paging.number-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">이전</a>
-
-        <span th:each="p : ${#numbers.sequence(0, paging.totalPages-1)}"
-              th:if="${p >= paging.number-5 and p <= paging.number+5}">
-            <a th:if="${p != paging.number}"
-               th:text="${p+1}"
-               th:href="@{/cafe/list(page=${p}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}"></a>
-            <span th:if="${p == paging.number}" th:text="${p+1}"></span>
-        </span>
-
-        <a th:if="${!paging.last}"
-           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">다음</a>
-    </div>
-
+        <a class="page-btn" href="?page=2" aria-label="다음 페이지" th:if="${!paging.last}"
+           th:href="@{/cafe/list(page=${paging.number+1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}">다음
+        </a>
+        <a class="page-btn"  th:href="@{/cafe/list(page=${paging.totalPages-1}, size=${paging.size}, kw=${kw}, sort=${sort}, dir=${dir}, parking=${parking}, openNow=${openNow}, keyList=${selectedKeys})}" aria-label="마지막 페이지">»</a>
+    </nav>
 
 
     <script src="/js/filter-chip.js"></script>
