@@ -137,7 +137,7 @@ public class CafeListController {
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
         // 최신 리뷰 3개 hy
-        List<Review> latestReviews = reviewRepository.findTop3ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+        List<Review> latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
 
         // 콘솔에서 리뷰 개수 확인 hy
         System.out.println("리뷰 개수: " + latestReviews.size());

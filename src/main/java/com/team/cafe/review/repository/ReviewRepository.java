@@ -53,5 +53,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     long countLikes(@Param("reviewId") Long reviewId);
 
     // 리뷰를 최신순 3개 가져오기 hy
-    List<Review> findTop3ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(Long cafeId);
+    List<Review> findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(Long cafeId);
 }
