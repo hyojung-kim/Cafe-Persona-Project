@@ -9,6 +9,7 @@ import com.team.cafe.keyword.hj.KeywordType;
 import com.team.cafe.like.CafeLikeCount;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.dto.CafeWithRating;
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
@@ -81,13 +82,18 @@ public class CafeListController {
         // 좋아요 갯수 ids로 가져오기
         List<CafeLikeCount> likeCount = likeService.findLikeCountsByCafeIds(ids);
         // 별점평균 갸져오기 ids로
-        List<CafeLikeCount> ratingAvg = likeService.findLikeCountsByCafeIds(ids);
+        List<CafeWithRating> ratingAvg = cafeListService.getCafesWithAvgRating(ids);
+
         //map으로 리턴
         Map<Long, Long> likeCountMap = likeCount.stream()
                 .collect(Collectors.toMap(CafeLikeCount::getCafeId, CafeLikeCount::getCnt));
 
-
-
+        //map으로 리턴
+        Map<Long, Double> ratingAvgMap = ratingAvg.stream()
+                .collect(Collectors.toMap(
+                        CafeWithRating::getId,
+                        r -> r.getAvgRating() != null ? r.getAvgRating() : 0.0
+                ));
 
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
@@ -98,6 +104,7 @@ public class CafeListController {
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
         model.addAttribute("likeCountMap", likeCountMap);
+        model.addAttribute("ratingAvgMap", ratingAvgMap);
         //키워드 모델
         model.addAttribute("keywordsByType", keywordsByType);
         model.addAttribute("selectedKeys", keyList);

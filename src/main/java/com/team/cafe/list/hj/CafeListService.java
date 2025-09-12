@@ -1,6 +1,7 @@
 package com.team.cafe.list.hj;
 
 import com.team.cafe.DataNotFoundException;
+import com.team.cafe.review.dto.CafeWithRating;
 import com.team.cafe.review.repository.ReviewRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -146,4 +147,7 @@ public class CafeListService {
     }
 
 
+    public List<CafeWithRating> getCafesWithAvgRating(List<Long> ids) {
+        return cafeListRepository.getCafesWithAvgRating(ids);
+    }
 }
