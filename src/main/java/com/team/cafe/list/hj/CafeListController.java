@@ -78,10 +78,16 @@ public class CafeListController {
 
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
+        // 좋아요 갯수 ids로 가져오기
         List<CafeLikeCount> likeCount = likeService.findLikeCountsByCafeIds(ids);
-
+        // 별점평균 갸져오기 ids로
+        List<CafeLikeCount> ratingAvg = likeService.findLikeCountsByCafeIds(ids);
+        //map으로 리턴
         Map<Long, Long> likeCountMap = likeCount.stream()
                 .collect(Collectors.toMap(CafeLikeCount::getCafeId, CafeLikeCount::getCnt));
+
+
+
 
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
