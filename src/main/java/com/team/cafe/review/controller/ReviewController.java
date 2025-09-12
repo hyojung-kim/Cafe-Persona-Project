@@ -141,6 +141,7 @@ public class ReviewController {
        ======================= */
     @GetMapping("/cafes/{cafeId}/reviews/location")
     public String locationCertify(@PathVariable Long cafeId, Model model) {
+        currentUserService.getCurrentUserOrThrow();
         var cafe = cafeService.getById(cafeId);
         model.addAttribute("cafe", cafe);
         model.addAttribute("kakaoApiKey", kakaoApiKey);

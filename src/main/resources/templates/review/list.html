@@ -38,8 +38,8 @@
       </div>
       <div class="text-end">
         <a th:href="@{|/cafe/detail/${cafe.id}|}" class="btn btn-outline-secondary btn-sm">카페 상세</a>
-        <a th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn btn-outline-success btn-sm ms-1">위치 인증</a>
-      </div>
+        <a sec:authorize="isAuthenticated()" th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn btn-outline-success btn-sm ms-1">위치 인증</a>
+    </div>
     </div>
   </section>
 
