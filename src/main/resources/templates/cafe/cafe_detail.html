@@ -71,6 +71,13 @@
         </span>
     </div>
 
+    <div class="chips">
+        <span class="chip" th:each="k : ${detailKeyword}" th:text="${k.name}">키워드</span>
+    </div>
+
+    <!-- 없을 때 -->
+    <p class="muted" th:if="${#lists.isEmpty(detailKeyword)}">등록된 키워드가 없습니다.</p>
+
     <script src="/js/cafe-like.js"></script>
 
     <!-- 하단: 리뷰 리스트 페이지로 이동 (스타일 없음) -->

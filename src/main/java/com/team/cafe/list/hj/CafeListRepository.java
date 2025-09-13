@@ -17,37 +17,6 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
     // 기본 전체 조회 페이징
     Page<Cafe> findAll(Pageable pageable);
 
-//    @Query("""
-//            select c from Cafe c
-//            where
-//              ( :kw is null or :kw = ''
-//                  or lower(c.name)     like lower(concat('%', :kw, '%'))
-//                  or lower(c.city)     like lower(concat('%', :kw, '%'))
-//                  or lower(c.district) like lower(concat('%', :kw, '%'))
-//                  or lower(c.address1) like lower(concat('%', :kw, '%'))
-//              )
-//              and ( :parking is null or c.parkingYn = :parking )
-//              and (
-//                    :now is null
-//                    or (
-//                          c.openTime is not null and c.closeTime is not null and
-//                          (
-//                             ( c.openTime <= c.closeTime
-//                               and c.openTime <= :now and :now <= c.closeTime )
-//                             or
-//                             ( c.openTime > c.closeTime
-//                               and ( :now >= c.openTime or :now <= c.closeTime ) )
-//                          )
-//                       )
-//                  )
-//            """)
-//    Page<Cafe> searchWithFilters(@Param("kw") String kw,
-//                                 @Param("parking") Boolean parking,
-//                                 @Param("now") java.time.LocalTime now,
-//                                 Pageable pageable);
-
-
-
     // 해당 유저가 이 카페를 좋아요 했는지 여부
     boolean existsByIdAndLikedUsers_Id(Long cafeId, Long userId); // ⬅️ Integer → Long
 
@@ -146,4 +115,9 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
     ORDER BY c.cafe_id
     """, nativeQuery = true)
     List<CafeWithRating> getCafesWithAvgRating(List<Long> ids);
+
+
+
+
+
 }

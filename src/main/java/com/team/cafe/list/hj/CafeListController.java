@@ -4,6 +4,7 @@ import com.team.cafe.bookmark.BookmarkService;
 import com.team.cafe.bookmark.LikeBookmarkFacade;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.keyword.hj.Keyword;
+import com.team.cafe.keyword.hj.KeywordRow;
 import com.team.cafe.keyword.hj.KeywordService;
 import com.team.cafe.keyword.hj.KeywordType;
 import com.team.cafe.like.CafeLikeCount;
@@ -124,6 +125,7 @@ public class CafeListController {
         //기존코드 주석
         //Cafe cafe = cafeListService.getById(cafeId);
         Cafe cafe = cafeImageService.getDetailImg(cafeId);
+        List<KeywordRow> detailKeyword = keywordService.findKeywordRowsByCafeId(cafeId);
 
         boolean bookmarked = false;
 
@@ -160,6 +162,7 @@ public class CafeListController {
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("openNow", openNow);
         model.addAttribute("bookmarked", bookmarked);
+        model.addAttribute("detailKeyword", detailKeyword);
 
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
