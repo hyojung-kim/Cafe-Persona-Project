@@ -1,5 +1,6 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- 카페명 + 영업상태 -->
     <h2>
         <span th:text="${cafe.name}">카페명</span>
@@ -12,6 +13,11 @@
         <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
         <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
     </h2>
+    <div >
+        <img th:each="img : ${cafe.images}" th:src="${img.imgUrl}" class="thumb" alt="이미지"
+             style="width:150px; height:150px; object-fit:cover; border-radius:8px; margin:4px;">
+    </div>
+
 
     <!-- 주소 + 영업시간 -->
     <p>
@@ -47,16 +53,22 @@
          th:data-cafe-id="${cafe.id}"
          th:data-liked="${liked}">
         <button id="likeBtn" type="button" aria-label="좋아요 토글">
-            <span class="label-liked" th:if="${liked}">♥ 좋아요 취소</span>
-            <span class="label-unliked" th:if="${!liked}">♡ 좋아요</span>
+            <span class="label-liked" th:if="${liked}"><i class="fa-solid fa-bookmark" id="activeBookmark"></i></span>
+            <span class="label-unliked" th:if="${!liked}"><i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i></span>
+
         </button>
         <span style="margin-left:8px;">
-            좋아요 수: <b id="likeCount" th:text="${likeCount}">0</b>
+            북마크 갯수 : <b id="likeCount" th:text="${likeCount}">0</b>
         </span>
-        <span id="bookmark-badge"
-              th:if="${bookmarked}"
-              title="내 북마크에 있음"
-              aria-label="북마크됨">★ 북마크</span>
+    </div>
+
+    <div class="meta">
+        <span>리뷰 수:
+            <strong th:text="${reviewCount}">0</strong>
+        </span>
+        <span>평균 별점:
+            <strong th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">0.0</strong>
+        </span>
     </div>
 
     <script src="/js/cafe-like.js"></script>

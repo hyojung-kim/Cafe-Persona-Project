@@ -121,8 +121,10 @@ public class CafeListController {
                          Principal principal,
                          HttpSession session,
                          Model model) {
+        //기존코드 주석
+        //Cafe cafe = cafeListService.getById(cafeId);
+        Cafe cafe = cafeImageService.getDetailImg(cafeId);
 
-        Cafe cafe = cafeListService.getById(cafeId);
         boolean bookmarked = false;
 
         cafeListService.increaseViewOncePerSession(cafeId, session);
@@ -167,6 +169,7 @@ public class CafeListController {
 
         // 템플릿에서 ${reviews}로 사용
         model.addAttribute("reviews", reviews);
+
 
         // 분리한 템플릿 경로와 일치
         return "cafe/cafe_detail";

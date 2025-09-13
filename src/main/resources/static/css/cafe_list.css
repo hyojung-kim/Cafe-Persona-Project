@@ -125,14 +125,12 @@
 }
 
 .disable-text{
-  font-size : 0.5rem;
   color: #aaa;                /* 기본: 흐린 회색 */
   font-weight: normal;
   transition: all 0.2s ease;  /* 부드럽게 전환 */
 }
 
 .disable-text.active{
-  font-size : 0.5rem;
    color: #d94d4d;             /* 강조: 포인트 컬러 */
    font-weight: 700;           /* 두껍게 */
    transform: scale(1.1);      /* 살짝 커지는 효과 */
@@ -140,14 +138,12 @@
 
 
 .count-label {
-  font-size : 10px;
   color: #aaa;                /* 기본: 흐린 회색 */
   font-weight: normal;
   transition: all 0.2s ease;  /* 부드럽게 전환 */
 }
 
 .count-label.active {
-  font-size : 10px;
   color: #d94d4d;             /* 강조: 포인트 컬러 */
   font-weight: 700;           /* 두껍게 */
   transform: scale(1.1);      /* 살짝 커지는 효과 */
@@ -325,7 +321,7 @@
         justify-content: center;
         gap: .75rem;
         padding: 1rem 0;
-        font-family: "Noto Sans KR", system-ui, sans-serif;
+
       }
 
       .page-btn {
