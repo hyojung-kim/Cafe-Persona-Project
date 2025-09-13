@@ -1,8 +1,8 @@
 :root {
   --container-max: 1280px;
   --gap: 24px;
-  --radius: 16px;
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --radius: 30px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
   --bd: 1px solid #e9ecef;
   --bg: #fff;
   --muted: #6b7280;
@@ -16,10 +16,11 @@ body {
   margin: 0;
   font-family: system-ui, "Noto Sans KR", sans-serif;
   color: #111827;
+  margin: 0 auto;
 }
-.container {
+.container-1 {
   max-width: var(--container-max);
-  margin: 32px auto;
+
 }
 
 .hero {
@@ -29,7 +30,7 @@ body {
   background: var(--bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: var(--gap);
+ /* padding: var(--gap);*/
 }
 .hero__imgwrap {
   border-radius: 20px;
@@ -51,7 +52,7 @@ body {
   background: var(--bg);
   border: var(--bd);
   border-radius: 20px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -119,7 +120,6 @@ body {
   background: var(--bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 20px;
   margin-top: 20px;
 }
 .section__title {
