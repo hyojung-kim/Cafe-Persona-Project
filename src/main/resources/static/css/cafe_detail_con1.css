@@ -1,0 +1,66 @@
+:root{
+--container-max: 1280px;
+--gap: 24px;
+--radius: 16px;
+--shadow: 0 8px 24px rgba(0,0,0,.08);
+--bd: 1px solid #e9ecef;
+--bg: #fff;
+--muted:#6b7280;
+--chip:#f3f4f6;
+--accent:#10b981;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:system-ui, "Noto Sans KR",
+sans-serif; background:#f4f8f4;
+color:#111827
+}
+.container{max-width:var(--container-max); margin:32px auto;}
+
+
+.hero{display:grid; grid-template-columns: 480px 1fr; gap:var(--gap); background:var(--bg); border-radius:var(--radius); box-shadow:var(--shadow); padding:var(--gap)}
+.hero__imgwrap{border-radius:20px; border: 3px solid #e5e7eb; display:flex; align-items:center; justify-content:center; background:#c0a89a;}
+.hero__img{width:100%; height:100%; max-height:460px; object-fit:cover; border-radius:12px}
+
+
+.card{background:var(--bg); border:var(--bd); border-radius:20px; box-shadow:0 4px 14px rgba(0,0,0,.06); padding:20px; display:flex; flex-direction:column; gap:14px}
+
+.title{font-size:28px; font-weight:800;}
+.subtitle{font-size:14px; color:#6b7280}
+
+
+.stats{display:flex; gap:18px; flex-wrap:wrap; align-items:center}
+.stat{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; background:#fff; border:var(--bd); border-radius:999px}
+.actions{display:flex; gap:10px}
+.btn{border:var(--bd); background:#fff; border-radius:999px; padding:10px 14px; font-weight:600; cursor:pointer}
+.btn--save{border-color:#d1fae5; background:#ecfdf5}
+
+
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{padding:6px 10px; background:var(--chip); border-radius:999px; font-size:13px}
+.chip--accent{background:#ecfdf5; color:#065f46}
+
+
+.section{background:var(--bg); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-top:20px}
+.section__title{font-size:20px; font-weight:800; margin:0 0 12px}
+
+
+
+.info-grid{display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:8px}
+.kv{display:grid; grid-template-columns: 120px 1fr; gap:10px; align-items:start; padding:10px 12px; border:var(--bd); border-radius:12px}
+.kv dt{color:#6b7280}
+.kv dd{margin:0}
+.kv.full{grid-column: 1 / -1}
+.close{margin-left:8px; color:#ef4444; font-weight:700}
+
+
+.gallery{display:flex; flex-wrap:wrap; gap:10px}
+.thumb{width:160px; height:160px; object-fit:cover; border-radius:12px; border:var(--bd)}
+
+
+@media (max-width: 1024px){
+.hero{grid-template-columns:1fr;}
+.hero__imgwrap{height:320px}
+.info-grid{grid-template-columns:1fr}
+}
