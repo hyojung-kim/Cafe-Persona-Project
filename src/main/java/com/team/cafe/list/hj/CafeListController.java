@@ -115,9 +115,12 @@ public class CafeListController {
     public String detail(@PathVariable Long cafeId,
                          @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
                          @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
+                         @RequestParam(name = "sort", required = false, defaultValue = "createdAt") String sort,
                          Principal principal,
                          HttpSession session,
                          Model model) {
+
+
 
         Cafe cafe = cafeListService.getById(cafeId);
         boolean bookmarked = false;
@@ -149,13 +152,22 @@ public class CafeListController {
         Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
-        // 최신 리뷰 3개 hy
-        List<Review> latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+        // 최신 리뷰 4개 hy
+        List<Review> latestReviews;
 
+        if ("hit".equals(sort)) {
+            // 인기순
+            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(cafeId);
+        } else {
+            // 최신순 (기본값)
+            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+        }
         // 콘솔에서 리뷰 개수 확인 hy
         System.out.println("리뷰 개수: " + latestReviews.size());
         // 콘솔에서 현재 카페 id 확인 hy
         System.out.println("현재 카페 ID: " + cafeId);
+        // 콘솔 확인용 hy
+        System.out.println("sort 파라미터: " + sort);
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("liked", liked);
@@ -172,8 +184,10 @@ public class CafeListController {
         // 템플릿에서 ${reviews}로 사용
         model.addAttribute("reviews", reviews);
 
+
         // 템플릿에서 ${latestReviews}로 사용 hy
         model.addAttribute("latestReviews", latestReviews);
+        model.addAttribute("sort", sort);
 
         // 분리한 템플릿 경로와 일치
         return "cafe/cafe_detail";

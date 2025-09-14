@@ -34,17 +34,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /** 활성 리뷰 개수 */
     long countByCafe_IdAndActiveTrue(Long cafeId);
 
-    ///  hy 리뷰 좋아요 순으로 정렬하기
-    @Query("""
-       SELECT r FROM Review r
-       LEFT JOIN r.likedUsers lu
-       WHERE r.cafe.id = :cafeId AND r.active = true
-       GROUP BY r
-       ORDER BY COUNT(lu) DESC
-       """)
-    @EntityGraph(attributePaths = {"user", "images"})
-    Page<Review> findByCafeIdOrderByLikesDesc(@Param("cafeId") Long cafeId, Pageable pageable);
-
     /* ========== 단건 상세/통계 ========== */
 
     /**
@@ -63,6 +52,18 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("select count(u) from Review r join r.likedUsers u where r.id = :reviewId")
     long countLikes(@Param("reviewId") Long reviewId);
 
-    // 리뷰를 최신순 3개 가져오기 hy
+    // 리뷰를 최신순 4개 가져오기 hy
     List<Review> findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(Long cafeId);
+
+    // 리뷰를 좋아요 순으로 정렬하기
+    @Query("""
+   SELECT r FROM Review r
+   LEFT JOIN r.likedUsers lu
+   WHERE r.cafe.id = :cafeId AND r.active = true
+   GROUP BY r
+   ORDER BY COUNT(lu) DESC, r.createdAt DESC
+   LIMIT 4
+   """)
+    @EntityGraph(attributePaths = {"user", "images"})
+    List<Review> findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(@Param("cafeId") Long cafeId);
 }

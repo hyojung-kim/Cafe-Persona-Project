@@ -46,15 +46,6 @@ public class ReviewService {
         return reviewRepository.findByCafe_IdAndActiveTrueFetchUserImages(cafeId, pageable);
     }
 
-    // hy
-    /** 카페별 활성 리뷰 페이징 + user/images 즉시 로딩 + 좋아요 수 기준 정렬 */
-    @Transactional(readOnly = true)
-    public Page<Review> getReviewsSortedByLikes(Long cafeId, Pageable pageable) {
-        Objects.requireNonNull(cafeId, "cafeId is required");
-
-        // Repository에서 좋아요 수 기준 정렬 쿼리 사용
-        return reviewRepository.findByCafeIdOrderByLikesDesc(cafeId, pageable);
-    }
 
     /** 사용자별 활성 리뷰 페이징 */
     @Transactional(readOnly = true)
