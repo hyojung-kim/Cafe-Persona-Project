@@ -10,12 +10,12 @@
         안녕하세요, <b th:text="${@securityService.getNickname()}">사용자</b> 님!
     </div>
 
-    <div sec:authorize="isAnonymous()">
-        로그인하지 않은 상태입니다.
-    </div>
+<!--    <div sec:authorize="isAnonymous()">-->
+<!--        로그인하지 않은 상태입니다.-->
+<!--    </div>-->
 
 
-    <h2>카페 목록</h2>
+
 
     <!-- 검색 + 정렬 폼 -->
     <form th:action="@{/cafe/list}" id="filterForm" method="get" class="filter-form"></form>
@@ -101,9 +101,12 @@
             <label aria-label="검색">🔍</label>
         </label>
     </div>
+
     <input type="hidden" name="size" th:value="${size}" form="filterForm">
-    <h2>카페리스트</h2>
+    <h2 class="cafe-title-2">카페리스트</h2>
+
     <section class="cafe-list">
+
         <div class="card" th:each="cafeList : ${paging}">
             <a th:href="@{|/cafe/detail/${cafeList.id}|}">
                 <img th:src="${imageMap[cafeList.id]} ?: '/images/DBimg.PNG'"
@@ -113,7 +116,7 @@
             <div class="card-body">
                 <div class="card-header">
                     <a class="cafe-title" th:href="@{|/cafe/detail/${cafeList.id}|}" th:text="${cafeList.name}">카페 이름</a>
-                    <span class="status open" th:text="${cafeList.openNow} ? '영업중' : '영업마감'">영업중</span>
+                    <span class="status" th:text="${cafeList.openNow} ? '영업중' : '영업 마감'" th:classappend="${openNow} ? ' open' : ' closed'">영업중</span>
                 </div>
                 <p class="address" th:text="${cafeList.address1}"></p>
                 <p class="time" th:if="${cafeList.openTime != null and cafeList.closeTime != null}"

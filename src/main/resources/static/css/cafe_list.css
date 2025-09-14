@@ -273,6 +273,11 @@
   /*padding: 1rem;*/
 }
 
+.cafe-title-2{
+    font-size: 2rem; /* 제목 크기 */
+    padding: 2rem 0rem;
+}
+
 .card {
   background: #fff;
   border-radius: 20px;
