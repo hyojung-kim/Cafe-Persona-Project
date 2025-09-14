@@ -19,15 +19,15 @@
                       <span th:if="${openNow != null}"
                           class=""
                           th:classappend="${openNow} ? 'status open' : 'status closed'"
-                          th:text="${openNow} ? '[영업중]' : '[마감]'">영업중</span>
+                          th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
                 </div>
                 <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
                 <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
 
                 <div class="stats">
-                    <span class="stat" th:text="|★ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
+                    <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
                     <span class="stat" th:text="|리뷰 ${reviewCount}|">리뷰 0</span>
-                    <span class="stat" th:text="|조회 ${cafe.hitCount}"|>조회 0</span>
+                    <span class="stat" th:text="|👁 조회수 ${cafe.hitCount}"|>조회 0</span>
                     <div id="likeBox"
                          th:data-cafe-id="${cafe.id}"
                          th:data-liked="${liked}">
@@ -67,58 +67,72 @@
                 <h2 id="storeTitle" class="store__title">카페 소개</h2>
             </header>
 
-            <!-- 소개 문단 -->
-            <div class="store__intro">
-                <p class="intro" th:if="${#strings.isEmpty(cafe.intro)}">등록된 소개글이 없습니다.</p>
-                <p class="intro" th:unless="${#strings.isEmpty(cafe.intro)}" th:text="${cafe.intro}"></p>
-            </div>
 
-            <!-- 정보 그리드 -->
-            <section class="store__info" aria-label="기본 정보">
-                <ul class="info-grid">
-                    <li class="info-grid__row">
-                        <span class="info-grid__label">영업시간</span>
-                        <span class="info-grid__value">
+            <div class="section-aside">
+                <!-- 정보 그리드 -->
+                <section class="store__info" aria-label="기본 정보">
+                    <!-- 소개 문단 -->
+                    <div class="store__intro">
+                        <p class="intro" th:if="${#strings.isEmpty(cafe.intro)}">등록된 소개글이 없습니다.</p>
+                        <p class="intro" th:unless="${#strings.isEmpty(cafe.intro)}" th:text="${cafe.intro}"></p>
+                    </div>
+                    <ul class="info-grid">
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">영업시간</span>
+                            <span class="info-grid__value">
                             <!-- 상태 배지 + 시간 -->
                             <span th:if="${openNow != null}"
                                   class=""
                                   th:classappend="${openNow} ? 'status open' : 'status closed'"
-                                  th:text="${openNow} ? '[영업중]' : '[마감]'">영업중</span>
+                                  th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
                             <span th:if="${cafe.openTime != null and cafe.closeTime != null}"
                                   th:text="|${#temporals.format(cafe.openTime,'HH:mm')} ~ ${#temporals.format(cafe.closeTime,'HH:mm')}|">
                                 09:00 ~ 22:00
                             </span>
                         </span>
-                    </li>
+                        </li>
 
-                    <li class="info-grid__row">
-                        <span class="info-grid__label">전화번호</span>
-                        <span class="info-grid__value">
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">전화번호</span>
+                            <span class="info-grid__value">
                             <span th:if="${cafe.phoneNum}" th:text="${cafe.phoneNum}"></span>
                             <span th:unless="${cafe.phoneNum}" class="muted">없음</span>
                         </span>
-                    </li>
+                        </li>
 
-                    <li class="info-grid__row">
-                        <span class="info-grid__label">편의시설</span>
-                        <span class="info-grid__value">
-                         <p class="chip-kw">
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">편의시설</span>
+                            <span class="info-grid__value">
+                            <span class="chip-kw">
                             <strong>주차 </strong>
                             <span th:text="${cafe.parkingYn} ? '가능' : '불가'">가능</span>
-                        </p>
-                    </li>
+                            </span>
+                        </span>
+                        </li>
 
-                    <li class="info-grid__row">
-                        <span class="info-grid__label">웹사이트</span>
-                        <span class="info-grid__value">
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">웹사이트</span>
+                            <span class="info-grid__value">
                             <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
                             <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
                         </span>
-                    </li>
+                        </li>
+                    </ul>
+                </section>
 
+                <aside class="menu-section">
+                    <h3 class="title-2">메뉴 목록</h3>
+                    <ul class="menu-list">
+                        <li class="menu-item" th:each="m : ${menus}">
+                            <span class="menu-name" th:text="${m.name}">메뉴명</span>
+                            <span class="menu-price"
+                                  th:text="${#numbers.formatInteger(m.price,0,'COMMA')} + ' 원'">0 원</span>
+                            <span th:unless="${m.price}" class="muted">메뉴 없음</span>
+                        </li>
+                    </ul>
+                </aside>
+            </div>
 
-                </ul>
-            </section>
         </section>
 
 

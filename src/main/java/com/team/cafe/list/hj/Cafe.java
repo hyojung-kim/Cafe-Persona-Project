@@ -1,6 +1,7 @@
 package com.team.cafe.list.hj;
 
 
+import com.team.cafe.Menu.Menu;
 import com.team.cafe.bookmark.Bookmark;
 import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.keyword.hj.CafeKeyword;
@@ -129,6 +130,11 @@ public class Cafe extends BaseEntity {
     private List<CafeKeyword> cafeKeywords = new ArrayList<>();
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Comment("카페이미지 목록")
     private List<CafeImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Comment("메뉴 목록")
+    private List<Menu> Menu = new ArrayList<>();
 
 }

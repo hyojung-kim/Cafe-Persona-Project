@@ -216,6 +216,14 @@ a:hover {
   color: #555;
 }
 
+.section-aside{
+    display: grid;
+    grid-template-columns: 1fr 400px; /* 왼쪽=소개, 오른쪽=메뉴 */
+    gap: 2rem;
+}
+
+
+
 /* ===============================
    정보 그리드
    =============================== */
@@ -289,4 +297,31 @@ a:hover {
   background: #fff2e6;
   color: #d35400;
   border-color: #f5c89e;
+}
+
+
+/* ===============================
+    메뉴 섹션
+   =============================== */
+
+.menu-section {
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding: 1rem;
+    max-height: 260px;
+    overflow-y: auto;
+    margin-right: 20px; /* 오른쪽에만 8px 여백 */
+}
+.menu-list{
+    list-style:
+    none;margin:0;
+    padding:0.5rem;
+    margin:0.5rem;
+
+}
+.menu-name{
+    display:inline-block;
+    margin-right: 0.2rem;
+    margin-bottom: 1rem;
 }

@@ -1,5 +1,7 @@
 package com.team.cafe.list.hj;
 
+import com.team.cafe.Menu.Menu;
+import com.team.cafe.Menu.MenuService;
 import com.team.cafe.bookmark.BookmarkService;
 import com.team.cafe.bookmark.LikeBookmarkFacade;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
@@ -48,6 +50,7 @@ public class CafeListController {
     private final LikeBookmarkFacade likeBookmarkFacade;
     private final BookmarkService bookmarkService;
     private final KeywordService keywordService;
+    private final MenuService menuService;
 
     @Value("{kakao.api.key}")
     private String kakaoApiKey;
@@ -126,7 +129,7 @@ public class CafeListController {
         //Cafe cafe = cafeListService.getById(cafeId);
         Cafe cafe = cafeImageService.getDetailImg(cafeId);
         List<KeywordRow> detailKeyword = keywordService.findKeywordRowsByCafeId(cafeId);
-
+        List<Menu> menus = menuService.findForDetail(cafeId);
         boolean bookmarked = false;
 
         cafeListService.increaseViewOncePerSession(cafeId, session);
@@ -163,6 +166,7 @@ public class CafeListController {
         model.addAttribute("openNow", openNow);
         model.addAttribute("bookmarked", bookmarked);
         model.addAttribute("detailKeyword", detailKeyword);
+        model.addAttribute("menus", menus);
 
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
