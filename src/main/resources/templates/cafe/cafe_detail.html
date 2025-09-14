@@ -69,11 +69,8 @@
 
             <!-- 소개 문단 -->
             <div class="store__intro">
-                <p>
-                    <!-- 가게 소개 텍스트 -->
-                    <!-- th:text="${store.description}" -->
-                    카페 소개글 입니다.
-                </p>
+                <p class="intro" th:if="${#strings.isEmpty(cafe.intro)}">등록된 소개글이 없습니다.</p>
+                <p class="intro" th:unless="${#strings.isEmpty(cafe.intro)}" th:text="${cafe.intro}"></p>
             </div>
 
             <!-- 정보 그리드 -->

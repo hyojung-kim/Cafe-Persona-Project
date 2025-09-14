@@ -81,6 +81,11 @@ public class Cafe extends BaseEntity {
     @Comment("조회 수")
     private int hitCount;
 
+    @Lob
+    @Column(name = "intro", columnDefinition = "TEXT")
+    @Comment("카페 소개글")
+    private String intro;
+
 //    @Column(name = "like_count", nullable = false)
 //    @Comment("좋아요 수")
 //    private int likeCount;
