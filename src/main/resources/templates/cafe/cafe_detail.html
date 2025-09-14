@@ -9,70 +9,122 @@
         <section class="hero" aria-labelledby="cafeTitle">
             <!-- 이미지 -->
             <div class="hero__imgwrap">
-                <img class="hero__img" src="/img/placeholder_cafe.jpg" alt="대표 이미지">
+                <img class="hero__img" th:each="img : ${cafe.images}" th:src="${img.imgUrl}" alt="이미지">
             </div>
 
             <!-- 정보 카드 -->
             <article class="card">
-
-                <h1 class="title" id="cafeTitle">카페명</h1>
-                <p class="subtitle">카페 한 줄 소개</p>
+                <div>
+                      <span class="title" id="cafeTitle" th:text="${cafe.name}"></span>
+                      <span th:if="${openNow != null}"
+                          class=""
+                          th:classappend="${openNow} ? 'status open' : 'status closed'"
+                          th:text="${openNow} ? '[영업중]' : '[마감]'">영업중</span>
+                </div>
+                <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
+                <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
 
                 <div class="stats">
-                    <span class="stat">★ 4.5</span>
-                    <span class="stat">리뷰 0</span>
-                    <span class="stat">조회 0</span>
-                    <div class="actions">
-
-                        <button class="btn btn--save" type="button">북마크 저장</button>
+                    <span class="stat" th:text="|★ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
+                    <span class="stat" th:text="|리뷰 ${reviewCount}|">리뷰 0</span>
+                    <span class="stat" th:text="|조회 ${cafe.hitCount}"|>조회 0</span>
+                    <div id="likeBox"
+                         th:data-cafe-id="${cafe.id}"
+                         th:data-liked="${liked}">
+                        <button id="likeBtn" type="button" aria-label="좋아요 토글">
+                            <span class="label-liked" th:if="${liked}">
+                                <i class="fa-solid fa-bookmark" id="activeBookmark"></i>
+                            </span>
+                            <span class="label-unliked" th:if="${!liked}">
+                                <i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i>
+                            </span>
+                        </button>
+                        <span>
+                            북마크 저장 : <b id="likeCount" th:text="${likeCount}">0</b>
+                        </span>
                     </div>
                 </div>
-
-                <div class="chips">
-                    <span class="chip chip--accent">합리적인</span>
-                    <span class="chip">예약 가능</span>
+                <div class="info-grid__row">
+                    <div class="title-2">주소</div>
+                    <span class="info-grid__value">
+                        <span class="link" th:text="${cafe.address1}"></span>
+                    </span>
                 </div>
+                <div class="chips">
+                    <div class="title-2" id="">현재 카페의 키워드</div>
+                    <span class="chip-kw" th:each="k : ${detailKeyword}" th:text="${k.name}">합리적인</span>
+                </div>
+                <span th:if="${#lists.isEmpty(detailKeyword)}" class="chip--empty">
+                    등록된 키워드가 없습니다.
+                </span>
             </article>
         </section>
 
-        <!-- ===== 매장 소개 ===== -->
-        <section class="section" aria-labelledby="introTitle">
-            <h2 class="section__title" id="introTitle">매장 소개</h2>
+        <!-- ===== 카페 소개 ===== -->
+        <section class="store" aria-labelledby="storeTitle">
+            <!-- 제목 -->
+            <header class="store__header">
+                <h2 id="storeTitle" class="store__title">카페 소개</h2>
+            </header>
 
-            <div class="info-grid">
-                <dl class="kv">
-                    <dt>영업시간</dt>
-                    <dd>09:00 ~ 22:00 <span class="close">CLOSE</span></dd>
-                </dl>
-                <dl class="kv">
-                    <dt>전화번호</dt>
-                    <dd><span href="tel:02-0000-0000">02-0000-0000</span></dd>
-                </dl>
-                <dl class="kv full">
-                    <dt>주소</dt>
-                    <dd>서울특별시 강남구 도로명 주소 11 <a href="#">지도보기</a></dd>
-                </dl>
-                <dl class="kv">
-                    <dt>웹사이트</dt>
-                    <dd>없음</dd>
-                </dl>
-                <dl class="kv">
-                    <dt>편의시설</dt>
-                    <dd>
-                        <span class="chip">주차 가능</span>
-                    </dd>
-                </dl>
+            <!-- 소개 문단 -->
+            <div class="store__intro">
+                <p>
+                    <!-- 가게 소개 텍스트 -->
+                    <!-- th:text="${store.description}" -->
+                    카페 소개글 입니다.
+                </p>
             </div>
+
+            <!-- 정보 그리드 -->
+            <section class="store__info" aria-label="기본 정보">
+                <ul class="info-grid">
+                    <li class="info-grid__row">
+                        <span class="info-grid__label">영업시간</span>
+                        <span class="info-grid__value">
+                            <!-- 상태 배지 + 시간 -->
+                            <span th:if="${openNow != null}"
+                                  class=""
+                                  th:classappend="${openNow} ? 'status open' : 'status closed'"
+                                  th:text="${openNow} ? '[영업중]' : '[마감]'">영업중</span>
+                            <span th:if="${cafe.openTime != null and cafe.closeTime != null}"
+                                  th:text="|${#temporals.format(cafe.openTime,'HH:mm')} ~ ${#temporals.format(cafe.closeTime,'HH:mm')}|">
+                                09:00 ~ 22:00
+                            </span>
+                        </span>
+                    </li>
+
+                    <li class="info-grid__row">
+                        <span class="info-grid__label">전화번호</span>
+                        <span class="info-grid__value">
+                            <span th:if="${cafe.phoneNum}" th:text="${cafe.phoneNum}"></span>
+                            <span th:unless="${cafe.phoneNum}" class="muted">없음</span>
+                        </span>
+                    </li>
+
+                    <li class="info-grid__row">
+                        <span class="info-grid__label">편의시설</span>
+                        <span class="info-grid__value">
+                         <p class="chip-kw">
+                            <strong>주차 </strong>
+                            <span th:text="${cafe.parkingYn} ? '가능' : '불가'">가능</span>
+                        </p>
+                    </li>
+
+                    <li class="info-grid__row">
+                        <span class="info-grid__label">웹사이트</span>
+                        <span class="info-grid__value">
+                            <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
+                            <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
+                        </span>
+                    </li>
+
+
+                </ul>
+            </section>
         </section>
 
-        <!-- ===== 이미지 갤러리 ===== -->
-        <section class="section" aria-labelledby="galTitle">
-            <h2 class="section__title" id="galTitle">사진</h2>
-            <div class="gallery">
-                <img src="/img/placeholder_cafe.jpg" alt="이미지" class="thumb">
-                <img src="/img/placeholder_cafe.jpg" alt="이미지" class="thumb">
-            </div>
-        </section>
+
 
     </main>
 
