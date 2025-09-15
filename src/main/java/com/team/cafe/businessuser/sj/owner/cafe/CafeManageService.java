@@ -8,15 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-/**
- * 사업장(카페) 관리 서비스
- * - 사업장 생성(createBusiness)
- * - 프로필 저장(saveProfile)
- *
- * 주의:
- *  - Business 엔티티에 createdAt/updatedAt은 @PrePersist/@PreUpdate로 자동 세팅되도록 구성되어 있어야 합니다.
- *  - BusinessRepository에 findByUserId, existsByUserId, existsByBusinessNumber, findByBusinessNumber 메서드가 필요합니다.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -25,98 +16,93 @@ public class CafeManageService {
     private final BusinessUserRepository businessUserRepository;
 
     /**
-     * 사업장 신규 등록
+     * 사업장 정보 저장(업서트)
+     * - 사업자 회원가입 시 이미 생성된 BusinessUser row를 찾아 필드를 채워넣습니다.
+     * - 없다면(비정상 케이스) 새로 만들어 붙입니다.
      */
     @Transactional
     public BusinessUser createBusiness(
-            SiteUser user,
-            String companyName,
-            String businessNumber,
-            String representativeName,
-            String representativeEmail,
-            String representativePhone,
-            String address,
-            String description
+                                        SiteUser user,
+                                        String companyName,
+                                        String businessNumber,
+                                        String representativeName,
+                                        String representativeEmail,
+                                        String representativePhone,
+                                        String address,
+                                        String description
     ) {
-        // 사용자당 1개 제한(원치 않으면 제거)
-        if (businessUserRepository.existsByUserId(user.getId())) {
-            throw new IllegalStateException("이미 등록된 사업장이 있습니다.");
+        // ✅ 기존 row 가져오기 (정상 케이스: 가입 시 이미 1줄 존재)
+        BusinessUser bu = businessUserRepository.findByUserId(user.getId())
+                .orElseGet(() -> {
+                    BusinessUser nb = new BusinessUser();
+                    nb.setUser(user);
+                    return nb;
+                });
+
+        // ✅ 사업자번호 중복 체크 (자기 자신 제외)
+        if (businessNumber != null && !businessNumber.isBlank()) {
+            Optional<BusinessUser> existing = businessUserRepository.findByBusinessNumber(businessNumber);
+            if (existing.isPresent() && (bu.getId() == null || !existing.get().getId().equals(bu.getId()))) {
+                throw new DuplicateBusinessNumberException("중복 사업자번호: " + businessNumber);
+            }
         }
 
-        // 사업자번호 중복
-        if (businessNumber != null && !businessNumber.isBlank()
-                && businessUserRepository.existsByBusinessNumber(businessNumber)) {
-            throw new DuplicateBusinessNumberException("중복 사업자번호: " + businessNumber);
-        }
+        // ✅ 필드 채우기(업데이트)
+        if (companyName != null)           bu.setCompanyName(companyName);
+        if (businessNumber != null)        bu.setBusinessNumber(businessNumber);
+        if (representativeName != null)    bu.setRepresentativeName(representativeName);
+        if (representativeEmail != null)   bu.setRepresentativeEmail(representativeEmail);
+        if (representativePhone != null)   bu.setRepresentativePhone(representativePhone);
+        if (address != null)               bu.setAddress(address);
+        if (description != null)           bu.setDescription(description); // 엔티티에 description 필드 있어야 함
 
-        BusinessUser b = new BusinessUser();
-        b.setUser(user);
-        b.setCompanyName(companyName);
-        b.setBusinessNumber(businessNumber);
-        b.setRepresentativeName(representativeName);
-        b.setRepresentativeEmail(representativeEmail);
-        b.setRepresentativePhone(representativePhone);
-        b.setAddress(address);
-        b.setDescription(description);
-
-        return businessUserRepository.save(b);
+        return businessUserRepository.save(bu);
     }
 
     /**
-     * 사업장 프로필 저장/수정
-     *
-     * 주의: Business 엔티티에 website/instagram/phone/wifi/outlet/parking 필드가 없다면
-     *       현재 메서드는 해당 파라미터를 "받기만" 하며 사용하지 않습니다(컴파일 에러 방지).
-     *       실제로 저장하려면 Business 엔티티에 필드를 추가하고 setter를 호출하도록 확장하세요.
+     * (선택) 분리된 프로필 저장 메서드 – 엔티티에 해당 필드가 있을 때만 사용
      */
     @Transactional
     public BusinessUser saveProfile(
             SiteUser user,
             String companyName,
             String address,
-            String phone,        // (엔티티에 없으면 미사용)
-            String website,      // (엔티티에 없으면 미사용)
-            String instagram,    // (엔티티에 없으면 미사용)
+            String phone,        // 엔티티에 없으면 사용 X
+            String website,      // 엔티티에 없으면 사용 X
+            String instagram,    // 엔티티에 없으면 사용 X
             String description,
-            boolean wifi,        // (엔티티에 없으면 미사용)
-            boolean outlet,      // (엔티티에 없으면 미사용)
-            boolean parking,     // (엔티티에 없으면 미사용)
+            boolean wifi,        // 엔티티에 없으면 사용 X
+            boolean outlet,      // 엔티티에 없으면 사용 X
+            boolean parking,     // 엔티티에 없으면 사용 X
             String businessNumber,
             String representativeName,
             String representativeEmail
     ) {
-        BusinessUser biz = businessUserRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    // 없으면 새로 생성(원치 않으면 예외로 변경)
-                    BusinessUser nb = new BusinessUser();
-                    nb.setUser(user);
-                    return nb;
-                });
+        BusinessUser bu = businessUserRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalStateException("사업자 회원 정보가 없습니다."));
 
-        // 사업자번호 중복 체크(자기 자신 제외)
         if (businessNumber != null && !businessNumber.isBlank()) {
             Optional<BusinessUser> existing = businessUserRepository.findByBusinessNumber(businessNumber);
-            if (existing.isPresent() && (biz.getId() == null || !existing.get().getId().equals(biz.getId()))) {
+            if (existing.isPresent() && !existing.get().getId().equals(bu.getId())) {
                 throw new DuplicateBusinessNumberException("중복 사업자번호: " + businessNumber);
             }
         }
 
-        // 기본 정보 반영
-        if (companyName != null) biz.setCompanyName(companyName);
-        if (address != null) biz.setAddress(address);
-        if (description != null) biz.setDescription(description);
-        if (representativeName != null) biz.setRepresentativeName(representativeName);
-        if (representativeEmail != null) biz.setRepresentativeEmail(representativeEmail);
-        if (businessNumber != null) biz.setBusinessNumber(businessNumber);
+        if (companyName != null)         bu.setCompanyName(companyName);
+        if (address != null)             bu.setAddress(address);
+        if (description != null)         bu.setDescription(description);
+        if (representativeName != null)  bu.setRepresentativeName(representativeName);
+        if (representativeEmail != null) bu.setRepresentativeEmail(representativeEmail);
+        if (businessNumber != null)      bu.setBusinessNumber(businessNumber);
 
-        // 참고: 아래 값들은 엔티티에 필드가 없다면 주석 해제 전 필드 추가/매핑 필요
-        // if (phone != null) biz.setPhone(phone);
-        // if (website != null) biz.setWebsite(website);
-        // if (instagram != null) biz.setInstagram(instagram);
-        // biz.setWifi(wifi);
-        // biz.setOutlet(outlet);
-        // biz.setParking(parking);
+        // 아래는 엔티티에 필드 추가 후 사용
+        // if (phone != null) bu.setPhone(phone);
+        // if (website != null) bu.setWebsite(website);
+        // if (instagram != null) bu.setInstagram(instagram);
+        // bu.setWifi(wifi);
+        // bu.setOutlet(outlet);
+        // bu.setParking(parking);
 
-        return businessUserRepository.save(biz);
+        return businessUserRepository.save(bu);
     }
 }

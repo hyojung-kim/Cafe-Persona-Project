@@ -5,6 +5,9 @@ import com.team.cafe.review.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -43,5 +46,6 @@ public class CafeImage extends BaseEntity {
 //    @CreationTimestamp
 //    @Column(name = "created_at", nullable = false, updatable = false)
 //    private LocalDateTime createdAt;     // 등록 시각
+
 
 }
