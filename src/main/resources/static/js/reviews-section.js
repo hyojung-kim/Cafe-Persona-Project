@@ -14,7 +14,10 @@
         var wrap = document.createElement('div');
         wrap.innerHTML = html;
         var next = wrap.querySelector('#reviewsSection');
-        if (next) box.replaceWith(next);
+        if (next) {
+          box.replaceWith(next);
+          box = next;
+        }
       })
       .catch(function () {
         box.innerHTML = '<div class="card-body"><p class="text-danger m-0">리뷰를 불러오지 못했습니다.</p></div>';
@@ -30,4 +33,15 @@
     e.preventDefault();
     load(href);
   });
+
+  // 검색 폼 처리
+  var searchForm = document.getElementById('reviewSearchForm');
+  if (searchForm) {
+    searchForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var action = searchForm.getAttribute('action');
+      var params = new URLSearchParams(new FormData(searchForm));
+      load(action + '/section?' + params.toString());
+    });
+  }
 })();

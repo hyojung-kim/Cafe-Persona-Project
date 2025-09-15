@@ -10,7 +10,7 @@
 .rev-form { display:grid; gap:12px; }
 .rev-row { display:grid; gap:6px; }
 .rev-label { font-weight:600; }
-.rev-input, .rev-textarea { width:100%; border:1px solid var(--bd); border-radius:10px; padding:10px 12px; }
+.rev-input, .rev-textarea { width:100%; border:1px solid var(--bd); border-radius:10px; padding:10px 6px; }
 .rev-textarea { min-height:320px; line-height:3.2; resize:vertical; }
 .rev-error { color:#b91c1c; font-size:13px; }
 .rev-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
@@ -45,13 +45,18 @@
   color: var(--muted);
   font-size: 0.875rem;
 }
+
+/* 정렬 버튼 */
+.review-sort-group .btn.active {
+  color: #fff;
+}
 .rev-img-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; }
 @media (max-width:600px){ .rev-img-grid{ grid-template-columns:repeat(3, 1fr);} }
 
 .rate {
   display: inline-block;
   border: 0;
-  margin-right: 15px;
+  margin-right: 5px;
 }
 
 .rate > input {
@@ -92,6 +97,13 @@
   color: #f73c32 !important;
 }
 
+/* 리뷰 등록 버튼 크기/위치 조정 */
+.review-submit-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  width: 46px;
+}
+
 /* read-only display */
 .rate.read-only {
   pointer-events: none;
@@ -99,4 +111,58 @@
 
 .rate.read-only > label:before {
   cursor: default;
+}
+
+/* 상단 요약 슬라이더 */
+.review-image-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.review-image-slider .slider-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.review-image-slider .slide {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  padding: 0 4px;
+}
+
+.review-image-slider .review-image {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+}
+
+.review-image-slider .slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  padding: 0.25rem 0.5rem;
+}
+
+.review-image-slider .prev-btn {
+  left: 0;
+}
+
+.review-image-slider .next-btn {
+  right: 0;
+}
+
+.review-search-section {
+    height: 70%;
+}
+
+.review-search-input {
+    font-size: 16px;
+}
+
+.review-search-btn {
+    writing-mode: horizontal-tb;
+    white-space: nowrap;
 }

@@ -69,7 +69,16 @@
 
   <section class="card shadow-sm mb-3">
     <div class="card-body">
+      <h4>리뷰 내용</h4>
       <p class="mb-0" th:text="${review.content}">-</p>
+    </div>
+    <div class="card-body text-end">
+      <a class="btn btn-sm btn-primary" th:href="@{|/cafes/${review.cafe.id}/reviews|}">목록</a>
+      <a th:if="${canEdit}" class="btn btn-sm btn-secondary ms-1" th:href="@{|/reviews/${review.id}/edit|}">수정</a>
+      <form th:if="${canEdit}" th:action="@{|/reviews/${review.id}/delete|}" method="post" class="d-inline ms-1" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+      </form>
     </div>
   </section>
 
@@ -89,16 +98,6 @@
     </div>
   </section>
 
-  <section class="card shadow-sm">
-    <div class="card-body text-end">
-      <a class="btn btn-sm btn-primary" th:href="@{|/cafes/${review.cafe.id}/reviews|}">목록</a>
-      <a th:if="${canEdit}" class="btn btn-sm btn-secondary ms-1" th:href="@{|/reviews/${review.id}/edit|}">수정</a>
-      <form th:if="${canEdit}" th:action="@{|/reviews/${review.id}/delete|}" method="post" class="d-inline ms-1" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <button type="submit" class="btn btn-sm btn-danger">삭제</button>
-      </form>
-    </div>
-  </section>
 
   <!-- ★ 방어 스크립트: 빈/잘못된 script/link를 실시간 제거하고 원인 로그 출력 -->
 
