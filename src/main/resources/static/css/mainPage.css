@@ -291,7 +291,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: rgba(75,58,49,0.70); /* deep 70% */
+  color: rgba(75,58,49,0.80); /* deep 70% */
   font-size: 12px;
 }
 .hotcard__views {
