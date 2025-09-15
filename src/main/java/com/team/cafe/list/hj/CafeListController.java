@@ -243,28 +243,4 @@ public class CafeListController {
                 "bookmarked", likedNow   // 정책상 보장됨(OFF도 유지 정책이면 exists 쿼리로 반환)
         ));
     }
-
-    // 리뷰 목록 프래그먼트 (HTML 조각만 반환)
-    @GetMapping(value = "/detail/{cafeId}/reviews/section", produces = MediaType.TEXT_HTML_VALUE)
-    public String reviewsSection(@PathVariable Long cafeId,
-                                 @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
-                                 @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
-                                 Model model) {
-
-        Cafe cafe = cafeListService.getById(cafeId);
-        double avgRating = cafeListService.getActiveAverageRating(cafeId);
-        long reviewCount = cafeListService.getActiveReviewCount(cafeId);
-
-        Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
-
-        model.addAttribute("cafe", cafe);
-        model.addAttribute("avgRating", avgRating);
-        model.addAttribute("reviewCount", reviewCount);
-        model.addAttribute("reviews", reviews);
-
-        // 템플릿 선택: 프로젝트에 있는 프래그먼트로 바꿔도 됨
-        // return "review/list :: section";
-        return "cafe/reviews_section :: reviews_section";
-    }
 }
