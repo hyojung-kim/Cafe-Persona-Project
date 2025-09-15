@@ -15,4 +15,9 @@ public class KeywordService {
     public List<Keyword> findAllOrderByTypeAndName() {
         return keywordRepository.findAllByOrderByTypeAscNameAsc();
     }
+
+
+    public List<KeywordRow> findKeywordRowsByCafeId(Long cafeId) {
+        return keywordRepository.findKeywordRowsByCafeId(cafeId);
+    }
 }

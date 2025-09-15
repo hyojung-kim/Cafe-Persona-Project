@@ -1,14 +1,18 @@
 package com.team.cafe.list.hj;
 
+import com.team.cafe.Menu.Menu;
+import com.team.cafe.Menu.MenuService;
 import com.team.cafe.bookmark.BookmarkService;
 import com.team.cafe.bookmark.LikeBookmarkFacade;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.keyword.hj.Keyword;
+import com.team.cafe.keyword.hj.KeywordRow;
 import com.team.cafe.keyword.hj.KeywordService;
 import com.team.cafe.keyword.hj.KeywordType;
 import com.team.cafe.like.CafeLikeCount;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.dto.CafeWithRating;
 import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
@@ -47,6 +51,7 @@ public class CafeListController {
     private final LikeBookmarkFacade likeBookmarkFacade;
     private final BookmarkService bookmarkService;
     private final KeywordService keywordService;
+    private final MenuService menuService;
     // hy 추가
     private final ReviewRepository reviewRepository;
 
@@ -84,13 +89,18 @@ public class CafeListController {
         // 좋아요 갯수 ids로 가져오기
         List<CafeLikeCount> likeCount = likeService.findLikeCountsByCafeIds(ids);
         // 별점평균 갸져오기 ids로
-        List<CafeLikeCount> ratingAvg = likeService.findLikeCountsByCafeIds(ids);
+        List<CafeWithRating> ratingAvg = cafeListService.getCafesWithAvgRating(ids);
+
         //map으로 리턴
         Map<Long, Long> likeCountMap = likeCount.stream()
                 .collect(Collectors.toMap(CafeLikeCount::getCafeId, CafeLikeCount::getCnt));
 
-
-
+        //map으로 리턴
+        Map<Long, Double> ratingAvgMap = ratingAvg.stream()
+                .collect(Collectors.toMap(
+                        CafeWithRating::getId,
+                        r -> r.getAvgRating() != null ? r.getAvgRating() : 0.0
+                ));
 
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
@@ -101,6 +111,7 @@ public class CafeListController {
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
         model.addAttribute("likeCountMap", likeCountMap);
+        model.addAttribute("ratingAvgMap", ratingAvgMap);
         //키워드 모델
         model.addAttribute("keywordsByType", keywordsByType);
         model.addAttribute("selectedKeys", keyList);
@@ -115,11 +126,15 @@ public class CafeListController {
     public String detail(@PathVariable Long cafeId,
                          @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
                          @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
+                         @RequestParam(name = "sort", required = false, defaultValue = "createdAt") String sort,
                          Principal principal,
                          HttpSession session,
                          Model model) {
-
-        Cafe cafe = cafeListService.getById(cafeId);
+        //기존코드 주석
+        //Cafe cafe = cafeListService.getById(cafeId);
+        Cafe cafe = cafeImageService.getDetailImg(cafeId);
+        List<KeywordRow> detailKeyword = keywordService.findKeywordRowsByCafeId(cafeId);
+        List<Menu> menus = menuService.findForDetail(cafeId);
         boolean bookmarked = false;
 
         cafeListService.increaseViewOncePerSession(cafeId, session);
@@ -137,6 +152,7 @@ public class CafeListController {
             bookmarked = bookmarkService.existsByUser_IdAndCafe_Id(loginUser.getId(), cafeId);
          
         }
+
         
         long likeCount = likeService.getLikeCount(cafeId);
         boolean openNow = cafeListService.isOpenNow(cafe);
@@ -149,19 +165,30 @@ public class CafeListController {
         Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
-        // 최신 리뷰 3개 hy
-        List<Review> latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+        // 최신 리뷰 4개 hy
+        List<Review> latestReviews;
 
+        if ("hit".equals(sort)) {
+            // 인기순
+            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(cafeId);
+        } else {
+            // 최신순 (기본값)
+            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+        }
         // 콘솔에서 리뷰 개수 확인 hy
         System.out.println("리뷰 개수: " + latestReviews.size());
         // 콘솔에서 현재 카페 id 확인 hy
         System.out.println("현재 카페 ID: " + cafeId);
+        // 콘솔 확인용 hy
+        System.out.println("sort 파라미터: " + sort);
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("liked", liked);
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("openNow", openNow);
         model.addAttribute("bookmarked", bookmarked);
+        model.addAttribute("detailKeyword", detailKeyword);
+        model.addAttribute("menus", menus);
 
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -172,8 +199,11 @@ public class CafeListController {
         // 템플릿에서 ${reviews}로 사용
         model.addAttribute("reviews", reviews);
 
+
+
         // 템플릿에서 ${latestReviews}로 사용 hy
         model.addAttribute("latestReviews", latestReviews);
+        model.addAttribute("sort", sort);
 
         // 분리한 템플릿 경로와 일치
         return "cafe/cafe_detail";
@@ -212,29 +242,5 @@ public class CafeListController {
                 "liked", likedNow,
                 "bookmarked", likedNow   // 정책상 보장됨(OFF도 유지 정책이면 exists 쿼리로 반환)
         ));
-    }
-
-    // 리뷰 목록 프래그먼트 (HTML 조각만 반환)
-    @GetMapping(value = "/detail/{cafeId}/reviews/section", produces = MediaType.TEXT_HTML_VALUE)
-    public String reviewsSection(@PathVariable Long cafeId,
-                                 @RequestParam(name = "rpage", defaultValue = "0") int reviewPage,
-                                 @RequestParam(name = "rsize", defaultValue = "5") int reviewSize,
-                                 Model model) {
-
-        Cafe cafe = cafeListService.getById(cafeId);
-        double avgRating = cafeListService.getActiveAverageRating(cafeId);
-        long reviewCount = cafeListService.getActiveReviewCount(cafeId);
-
-        Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
-
-        model.addAttribute("cafe", cafe);
-        model.addAttribute("avgRating", avgRating);
-        model.addAttribute("reviewCount", reviewCount);
-        model.addAttribute("reviews", reviews);
-
-        // 템플릿 선택: 프로젝트에 있는 프래그먼트로 바꿔도 됨
-        // return "review/list :: section";
-        return "cafe/reviews_section :: reviews_section";
     }
 }

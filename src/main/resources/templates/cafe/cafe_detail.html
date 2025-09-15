@@ -1,93 +1,405 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/cafe_detail_con1.css}">
+
+    <head>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    </head>
+    <style>
+        /* 리뷰 전체 컨테이너 */
+        .review-summary .review-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(200px, 38%));
+            /* 2열 그리드 */
+            justify-content: center;
+            gap: 20px;
+            /* 리뷰 아이템 간 간격 */
+            margin-top: 16px;
+            margin-bottom: 8px;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed #833C0D;
+            background-color: #EDE9E8;
+            padding-top: 30px;
+            position: relative;
+            font-family: 'Noto Sans KR'
+        }
+
+        .review-subject {
+            position: absolute;
+            margin-top: 5px;
+            left: 20px;
+            background-color: #EDE9E8;
+            padding: 0 8px;
+            font-weight: bold;
+            color: #654429;
+            font-size: 16px;
+            z-index: 1;
+            /* 다른 요소 위에 올라오도록 */
+        }
+
+        /* 각 리뷰 아이템 */
+        .review-item {
+            background-color: #E5D9CB;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #BC9073;
+            justify-content: space-between;
+            min-height: 100px;
+            /*  max-height: 100px; 고정 높이 */
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* 리뷰 아이템 내부의 Flex 컨테이너 */
+        .review-item-inner {
+            display: flex;
+            flex-direction: row;
+            /* 가로 방향으로 배치 */
+            flex-grow: 1;
+            /* 부모(.review-item)의 남은 공간을 모두 차지 */
+            align-items: flex-start;
+        }
+
+        /* 사진 플레이스홀더 */
+        .review-image-placeholder {
+            /* position: relative; */
+            width: 100px;
+            height: 100px;
+            background-color: #D8A77F;
+            background-image: url("/images/review_no_img.png");
+            background-size: contain;
+            border-radius: 4px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 1px dashed #BF7F50;
+            background-position: center;
+        }
+
+        /* 별점 */
+        /*.review-item div span:first-child {
+            /* 별점 */
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            display: block;
+            font-weight: bold;
+            color: #e68a00;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }*/
+
+        /* 리뷰 내용 */
+        .review-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .review-content-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 리뷰 아이템 내부의 상세 내용 (ex: 작성자, 날짜 등) */
+        .review-item-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        /* 더보기 버튼 */
+        .more-reviews-button {
+            display: block;
+            text-align: right;
+            justify-content: center;
+            width: 20%
+                /* 부모 컨테이너 너비 */
+                margin-top: 20px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #9A887B;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .more-reviews-button:hover {
+            background-color: #55453C;
+        }
+
+        /* 필터 드롭다운 스타일 */
+        .filter-bar__sort select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            /* 필터와 리뷰 섹션 간 간격 */
+            cursor: pointer;
+        }
+
+        /* 리뷰 카운트 및 평균 별점 */
+        .review-summary p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .review-summary p span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .review-stars {
+            display: flex;
+            align-items: center; /* 아이콘, 점수 수평 정렬 */
+            gap: 4px;            /* 아이콘 사이 간격 */
+        }
+
+        .review-stars i {
+            font-size: 15px;
+        }
+        .review-score {
+            margin-left: 6px;
+            font-size: 14px;
+            color: #e68a00;
+        }
+
+        .review-content-text {
+            font-size: 16px;
+        }
+    </style>
+
     <!-- 카페명 + 영업상태 -->
-    <h2>
-        <span th:text="${cafe.name}">카페명</span>
+    <main class="container-1">
 
-        <span th:if="${openNow != null}"
-              class=""
-              th:classappend="${openNow} ? ' badge--open' : ' badge--closed'"
-              th:text="${openNow} ? '[영업중]' : '[마감]'">영업중</span>
+        <!-- ===== 헤더: 이미지 + 정보 카드 ===== -->
+        <section class="hero" aria-labelledby="cafeTitle">
+            <!-- 이미지 -->
+            <div class="hero__imgwrap">
+                <img class="hero__img" th:each="img : ${cafe.images}" th:src="${img.imgUrl}" alt="이미지">
+            </div>
 
-        <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
-        <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
-    </h2>
+            <!-- 정보 카드 -->
+            <article class="card">
+                <div>
+                      <span class="title" id="cafeTitle" th:text="${cafe.name}"></span>
+                      <span th:if="${openNow != null}"
+                          class=""
+                          th:classappend="${openNow} ? 'status open' : 'status closed'"
+                          th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
+                </div>
+                <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
+                <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
 
-    <!-- 주소 + 영업시간 -->
-    <p>
-        <strong>주소:</strong>
-        <span th:text="${cafe.address1}">대전 서구 둔산동 101</span>
-        <span th:if="${cafe.address2}" th:text="| ${cafe.address2}|"></span>
-    </p>
+                <div class="stats">
+                    <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
+                    <span class="stat" th:text="|리뷰 ${reviewCount}|">리뷰 0</span>
+                    <span class="stat" th:text="|👁 조회수 ${cafe.hitCount}"|>조회 0</span>
+                    <div id="likeBox"
+                         th:data-cafe-id="${cafe.id}"
+                         th:data-liked="${liked}">
+                        <button id="likeBtn" type="button" aria-label="좋아요 토글">
+                            <span class="label-liked" th:if="${liked}">
+                                <i class="fa-solid fa-bookmark" id="activeBookmark"></i>
+                            </span>
+                            <span class="label-unliked" th:if="${!liked}">
+                                <i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i>
+                            </span>
+                        </button>
+                        <span>
+                            북마크 저장 : <b id="likeCount" th:text="${likeCount}">0</b>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-grid__row">
+                    <div class="title-2">주소</div>
+                    <span class="info-grid__value">
+                        <span class="link" th:text="${cafe.address1}"></span>
+                    </span>
+                </div>
+                <div class="chips">
+                    <div class="title-2" id="">현재 카페의 키워드</div>
+                    <span class="chip-kw" th:each="k : ${detailKeyword}" th:text="${k.name}">합리적인</span>
+                </div>
+                <span th:if="${#lists.isEmpty(detailKeyword)}" class="chip--empty">
+                    등록된 키워드가 없습니다.
+                </span>
+            </article>
+        </section>
 
-    <p>
-        <strong>영업시간:</strong>
-        <span th:if="${cafe.openTime != null and cafe.closeTime != null}"
-              th:text="|${#temporals.format(cafe.openTime,'HH:mm')} ~ ${#temporals.format(cafe.closeTime,'HH:mm')}|">
-          09:00 ~ 22:00
-        </span>
-        <span th:unless="${cafe.openTime != null and cafe.closeTime != null}" class="muted">미등록</span>
-    </p>
+        <!-- ===== 카페 소개 ===== -->
+        <section class="store" aria-labelledby="storeTitle">
+            <!-- 제목 -->
+            <header class="store__header">
+                <h2 id="storeTitle" class="store__title">카페 소개</h2>
+            </header>
 
-    <p>
-        <strong>주차:</strong>
-        <span th:text="${cafe.parkingYn} ? '가능' : '불가'">가능</span>
-    </p>
 
-    <!-- URL 링크 -->
-    <p>
-        <strong>웹사이트:</strong>
-        <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
-        <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
-    </p>
+            <div class="section-aside">
+                <!-- 정보 그리드 -->
+                <section class="store__info" aria-label="기본 정보">
+                    <!-- 소개 문단 -->
+                    <div class="store__intro">
+                        <p class="intro" th:if="${#strings.isEmpty(cafe.intro)}">등록된 소개글이 없습니다.</p>
+                        <p class="intro" th:unless="${#strings.isEmpty(cafe.intro)}" th:text="${cafe.intro}"></p>
+                    </div>
+                    <ul class="info-grid">
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">영업시간</span>
+                            <span class="info-grid__value">
+                            <!-- 상태 배지 + 시간 -->
+                            <span th:if="${openNow != null}"
+                                  class=""
+                                  th:classappend="${openNow} ? 'status open' : 'status closed'"
+                                  th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
+                            <span th:if="${cafe.openTime != null and cafe.closeTime != null}"
+                                  th:text="|${#temporals.format(cafe.openTime,'HH:mm')} ~ ${#temporals.format(cafe.closeTime,'HH:mm')}|">
+                                09:00 ~ 22:00
+                            </span>
+                        </span>
+                        </li>
 
-    <span class="muted">조회수: <strong th:text="${cafe.hitCount}">0</strong></span>
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">전화번호</span>
+                            <span class="info-grid__value">
+                            <span th:if="${cafe.phoneNum}" th:text="${cafe.phoneNum}"></span>
+                            <span th:unless="${cafe.phoneNum}" class="muted">없음</span>
+                        </span>
+                        </li>
 
-    <div id="likeBox"
-         th:data-cafe-id="${cafe.id}"
-         th:data-liked="${liked}">
-        <button id="likeBtn" type="button" aria-label="좋아요 토글">
-            <span class="label-liked" th:if="${liked}">♥ 좋아요 취소</span>
-            <span class="label-unliked" th:if="${!liked}">♡ 좋아요</span>
-        </button>
-        <span style="margin-left:8px;">
-            좋아요 수: <b id="likeCount" th:text="${likeCount}">0</b>
-        </span>
-        <span id="bookmark-badge"
-              th:if="${bookmarked}"
-              title="내 북마크에 있음"
-              aria-label="북마크됨">★ 북마크</span>
-    </div>
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">편의시설</span>
+                            <span class="info-grid__value">
+                            <span class="chip-kw">
+                            <strong>주차 </strong>
+                            <span th:text="${cafe.parkingYn} ? '가능' : '불가'">가능</span>
+                            </span>
+                        </span>
+                        </li>
+
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">웹사이트</span>
+                            <span class="info-grid__value">
+                            <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
+                            <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
+                        </span>
+                        </li>
+                    </ul>
+                </section>
+
+                <aside class="menu-section">
+                    <h3 class="title-2">메뉴 목록</h3>
+                    <ul class="menu-list">
+                        <li class="menu-item" th:each="m : ${menus}">
+                            <span class="menu-name" th:text="${m.name}">메뉴명</span>
+                            <span class="menu-price"
+                                  th:text="${#numbers.formatInteger(m.price,0,'COMMA')} + ' 원'">0 원</span>
+                            <span th:unless="${m.price}" class="muted">메뉴 없음</span>
+                        </li>
+                    </ul>
+                </aside>
+            </div>
+
+        </section>
+
+
+
+    </main>
 
     <script src="/js/cafe-like.js"></script>
 
 
-    <!-- mybookmark페이지에서 이동해 왔을 때 뒤로가기 버튼 생성 -->
-    <div th:if="${param.from != null and param.from[0] == 'bookmark'}" style="margin-top: 16px;">
-        <a th:href="@{/mypage/my/bookmark}" class="btn btn-secondary">
-            내 북마크로 돌아가기
-        </a>
-    </div>
     <div style="margin-top:8px;">
         <a class="btn" th:href="@{/cafe/map/{cafeId}(cafeId=${cafe.id})}">카페 위치 보기</a>
     </div>
     <!-- 하단: 리뷰 리스트 페이지로 이동 (스타일 없음) -->
     <!--  기본순 - 최신순 , 인기순 - 리뷰 좋아요 갯수 순  -->
     <div style="margin-top:16px;">
-        <a th:href="@{/cafes/{id}/reviews(id=${cafe.id})}"
-           style="display: block; text-decoration: none; color: inherit;">
-        <div>
-            <!--  총 등록 리뷰수  -->
-            <p>등록된 리뷰 수 : <span th:text="${reviewCount}"></span></p>
-            <p>평균 별점 : <span th:text="${avgRating}"></span></p>
-            <div th:each="review : ${latestReviews}">
-                <span th:text="${review.content}"></span>
-                <span th:text="${review.rating}"></span>
+
+        <div class="review-summary">
+            <!--   소수점 첫째자리까지만  -->
+            <p>평균 별점 :
+                <span>
+        <!-- 채워진 별 -->
+        <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avgRating))}">
+            <i class="fa-solid fa-star"></i>
+        </span>
+
+                    <!-- 반 별 (0.5 이상일 때) -->
+        <span th:if="${avgRating - T(java.lang.Math).floor(avgRating) >= 0.5}">
+            <i class="fa-solid fa-star-half-stroke"></i>
+        </span>
+
+                    <!-- 빈 별 -->
+        <span th:each="i : ${#numbers.sequence( 1, 5 - T(java.lang.Math).floor(avgRating) - (avgRating - T(java.lang.Math).floor(avgRating) >= 0.5 ? 1 : 0)
+        )}">
+            <i class="fa-regular fa-star"></i>
+        </span>
+    </span>
+                <span th:text="${T(java.lang.Math).floor(avgRating * 10) / 10}"></span></p>
+
+            <form th:action="@{/cafe/detail/{id}(id=${cafe.id})}" id="filterForm" method="get"
+                  class="filter-form"></form>
+            <label class="filter-bar__sort">
+                <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
+                    <option value="createdAt" th:selected="${sort} == 'createdAt'">최신순</option>
+                    <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
+                </select>
+            </label>
+
+            <div class="review-container">
+                <div class="review-subject">Review (<span th:text="${reviewCount}"></span>)</div>
+                <a th:each="review : ${latestReviews}"
+                   th:href="@{/cafes/{id}/reviews(id=${cafe.id})}"
+                   class="review-item"
+                   style="display: block; text-decoration: none; color: inherit;">
+
+                    <div class="review-item-inner">
+                        <div class="review-image-placeholder">
+                        </div>
+                        <div class="review-content">
+                            <div class="review-stars">
+                                <!-- 꽉 찬 별 -->
+                                <i class="fa-solid fa-star"
+                                   th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(review.rating))}"></i>
+
+                                <!-- 반 별 -->
+                                <i class="fa-solid fa-star-half-stroke"
+                                   th:if="${review.rating % 1 >= 0.5}"></i>
+
+                                <!-- 빈 별 -->
+                                <i class="fa-regular fa-star"
+                                   th:each="i : ${#numbers.sequence(1, 5 - T(java.lang.Math).floor(review.rating) - (review.rating % 1 >= 0.5 ? 1 : 0))}"></i>
+                                <span class="review-score" th:text="${review.rating}"></span>
+                            </div>
+
+                            <span class="review-content-text" th:text="${review.content}"></span>
+                        </div>
+                    </div>
+                </a>
             </div>
+            <!-- 더보기 버튼 -->
+            <button type="button" class="more-reviews-button"
+                    th:onclick="location.href='/cafes/' + [[${cafe.id}]] + '/reviews'">더보기
+            </button>
         </div>
-        <!-- 더보기 버튼 -->
-        <span>더보기</span>
-        </a>
     </div>
 </div>
 </html>

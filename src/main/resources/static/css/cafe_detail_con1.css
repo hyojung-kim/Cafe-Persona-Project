@@ -1,0 +1,327 @@
+:root {
+  --container-max: 1280px;
+  --gap: 24px;
+  --radius: 30px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
+  --bd: 1px solid #e9ecef;
+  --bg: #fff;
+  --muted: #6b7280;
+  --chip: #f3f4f6;
+  --accent: #10b981;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, "Noto Sans KR", sans-serif;
+  color: #111827;
+  margin: 0 auto;
+}
+.container-1 {
+  max-width: var(--container-max);
+
+}
+
+.hero {
+  display: grid;
+  height : 450px;
+  grid-template-columns: 450px 1fr;
+  gap: var(--gap);
+  background: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+ /* padding: var(--gap);*/
+}
+.hero__imgwrap {
+  border-radius: 20px;
+  border: 3px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c0a89a;
+}
+.hero__img {
+  width: 100%;
+  height: 100%;
+  max-height: 450px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.card {
+  background: var(--bg);
+  border: var(--bd);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.title {
+  display:inline-block;
+  font-size: 2rem;
+  font-weight: 800;
+}
+.title-2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom:0.5rem;
+}
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.status.open {
+  background: #e6f7e6;
+  color: #2e7d32;
+}
+.status.closed {
+  background: #fbeaea;
+  color: #c62828;
+}
+
+
+
+.stats {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #fff;
+  border: var(--bd);
+  border-radius: 999px;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+}
+.btn {
+  border: var(--bd);
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn--save {
+  border-color: #d1fae5;
+  background: #ecfdf5;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chips > div {
+  width:100%;
+  display: block;
+}
+.chip-kw {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.8rem;
+  border-radius: 999px;                 /* 알약 형태 */
+  background: #f7f5f1;                  /* 따뜻한 베이지 */
+  border: 1px solid #e6e1d9;
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05); /* 은은한 그림자 */
+  user-select: none;
+  transition: background .15s ease, border-color .15s ease, transform .04s ease;
+}
+
+.chip--accent {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+
+
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.thumb {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: var(--bd);
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+  .hero__imgwrap {
+    height: 320px;
+  }
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===============================
+   매장소개 섹션
+   =============================== */
+body {
+
+}
+
+h2, h3 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+a {
+  color: #0066cc;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   매장 소개 영역
+   =============================== */
+.store {
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
+
+}
+
+.store__intro {
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.section-aside{
+    display: grid;
+    grid-template-columns: 1fr 400px; /* 왼쪽=소개, 오른쪽=메뉴 */
+    gap: 2rem;
+}
+
+
+
+/* ===============================
+   정보 그리드
+   =============================== */
+.info-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem 2rem;
+  margin: 0;
+  padding: 0px;
+  list-style: none;
+  margin-bottom : 0.8rem;
+}
+
+.info-grid__label {
+  display:inline-block;
+  font-weight: 600;
+  color: #444;
+  margin-bottom:0.5rem;
+}
+
+.info-grid__value {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom:1rem;
+}
+
+/* 상태 배지 */
+.badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+
+/* ===============================
+   키워드 칩
+   =============================== */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  border-radius: 16px;
+  background: #f5f5f5;
+  color: #555;
+  border: 1px solid #ddd;
+  transition: background 0.2s;
+}
+
+.chip:hover {
+  background: #eee;
+}
+
+.chip--ok {
+  background: #e6f7e6;
+  color: #2e7d32;
+  border-color: #b7e1b7;
+}
+
+.chip--warn {
+  background: #fff2e6;
+  color: #d35400;
+  border-color: #f5c89e;
+}
+
+
+/* ===============================
+    메뉴 섹션
+   =============================== */
+
+.menu-section {
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding: 1rem;
+    max-height: 260px;
+    overflow-y: auto;
+    margin-right: 20px; /* 오른쪽에만 8px 여백 */
+}
+.menu-list{
+    list-style:
+    none;margin:0;
+    padding:0.5rem;
+    margin:0.5rem;
+
+}
+.menu-name{
+    display:inline-block;
+    margin-right: 0.2rem;
+    margin-bottom: 1rem;
+}

@@ -1,5 +1,6 @@
 package com.team.cafe.cafeListImg.hj;
 
+import com.team.cafe.list.hj.Cafe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,5 +19,10 @@ public interface CafeImageRepository extends JpaRepository<CafeImage, Long> {
 
     @Query("select count(u) from Cafe c join c.likedUsers u where c.id = :cafeId")
     long countLikes(@Param("cafeId") Long cafeId);
+    List<CafeImage> findAllByCafe_Id(Long cafeId);
+
+
+    @Query("select distinct c from Cafe c left join fetch c.images where c.id = :id")
+    Optional<Cafe> findByIdWithImages(@Param("id") Long id);
 
 }

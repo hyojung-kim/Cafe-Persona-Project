@@ -1,7 +1,9 @@
 package com.team.cafe.list.hj;
 
 
+import com.team.cafe.Menu.Menu;
 import com.team.cafe.bookmark.Bookmark;
+import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.keyword.hj.CafeKeyword;
 import com.team.cafe.review.domain.BaseEntity;
 import com.team.cafe.review.domain.Review;
@@ -80,6 +82,11 @@ public class Cafe extends BaseEntity {
     @Comment("조회 수")
     private int hitCount;
 
+    @Lob
+    @Column(name = "intro", columnDefinition = "TEXT")
+    @Comment("카페 소개글")
+    private String intro;
+
 //    @Column(name = "like_count", nullable = false)
 //    @Comment("좋아요 수")
 //    private int likeCount;
@@ -121,5 +128,13 @@ public class Cafe extends BaseEntity {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Comment("카페 키워드 목록")
     private List<CafeKeyword> cafeKeywords = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Comment("카페이미지 목록")
+    private List<CafeImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Comment("메뉴 목록")
+    private List<Menu> Menu = new ArrayList<>();
 
 }
