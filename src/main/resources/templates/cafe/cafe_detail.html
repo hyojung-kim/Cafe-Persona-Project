@@ -133,7 +133,10 @@
                             </div>
                             <span class="review-content-text" th:text="${review.content}"></span>
 
-<!--                            <span class="review-like-count ms-1" th:text="${likeCountMap[review.id.toString()]}">0</span>-->
+                            <span class="review-liked-icon"
+                                  th:classappend="${likedMap?.get(review.id) == true} ? 'liked' : ''">♡</span>
+                            <span class="review-like-count ms-1" th:text="${likeCountMap?.get(review.id) ?: 0}"></span>
+                            <!--                            <span class="review-like-count ms-1" th:text="${likeCountMap[review.id.toString()]}">0</span>-->
                         </div>
                     </div>
                 </a>

@@ -87,6 +87,18 @@ public class ReviewController {
             meOpt.ifPresent(me -> likedMap.put(rv.getId(), reviewLikeService.isLiked(rv.getId(), me.getId())));
         }
 
+        // 컨트롤러 코드 (디버깅용) hy
+//        Map<Long, Boolean> likedMap = new HashMap<>();
+//        Map<Long, Long> likeCountMap = new HashMap<>();
+//        for (Review rv : reviews.getContent()) {
+//            Long reviewId = rv.getId();
+//            Long likeCount = reviewLikeService.getLikeCount(reviewId);
+//            likeCountMap.put(reviewId, likeCount);
+//            meOpt.ifPresent(me -> likedMap.put(rv.getId(), reviewLikeService.isLiked(rv.getId(), me.getId())));
+//            System.out.println("Review ID: " + reviewId + ", Like Count: " + likeCount); // 디버깅 로그 추가
+//        }
+
+
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -94,7 +106,9 @@ public class ReviewController {
         model.addAttribute("likedMap", likedMap);
         model.addAttribute("likeCountMap", likeCountMap);
 
+
         return "review/list";
+
     }
 
     /* =======================
