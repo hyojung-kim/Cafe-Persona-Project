@@ -23,10 +23,6 @@
             th:object="${form}"
             class="needs-validation" novalidate>
         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <div th:each="img : ${form.imageUrl}">
-          <input type="hidden" name="imageUrl" th:value="${img}"/>
-        </div>
-
         <div class="row g-2">
           <div class="col-12 col-md-2">
             <div class="rate">
@@ -52,9 +48,11 @@
           </div>
         </div>
 
-        <div class="row g-2 mt-1" th:if="${review.images != null && !review.images.isEmpty()}">
-          <div class="col-4" th:each="img : ${review.images}">
-            <img th:src="${img.imageUrl}" alt="review image" class="img-fluid rounded">
+        <div class="row g-2 mt-1" id="existingImageList" th:if="${form.imageUrl != null && !form.imageUrl.isEmpty()}">
+          <div class="col-4 position-relative existing-image" th:each="img : ${form.imageUrl}">
+            <input type="hidden" name="imageUrl" th:value="${img}"/>
+            <img th:src="${img}" alt="review image" class="img-fluid rounded">
+            <button type="button" class="btn-close position-absolute top-0 end-0" aria-label="삭제" onclick="removeExistingImage(this)"></button>
           </div>
         </div>
 
