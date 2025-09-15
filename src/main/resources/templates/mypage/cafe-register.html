@@ -86,23 +86,13 @@
                             <input name="address2" type="text" placeholder="상세 주소" style="margin-top:8px;"
                                    th:value="${biz != null ? biz.address2 : ''}"/>
 
-                            <div style="display:flex; gap:8px; margin-top:8px;">
-                                <input name="district" type="text" placeholder="구/군" style="flex:1"
-                                       th:value="${biz != null ? biz.district : ''}"/>
-                                <input name="city" type="text" placeholder="시/도" style="flex:1"
-                                       th:value="${biz != null ? biz.city : ''}"/>
-                            </div>
+
                         </div>
 
                         <!-- (선택) 위치/영업시간/주차 -->
                         <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                            <input name="lat" type="text" placeholder="위도 (예: 37.1234567)"/>
-                            <input name="lng" type="text" placeholder="경도 (예: 127.1234567)"/>
                             <input name="openTime" type="time" placeholder="영업 시작"/>
                             <input name="closeTime" type="time" placeholder="영업 종료"/>
-                            <label style="grid-column:1 / -1; display:flex; align-items:center; gap:6px;">
-                                <input type="checkbox" name="parkingYn"/> 주차 가능
-                            </label>
                         </div>
 
                         <!-- 사진 등록 (같은 폼에서 전송) -->

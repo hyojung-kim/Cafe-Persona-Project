@@ -17,8 +17,6 @@ public class CafeRegisterRequest {
     private String address2;
     private String district;
     private String city;
-    private BigDecimal lat;
-    private BigDecimal lng;
     private LocalTime openTime;
     private LocalTime closeTime;
     private boolean parkingYn;
