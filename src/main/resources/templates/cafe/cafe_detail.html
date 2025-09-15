@@ -1,6 +1,7 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
     <link rel="stylesheet" th:href="@{/css/cafe_detail_review.css}">
+    <link rel="stylesheet" th:href="@{/css/cafe_detail_con1.css}">
     <head>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     </head>
@@ -153,26 +154,26 @@
     <div style="margin-top:16px;">
 
         <div class="review-summary">
-            <!--   소수점 첫째자리까지만  -->
-            <p>평균 별점 :
-                <span>
-        <!-- 채워진 별 -->
-        <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avgRating))}">
-            <i class="fa-solid fa-star"></i>
-        </span>
+<!--            &lt;!&ndash;   소수점 첫째자리까지만  &ndash;&gt;-->
+<!--            <p>평균 별점 :-->
+<!--                <span>-->
+<!--        &lt;!&ndash; 채워진 별 &ndash;&gt;-->
+<!--        <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avgRating))}">-->
+<!--            <i class="fa-solid fa-star"></i>-->
+<!--        </span>-->
 
-                    <!-- 반 별 (0.5 이상일 때) -->
-        <span th:if="${avgRating - T(java.lang.Math).floor(avgRating) >= 0.5}">
-            <i class="fa-solid fa-star-half-stroke"></i>
-        </span>
+<!--                    &lt;!&ndash; 반 별 (0.5 이상일 때) &ndash;&gt;-->
+<!--        <span th:if="${avgRating - T(java.lang.Math).floor(avgRating) >= 0.5}">-->
+<!--            <i class="fa-solid fa-star-half-stroke"></i>-->
+<!--        </span>-->
 
-                    <!-- 빈 별 -->
-        <span th:each="i : ${#numbers.sequence( 1, 5 - T(java.lang.Math).floor(avgRating) - (avgRating - T(java.lang.Math).floor(avgRating) >= 0.5 ? 1 : 0)
-        )}">
-            <i class="fa-regular fa-star"></i>
-        </span>
-    </span>
-                <span th:text="${T(java.lang.Math).floor(avgRating * 10) / 10}"></span></p>
+<!--                    &lt;!&ndash; 빈 별 &ndash;&gt;-->
+<!--        <span th:each="i : ${#numbers.sequence( 1, 5 - T(java.lang.Math).floor(avgRating) - (avgRating - T(java.lang.Math).floor(avgRating) >= 0.5 ? 1 : 0)-->
+<!--        )}">-->
+<!--            <i class="fa-regular fa-star"></i>-->
+<!--        </span>-->
+<!--    </span>-->
+<!--                <span th:text="${T(java.lang.Math).floor(avgRating * 10) / 10}"></span></p>-->
 
             <form th:action="@{/cafe/detail/{id}(id=${cafe.id})}" id="filterForm" method="get"
                   class="filter-form"></form>
@@ -195,28 +196,24 @@
                         </div>
                         <div class="review-content">
                             <div class="review-stars">
+                                <div class="rating-group">
                                 <!-- 1부터 5까지 반복 -->
                                 <span th:each="i : ${#numbers.sequence(1,5)}">
                                     <!-- 꽉 찬 별 -->
-                                    <i class="fa-solid fa-star"
-                                       th:if="${review.rating >= i}"></i>
-
-                                                                <!-- 반 별 -->
-                                    <i class="fa-solid fa-star-half-stroke"
-                                       th:if="${review.rating >= i - 0.5 and review.rating < i}"></i>
-
-                                                                <!-- 빈 별 -->
-                                    <i class="fa-regular fa-star"
-                                       th:if="${review.rating < i - 0.5}"></i>
+                                    <i class="fa-solid fa-star" th:if="${review.rating >= i}"></i>
+                                    <!-- 반 별 -->
+                                    <i class="fa-solid fa-star-half-stroke" th:if="${review.rating >= i - 0.5 and review.rating < i}"></i>
+                                    <!-- 빈 별 -->
+                                    <i class="fa-regular fa-star" th:if="${review.rating < i - 0.5}"></i>
                                 </span>
                                 <span class="review-score" th:text="${review.rating}"></span>
+                                </div>
+                                <div class="review-likes-info">
+                                    <i class="fa-solid fa-heart" style="color: #eb4747;"></i>
+                                    <span th:text="${likeCountMap.get(review.id)} ?: 0">0</span>
+                                </div>
                             </div>
                             <span class="review-content-text" th:text="${review.content}"></span>
-
-                            <span class="review-liked-icon"
-                                  th:classappend="${likedMap?.get(review.id) == true} ? 'liked' : ''">♡</span>
-                            <span class="review-like-count ms-1" th:text="${likeCountMap?.get(review.id) ?: 0}"></span>
-                            <!--                            <span class="review-like-count ms-1" th:text="${likeCountMap[review.id.toString()]}">0</span>-->
                         </div>
                     </div>
                 </a>

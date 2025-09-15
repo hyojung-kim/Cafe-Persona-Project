@@ -10,15 +10,13 @@
             <input type="text" name="username" id="username" placeholder="ID" class="form-control text-box-id">
             <span class="clear-btn">&times;</span>
         </div>
-        <div class="mb-3 input-with-toggle">
+        <div class="mb-1 input-with-toggle">
             <input type="password" name="password" id="password" placeholder="PASSWORD" class="form-control">
             <i class="bi bi-eye toggle-btn"></i>
-            <div>
-            <small th:if="${param.error}" id="loginConfirmError" class="form-text text-danger d-block">
-                아이디 또는 비밀번호가 일치하지 않습니다.
-            </small>
         </div>
-        </div>
+        <small th:if="${param.error}" id="loginConfirmError" class="form-text text-danger d-block">
+            아이디 또는 비밀번호가 일치하지 않습니다.
+        </small>
 
         <div class="login-btn">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">

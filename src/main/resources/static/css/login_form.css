@@ -20,7 +20,6 @@
             input.form-control {
                 width: 100%;
                 padding: 12px 10px;
-                margin-bottom: 21px;
                 border-radius: 12px;
                 border: 1px solid #ccc;
                 font-size: 16px;
@@ -74,12 +73,13 @@
             .input-with-toggle .toggle-btn {
                 position: absolute;
                 right: 10px;
-                top: 50%;
-                transform: translateY(-90%);
+                top: 50%;                /* 부모 높이 기준으로 */
+                transform: translateY(-50%); /* 정확히 수직 가운데 정렬 */
                 cursor: pointer;
-                font-size: 20px;
+                font-size: 18px;         /* 버튼 크기 조절 */
                 color: #888;
                 display: none;
+                line-height: 1;
             }
 
             /* 로그인 버튼 */
@@ -87,6 +87,7 @@
                 width: 100%;
                 padding: 12px;
                 margin-bottom: 5px;
+                margin-top: 21px;
                 border-radius: 12px;
                 background-color: #9A887B;
                 color: white;/* 와이어프레임 회색 버튼 */

@@ -25,7 +25,7 @@
             padding: 0 8px;
             font-weight: bold;
             color: #654429;
-            font-size: 16px;
+            font-size: 20px;
             z-index: 1;
             /* 다른 요소 위에 올라오도록 */
         }
@@ -159,19 +159,32 @@
 
         .review-stars {
             display: flex;
-            align-items: center; /* 아이콘, 점수 수평 정렬 */
-            gap: 4px;            /* 아이콘 사이 간격 */
+            align-items: center;  /* 아이콘, 점수 수평 정렬 */
+            width: 100%;
+        }
+        .rating-group {
+            display: flex; /* 별점과 점수를 한 줄에 표시 */
+            align-items: center;
+            gap: 4px;
         }
 
         .review-stars i {
             font-size: 15px;
         }
         .review-score {
-            margin-left: 6px;
+            margin-left: 2px;
             font-size: 14px;
             color: #e68a00;
         }
 
         .review-content-text {
             font-size: 16px;
+        }
+        .review-likes-info {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .review-likes-info i {
+            font-size: 15px;
         }
