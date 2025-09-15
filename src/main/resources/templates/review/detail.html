@@ -69,8 +69,20 @@
 
   <section class="card shadow-sm mb-3">
     <div class="card-body">
-      <h4>리뷰 내용</h4>
+      <h5 class = "review-content-head"리뷰 내용</h5>
       <p class="mb-0" th:text="${review.content}">-</p>
+    </div>
+    <div class="card-body">
+      <h5 class = "review-content-head">첨부 이미지</h5>
+      <div id="reviewImageSlider" class="review-image-slider">
+        <div class="slider-track">
+          <div class="slide" th:each="img : ${review.images}">
+            <img th:src="@{${img.imageUrl}}" alt="review image" class="review-image"/>
+          </div>
+        </div>
+        <button class="slider-btn prev-btn" type="button">&#10094;</button>
+        <button class="slider-btn next-btn" type="button">&#10095;</button>
+      </div>
     </div>
     <div class="card-body text-end">
       <a class="btn btn-sm btn-primary" th:href="@{|/cafes/${review.cafe.id}/reviews|}">목록</a>
@@ -84,18 +96,7 @@
 
   <section class="card shadow-sm mb-3"
            th:if="${review.images != null and !#lists.isEmpty(review.images)}">
-    <div class="card-body">
-      <h3 class="h6 mb-3">첨부 이미지</h3>
-      <div id="reviewImageSlider" class="review-image-slider">
-        <div class="slider-track">
-          <div class="slide" th:each="img : ${review.images}">
-            <img th:src="@{${img.imageUrl}}" alt="review image" class="review-image"/>
-          </div>
-        </div>
-        <button class="slider-btn prev-btn" type="button">&#10094;</button>
-        <button class="slider-btn next-btn" type="button">&#10095;</button>
-      </div>
-    </div>
+
   </section>
 
 
