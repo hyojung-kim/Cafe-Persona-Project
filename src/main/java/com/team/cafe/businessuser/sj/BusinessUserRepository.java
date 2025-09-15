@@ -1,5 +1,6 @@
 package com.team.cafe.businessuser.sj;
 
+import com.team.cafe.user.sjhy.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -7,10 +8,14 @@ import java.util.Optional;
 
 @Repository
 public interface BusinessUserRepository extends JpaRepository<BusinessUser, Long> {
-
-    // 사업자번호 중복 체크
+    // 기본
     boolean existsByBusinessNumber(String businessNumber);
-
-    // 대표 이메일 중복 체크 (선택)
     Optional<BusinessUser> findByRepresentativeEmail(String email);
+
+    // 편의 메서드 (서비스에서 쓰는 것만 남기기)
+    Optional<BusinessUser> findByUser(SiteUser user);
+    Optional<BusinessUser> findByUserId(Long userId);
+    boolean existsByUserId(Long userId);
+    Optional<BusinessUser> findByBusinessNumber(String businessNumber);
 }
+

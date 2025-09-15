@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +67,13 @@ public class BusinessUserService {
     // 사업자번호 존재 여부 (BusinessUser 기준)
     public boolean existsByBusinessNumber(String businessNumber) {
         return businessUserRepository.existsByBusinessNumber(businessNumber);
+    }
+
+
+    /** SiteUser → BusinessUser 직접 조회 (컨트롤러에서 SiteUser가 있을 때) */
+    @Transactional(readOnly = true)
+    public Optional<BusinessUser> getMyBusinessByUsername(String username) {
+        return siteUserRepository.findByUsername(username)
+                .flatMap(businessUserRepository::findByUser);
     }
 }

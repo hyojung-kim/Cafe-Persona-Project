@@ -16,8 +16,8 @@ $(function () {
     box.attr('data-liked', liked ? 'true' : 'false');
     btn.html(
       liked
-        ? '<span class="label-liked">♥ 좋아요 취소</span>'
-        : '<span class="label-unliked">♡ 좋아요</span>'
+        ? '<i class="fa-solid fa-bookmark" id="activeBookmark"></i>'
+        : '<i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i>'
     );
   }
 

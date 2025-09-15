@@ -40,6 +40,10 @@ public class BusinessUser {
     @Column(name = "address")
     private String address;
 
+    // ✅ 설명 필드 추가
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "status", length = 20)
     private String status = "pending";
 
@@ -60,4 +64,6 @@ public class BusinessUser {
     protected void onUpdate() {
         this.updatedAt = java.time.LocalDateTime.now();
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.team.cafe.list.hj;
 
+import com.team.cafe.review.dto.CafeWithRating;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,37 +16,6 @@ import java.util.List;
 public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅️ Integer → Long
     // 기본 전체 조회 페이징
     Page<Cafe> findAll(Pageable pageable);
-
-//    @Query("""
-//            select c from Cafe c
-//            where
-//              ( :kw is null or :kw = ''
-//                  or lower(c.name)     like lower(concat('%', :kw, '%'))
-//                  or lower(c.city)     like lower(concat('%', :kw, '%'))
-//                  or lower(c.district) like lower(concat('%', :kw, '%'))
-//                  or lower(c.address1) like lower(concat('%', :kw, '%'))
-//              )
-//              and ( :parking is null or c.parkingYn = :parking )
-//              and (
-//                    :now is null
-//                    or (
-//                          c.openTime is not null and c.closeTime is not null and
-//                          (
-//                             ( c.openTime <= c.closeTime
-//                               and c.openTime <= :now and :now <= c.closeTime )
-//                             or
-//                             ( c.openTime > c.closeTime
-//                               and ( :now >= c.openTime or :now <= c.closeTime ) )
-//                          )
-//                       )
-//                  )
-//            """)
-//    Page<Cafe> searchWithFilters(@Param("kw") String kw,
-//                                 @Param("parking") Boolean parking,
-//                                 @Param("now") java.time.LocalTime now,
-//                                 Pageable pageable);
-
-
 
     // 해당 유저가 이 카페를 좋아요 했는지 여부
     boolean existsByIdAndLikedUsers_Id(Long cafeId, Long userId); // ⬅️ Integer → Long
@@ -132,4 +102,22 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
             @Param("dir")  String dir,
             Pageable pageable
     );
+
+
+    @Query(value = """
+    SELECT c.cafe_id AS id,
+           c.cafe_name AS cafeName,
+           COALESCE(AVG(r.rating * 1.0), 0.0) AS avgRating   -- Double로 강제
+    FROM cafe c
+    LEFT JOIN reviews r ON r.cafe_id = c.cafe_id
+    WHERE c.cafe_id IN (:ids)
+    GROUP BY c.cafe_id, c.cafe_name
+    ORDER BY c.cafe_id
+    """, nativeQuery = true)
+    List<CafeWithRating> getCafesWithAvgRating(List<Long> ids);
+
+
+
+
+
 }
