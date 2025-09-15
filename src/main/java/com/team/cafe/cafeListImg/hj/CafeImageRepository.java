@@ -18,5 +18,5 @@ public interface CafeImageRepository extends JpaRepository<CafeImage, Long> {
 
     @Query("select count(u) from Cafe c join c.likedUsers u where c.id = :cafeId")
     long countLikes(@Param("cafeId") Long cafeId);
-
+    List<CafeImage> findAllByCafe_Id(Long cafeId);
 }

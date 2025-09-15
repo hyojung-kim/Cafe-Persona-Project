@@ -78,3 +78,19 @@
   padding: 0;
   line-height: 1.6;
 }
+
+.photo-preview-grid img {
+    max-width: 150px;   /* 가로 최대 크기 */
+    max-height: 150px;  /* 세로 최대 크기 */
+    object-fit: cover;  /* 잘리지 않게 꽉 차게 */
+    border-radius: 8px; /* 모서리 둥글게 (선택) */
+    margin: 5px;        /* 사진 간격 */
+}
+
+.photo-preview-grid {
+    display: flex;            /* 가로 배치 */
+    gap: 10px;                /* 사진 간격 */
+    overflow-x: auto;         /* 가로 스크롤 가능 */
+    padding: 5px 0;
+    white-space: nowrap;      /* 줄바꿈 방지 */
+}

@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>사업장 등록</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- 전용 CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" th:href="@{/css/cafe-register.css}">
 </head>
 
@@ -26,15 +25,17 @@
             <span th:text="${error}">오류가 발생했습니다.</span>
         </div>
 
-        <!-- 등록 폼 -->
+        <!-- ✅ 단일 폼: 가게 정보 + 사진을 한 번에 제출 -->
         <div class="card register-form">
             <form th:action="@{/mypage/cafe/register(reauth=${param.reauth})}"
-                  method="post" autocomplete="on">
+                  method="post"
+                  enctype="multipart/form-data"
+                  autocomplete="on">
 
                 <!-- CSRF -->
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-                <!-- 사업자번호: hidden -->
+                <!-- 사업자번호: hidden (필요 시) -->
                 <input type="hidden" name="businessNumber"
                        th:value="${user != null and user.businessUser != null ? user.businessUser.businessNumber : ''}"/>
 
@@ -44,39 +45,86 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="companyName">상호명(회사명) <span class="required">*</span></label>
-                            <input id="companyName" name="companyName" type="text" required
+                            <!-- Cafe.name -->
+                            <input id="companyName" name="name" type="text" required
                                    placeholder="예) 빈스팟 커피"
-                                   th:value="${biz != null ? biz.companyName : ''}" />
+                                   th:value="${biz != null ? biz.companyName : ''}"/>
                         </div>
 
                         <div class="form-group">
                             <label for="representativeName">대표자 이름</label>
                             <input id="representativeName" name="representativeName" type="text"
                                    placeholder="예) 홍길동"
-                                   th:value="${biz != null ? biz.representativeName : ''}" />
+                                   th:value="${biz != null ? biz.representativeName : ''}"/>
                         </div>
 
                         <div class="form-group">
                             <label for="representativeEmail">대표자 이메일</label>
                             <input id="representativeEmail" name="representativeEmail" type="email"
                                    placeholder="you@example.com"
-                                   th:value="${biz != null ? biz.representativeEmail : ''}" />
+                                   th:value="${biz != null ? biz.representativeEmail : ''}"/>
                         </div>
 
                         <div class="form-group">
                             <label for="representativePhone">대표자 연락처</label>
-                            <input id="representativePhone" name="representativePhone" type="tel"
+                            <!-- Cafe.phoneNum -->
+                            <input id="representativePhone" name="phoneNum" type="tel"
                                    placeholder="010-1234-5678"
-                                   th:value="${biz != null ? biz.representativePhone : ''}" />
+                                   th:value="${biz != null ? biz.representativePhone : ''}"/>
                         </div>
                     </div>
 
-                                        <div class="col">
+                    <!-- 우측 칼럼 -->
+                    <div class="col">
                         <div class="form-group">
                             <label for="address">사업장 주소</label>
-                            <input id="address" name="address" type="text"
+                            <!-- Cafe.address1 / address2 / district / city -->
+                            <input id="address" name="address1" type="text"
                                    placeholder="예) 서울특별시 강남구 테헤란로..."
-                                   th:value="${biz != null ? biz.address : ''}" />
+                                   th:value="${biz != null ? biz.address : ''}"/>
+
+                            <input name="address2" type="text" placeholder="상세 주소" style="margin-top:8px;"
+                                   th:value="${biz != null ? biz.address2 : ''}"/>
+
+                            <div style="display:flex; gap:8px; margin-top:8px;">
+                                <input name="district" type="text" placeholder="구/군" style="flex:1"
+                                       th:value="${biz != null ? biz.district : ''}"/>
+                                <input name="city" type="text" placeholder="시/도" style="flex:1"
+                                       th:value="${biz != null ? biz.city : ''}"/>
+                            </div>
+                        </div>
+
+                        <!-- (선택) 위치/영업시간/주차 -->
+                        <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                            <input name="lat" type="text" placeholder="위도 (예: 37.1234567)"/>
+                            <input name="lng" type="text" placeholder="경도 (예: 127.1234567)"/>
+                            <input name="openTime" type="time" placeholder="영업 시작"/>
+                            <input name="closeTime" type="time" placeholder="영업 종료"/>
+                            <label style="grid-column:1 / -1; display:flex; align-items:center; gap:6px;">
+                                <input type="checkbox" name="parkingYn"/> 주차 가능
+                            </label>
+                        </div>
+
+                        <!-- 사진 등록 (같은 폼에서 전송) -->
+                        <div class="form-group">
+                            <label>가게 사진</label>
+
+                            <!-- 트리거 버튼 -->
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button type="button" class="btn" id="btn-photo-pick">사진 등록하기</button>
+                                <small class="text-muted">JPG/PNG 권장, 최대 10장 · 1장당 5MB 이내</small>
+                            </div>
+
+                            <!-- 실제 파일 인풋(숨김) : name="photos" -->
+                            <input type="file"
+                                   id="photos"
+                                   name="photos"
+                                   accept="image/*"
+                                   multiple
+                                   hidden>
+
+                            <!-- 미리보기 영역 -->
+                            <div id="photo-preview" class="photo-preview-grid" style="margin-top:10px;"></div>
                         </div>
 
                         <div class="form-group">
@@ -96,18 +144,9 @@
             </form>
         </div>
 
-        <!-- 안내 카드 -->
-        <div class="card guide">
-            <strong>다음 단계</strong>
-            <ul>
-                <li>프로필 관리: 대표 이미지/갤러리 업로드</li>
-                <li>메뉴 관리: 카테고리/메뉴/가격 등록</li>
-                <li>영업시간 설정: 요일별 개점/마감/브레이크 타임</li>
-                <li>공지/프로모션 등록: 이벤트/쿠폰/공지 노출</li>
-            </ul>
-        </div>
-
     </div>
+
+    <script th:src="@{/js/cafe-register.js}" defer></script>
 </div>
 </body>
 </html>
