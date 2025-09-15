@@ -46,6 +46,7 @@ public class ReviewService {
         return reviewRepository.findByCafe_IdAndActiveTrueFetchUserImages(cafeId, pageable);
     }
 
+
     /** 사용자별 활성 리뷰 페이징 */
     @Transactional(readOnly = true)
     public Page<Review> getActiveReviewsByUser(Long userId, Pageable pageable) {

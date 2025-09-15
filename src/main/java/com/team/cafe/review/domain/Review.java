@@ -77,6 +77,16 @@ public class Review extends BaseEntity {
     )
     private Set<SiteUser> likedUsers = new HashSet<>();
 
+//    private int likeCount; // hy 추가
+//
+//    // hy 추가
+//    // 엔티티 저장 , 업데이트 전 호출
+//    @PrePersist
+//    @PreUpdate
+//    public void updateLikeCount() {
+//        this.likeCount = likedUsers.size();
+//    }
+
     protected Review() { }
 
     public Review(Cafe cafe, SiteUser user, double rating, String content) {

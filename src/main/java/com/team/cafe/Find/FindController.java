@@ -48,8 +48,8 @@ public class FindController {
             // 인증 메일 발송 알림
             model.addAttribute("showAlert", true);
         } catch (RuntimeException e) {
-            model.addAttribute("emailError",
-                    e.getMessage());
+            model.addAttribute("emailError",true);
+
         }
         return "login/find_id";
     }
@@ -112,8 +112,7 @@ public class FindController {
             // 인증 메일 발송 알림
             model.addAttribute("showAlert", true);
         } catch (RuntimeException e) {
-            model.addAttribute("emailError",
-                    e.getMessage());
+            model.addAttribute("emailError", true);
         }
         return "login/find_password";
     }
@@ -131,7 +130,7 @@ public class FindController {
             session.setAttribute("verifiedUsername", username);
             return "redirect:/user/modifyPassword";
         } catch (RuntimeException e) {
-            model.addAttribute("codeError", e.getMessage());
+            model.addAttribute("codeError", true);
             model.addAttribute("username", username);
             model.addAttribute("email", email);
             model.addAttribute("showVerification", true); // 다시 인증번호 입력 폼 표시
@@ -165,15 +164,6 @@ public class FindController {
 //            return "redirect:/user/findPassword";
 //        }
 
-//        try {
-//            findService.updatePassword(username, password);
-//            model.addAttribute("successMessage", "비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
-//            return "login/login_form"; // 로그인 페이지로 이동
-//        } catch (RuntimeException e) {
-//            model.addAttribute("errorMessage", e.getMessage());
-//            return "login/modify_password";
-//        }
-        // 제미나이
         try {
             if (!password.equals(passwordConfirm)) {
                 model.addAttribute("errorMessage", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
@@ -182,7 +172,7 @@ public class FindController {
             }
             findService.updatePassword(username, password);
             session.removeAttribute("verifiedUsername");
-//            model.addAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
+            model.addAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
             return "redirect:/user/login"; // PRG 패턴 적용
         } catch (RuntimeException e) {
             model.addAttribute("errorMessage", e.getMessage());
