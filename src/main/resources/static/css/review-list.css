@@ -35,7 +35,7 @@ body {
 }
 
 .review-page .review-section {
-  border: none;
+  border: 1px solid rgba(120, 120, 120, 0.2);
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
