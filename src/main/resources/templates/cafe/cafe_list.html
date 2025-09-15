@@ -116,7 +116,7 @@
             <div class="card-body">
                 <div class="card-header">
                     <a class="cafe-title" th:href="@{|/cafe/detail/${cafeList.id}|}" th:text="${cafeList.name}">카페 이름</a>
-                    <span class="status" th:text="${cafeList.openNow} ? '영업중' : '영업 마감'" th:classappend="${openNow} ? ' open' : ' closed'">영업중</span>
+                    <span class="status" th:text="${cafeList.openNow} ? '영업중' : '영업 마감'" th:classappend="${cafeList.openNow} ? ' open' : ' closed'">영업중</span>
                 </div>
                 <p class="address" th:text="${cafeList.address1}"></p>
                 <p class="time" th:if="${cafeList.openTime != null and cafeList.closeTime != null}"
