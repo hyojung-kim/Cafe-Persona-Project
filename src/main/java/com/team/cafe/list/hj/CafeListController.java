@@ -47,8 +47,6 @@ public class CafeListController {
     private final LikeBookmarkFacade likeBookmarkFacade;
     private final BookmarkService bookmarkService;
     private final KeywordService keywordService;
-    // hy 추가
-    private final ReviewRepository reviewRepository;
 
     @Value("{kakao.api.key}")
     private String kakaoApiKey;
