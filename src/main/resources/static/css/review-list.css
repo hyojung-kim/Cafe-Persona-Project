@@ -1,6 +1,19 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
-:root { --bd:#e5e7eb; --ink:#111827; --muted:#6b7280; --bg:#fafafa; --danger:#b91c1c; }
+:root {
+  --bd:#D0C5B5;
+  --ink:#4B3621;
+  --muted:#A67B5B;
+  --bg:#F9F6F2;
+  --danger:#d94d4d;
+  --accent:#E5734A;
+}
+
+body {
+  font-family:"Noto Sans KR", sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+}
 .rev-container { max-width: 720px; margin: 0 auto; }
 .rev-card { background:#fff; border:1px solid var(--bd); border-radius:14px; padding:16px;
             box-shadow:0 1px 2px rgba(0,0,0,.04); }
@@ -89,14 +102,14 @@
 .rate input:checked ~ label,
 .rate label:hover,
 .rate label:hover ~ label {
-  color: #f73c32 !important;
+  color: var(--accent) !important;
 }
 
 .rate input:checked + label:hover,
 .rate input:checked ~ label:hover,
 .rate input:checked ~ label:hover ~ label,
 .rate label:hover ~ input:checked ~ label {
-  color: #f73c32 !important;
+  color: var(--accent) !important;
 }
 
 /* 리뷰 등록 버튼 크기/위치 조정 */
@@ -142,7 +155,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--accent);
   color: #fff;
   border: none;
   padding: 0.25rem 0.5rem;

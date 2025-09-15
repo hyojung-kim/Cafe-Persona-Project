@@ -42,7 +42,6 @@
         </div>
         <div class="text-end">
           <a th:href="@{|/cafe/detail/${cafe.id}|}" class="btn btn-outline-secondary btn-sm">카페 상세</a>
-          <a sec:authorize="isAuthenticated()" th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn btn-outline-success btn-sm ms-1">위치 인증</a>
         </div>
       </div>
 
@@ -65,7 +64,10 @@
   <!-- 작성 폼 -->
   <section class="card shadow-sm mb-3" sec:authorize="isAuthenticated()">
     <div class="card-body">
-      <h3 class="h6 mb-3">리뷰 작성</h3>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="h6 mb-0">리뷰 작성</h3>
+        <a th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn btn-outline-success btn-sm">위치 인증</a>
+      </div>
       <form id="reviewCreateForm"
             th:action="@{/cafes/{id}/reviews(id=${cafe.id})}"
             th:data-cafe-id="${cafe.id}"
@@ -91,7 +93,7 @@
             <button class="btn btn-primary btn-sm review-submit-btn mt-2 mt-md-auto" type="submit">등록</button>
           </div>
           <div class="col-12 col-md-7">
-            <textarea id="content" name="content" class="form-control" minlength="5" maxlength="4000" rows="4" placeholder="후기를 입력하세요(최소 5자)" required></textarea>
+            <textarea id="content" name="content" class="form-control" minlength="5" maxlength="4000" rows="4" placeholder="위치 인증 후, 후기를 입력하세요(최소 5자)" required></textarea>
           </div>
           <div class="col-12 col-md-3">
             <input type="file" name="images" class="form-control" accept="image/*" multiple>
