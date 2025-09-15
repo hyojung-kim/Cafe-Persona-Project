@@ -69,11 +69,11 @@
 
   <section class="card shadow-sm mb-3">
     <div class="card-body">
-      <h5 class = "review-content-head"리뷰 내용</h5>
+      <b class = "review-content-head">리뷰 내용</b>
       <p class="mb-0" th:text="${review.content}">-</p>
     </div>
     <div class="card-body">
-      <h5 class = "review-content-head">첨부 이미지</h5>
+      <b class = "review-content-head">첨부 이미지</b>
       <div id="reviewImageSlider" class="review-image-slider">
         <div class="slider-track">
           <div class="slide" th:each="img : ${review.images}">
