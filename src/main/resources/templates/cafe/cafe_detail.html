@@ -294,19 +294,31 @@
                         </div>
                         <div class="review-content">
                             <div class="review-stars">
-                                <!-- 꽉 찬 별 -->
-                                <i class="fa-solid fa-star"
-                                   th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(review.rating))}"></i>
+                                <!-- 1부터 5까지 반복 -->
+                                <span th:each="i : ${#numbers.sequence(1,5)}">
+        <!-- 꽉 찬 별 -->
+        <i class="fa-solid fa-star"
+           th:if="${review.rating >= i}"></i>
 
-                                <!-- 반 별 -->
-                                <i class="fa-solid fa-star-half-stroke"
-                                   th:if="${review.rating % 1 >= 0.5}"></i>
+                                    <!-- 반 별 -->
+        <i class="fa-solid fa-star-half-stroke"
+           th:if="${review.rating >= i - 0.5 and review.rating < i}"></i>
 
-                                <!-- 빈 별 -->
-                                <i class="fa-regular fa-star"
-                                   th:each="i : ${#numbers.sequence(1, 5 - T(java.lang.Math).floor(review.rating) - (review.rating % 1 >= 0.5 ? 1 : 0))}"></i>
+                                    <!-- 빈 별 -->
+        <i class="fa-regular fa-star"
+           th:if="${review.rating < i - 0.5}"></i>
+    </span>
                                 <span class="review-score" th:text="${review.rating}"></span>
                             </div>
+<!--                                <span th:text="'DEBUG: rating=' + ${review.rating}-->
+<!--              + ', rating10=' + ${rating10}-->
+<!--              + ', full=' + ${full}-->
+<!--              + ', half=' + ${half}-->
+<!--              + ', empty=' + ${empty}"></span>-->
+
+
+<!--                                <span class="review-score" th:text="${review.rating}"></span>-->
+<!--                            </div>-->
 
                             <span class="review-content-text" th:text="${review.content}"></span>
                         </div>
