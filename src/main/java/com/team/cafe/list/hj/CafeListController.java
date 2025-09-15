@@ -157,10 +157,10 @@ public class CafeListController {
 
         if ("hit".equals(sort)) {
             // 인기순
-            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(cafeId);
+            latestReviews = reviewService.findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(cafeId);
         } else {
             // 최신순 (기본값)
-            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+            latestReviews = reviewService.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
         }
         // 콘솔에서 리뷰 개수 확인 hy
         System.out.println("리뷰 개수: " + latestReviews.size());
