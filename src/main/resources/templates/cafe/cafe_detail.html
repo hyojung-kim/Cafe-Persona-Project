@@ -193,7 +193,16 @@
         <section class="hero" aria-labelledby="cafeTitle">
             <!-- 이미지 -->
             <div class="hero__imgwrap">
-                <img class="hero__img" th:each="img : ${cafe.images}" th:src="${img.imgUrl} ?: '/images/DBimg.PNG'" alt="이미지">
+                <th:block th:if="${#lists.isEmpty(cafe.images)}">
+                    <img class="hero__img" src="/images/DBimg.PNG" alt="이미지 없음">
+                </th:block>
+
+                <th:block th:unless="${#lists.isEmpty(cafe.images)}">
+                    <img class="hero__img"
+                         th:each="img : ${cafe.images}"
+                         th:src="${img.imgUrl}"
+                         alt="이미지">
+                </th:block>
             </div>
 
             <!-- 정보 카드 -->
