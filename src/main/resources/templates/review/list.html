@@ -198,28 +198,19 @@
         </article>
       </div>
 
-      <nav class="mt-3 review-pagination" th:if="${page != null and page.totalPages > 1}">
-        <ul class="pagination pagination-sm mb-0">
-          <li class="page-item" th:classappend="${!page.hasPrevious()}? 'disabled'">
-            <a class="page-link"
-               th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${page.number - 1}, rsize=${page.size}, keyword=${keyword}, sort=${sort})}">&laquo; 이전</a>
-          </li>
+      <nav class="pagination review-pagination" aria-label="페이지 이동" th:if="${page != null and page.totalPages > 1}">
+        <a class="page-btn" th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=0, rsize=${page.size}, keyword=${keyword}, sort=${sort})}" aria-label="첫 페이지">«</a>
+        <a class="page-btn" th:if="${page.hasPrevious()}" th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${page.number - 1}, rsize=${page.size}, keyword=${keyword}, sort=${sort})}" aria-label="이전 페이지">이전</a>
 
-          <li class="page-item"
-              th:each="p : ${#numbers.sequence(0, page.totalPages - 1)}"
-              th:classappend="${p} == ${page.number} ? 'active'">
-            <a class="page-link"
-               th:if="${p} != ${page.number}"
-               th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${p}, rsize=${page.size}, keyword=${keyword}, sort=${sort})}"
-               th:text="${p+1}">1</a>
-            <span class="page-link" th:if="${p} == ${page.number}" th:text="${p+1}">1</span>
+        <ol class="page-list" role="list">
+          <li th:each="p : ${#numbers.sequence(0, page.totalPages - 1)}" th:if="${p >= page.number-1 and p <= page.number+1}">
+            <a class="page-link" th:if="${p} != ${page.number}" th:text="${p+1}" th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${p}, rsize=${page.size}, keyword=${keyword}, sort=${sort})}">1</a>
+            <span class="page-link is-current" th:if="${p} == ${page.number}" th:text="${p+1}">1</span>
           </li>
+        </ol>
 
-          <li class="page-item" th:classappend="${!page.hasNext()}? 'disabled'">
-            <a class="page-link"
-               th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${page.number + 1}, rsize=${page.size}, keyword=${keyword}, sort=${sort})}">다음 &raquo;</a>
-          </li>
-        </ul>
+        <a class="page-btn" th:if="${page.hasNext()}" th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${page.number + 1}, rsize=${page.size}, keyword=${keyword}, sort=${sort})}" aria-label="다음 페이지">다음</a>
+        <a class="page-btn" th:href="@{/cafes/{id}/reviews/section(id=${cafe.id}, rpage=${page.totalPages - 1}, rsize=${page.size}, keyword=${keyword}, sort=${sort})}" aria-label="마지막 페이지">»</a>
       </nav>
 
       <div th:if="${page == null || page.totalElements == 0}" class="text-muted">

@@ -57,6 +57,8 @@
   display: inline-block;
   border: 0;
   margin-right: 5px;
+  overflow: hidden;
+  vertical-align: middle;
 }
 
 .rate > input {
@@ -165,4 +167,62 @@
 .review-search-btn {
     writing-mode: horizontal-tb;
     white-space: nowrap;
+}
+
+/* ===============================
+   페이징 영역
+=============================== */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: 1rem 0;
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 28px;
+  border-radius: 50%;
+  text-decoration: none;
+  color: #999;
+  border: 1px solid transparent;
+}
+.page-btn:hover { color: #555; }
+.page-btn.is-disabled {
+  pointer-events: none;
+  color: #ccc;
+  opacity: .6;
+}
+
+.page-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0; padding: 0; list-style: none;
+}
+.page-link {
+  display: inline-grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  text-decoration: none;
+  color: #6b7280;
+  transition: transform .15s ease, background-color .15s ease, color .15s ease;
+}
+.page-link:hover { color: #111; transform: translateY(-1px); }
+.page-link.is-current {
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination a:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+  border-radius: 999px;
 }
