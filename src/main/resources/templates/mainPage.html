@@ -1,0 +1,119 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+    <link rel="stylesheet" th:href="@{/css/mainPage.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Hero Search Section -->
+    <section class="hero full-width">
+        <!-- 배경 이미지 -->
+        <div class="hero__bg" aria-hidden="true"></div>
+
+        <!-- 카드 래퍼 -->
+        <div class="hero__card" role="search" aria-label="맛집 검색">
+            <div class="hero__grid">
+                <!-- 인사말 -->
+                <div class="hero__greeting">
+                    <p class="hero__hello">안녕하세요.</p>
+                    <p class="hero__ask">어떤 카페를 찾으시나요?</p>
+                </div>
+
+                <!-- 세로 구분선 -->
+                <div class="hero__divider" aria-hidden="true"></div>
+
+                <!-- 검색 영역 -->
+                <div class="hero__search">
+                    <!-- 입력창 -->
+                    <!-- 검색 + 정렬 폼 -->
+
+                    <form class="searchbar" th:action="@{/cafe/list}" method="get">
+                        <label class="sr-only" for="q">검색어</label>
+                        <div class="searchbar__box">
+                            <input name="kw" type="text" placeholder="카페명을 입력해 주세요" autocomplete="off" th:value="${kw}" />
+                            <button class="searchbar__filter" type="submit" aria-label="필터 열기">
+                                <!-- 간단한 톱니바퀴 -->
+                                <span class="searchbar__icon" aria-hidden="true">🔍</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- 탭 -->
+                    <nav class="search-tabs" aria-label="검색 탭">
+                        <form th:action="@{/cafe/list}" id="filterForm" method="get" class="filter-form">
+                            <button class="cta-btn" type="submit" form="filterForm" >카페 목록 이동하기</button>
+                        </form>
+
+                    </nav>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hot Spots Section -->
+    <section class="hotspots" aria-labelledby="hotspots-title">
+        <!-- 배경 데코는 CSS로 처리 (예: 오렌지 그라디언트) -->
+
+        <!-- Section Header -->
+        <header class="hotspots__header">
+            <h2 id="hotspots-title" class="hotspots__title">Hot Spots</h2>
+            <p class="hotspots__subtitle">인기 카페</p>
+        </header>
+
+        <!-- Carousel / Grid Wrapper -->
+        <div class="hotspots__viewport" role="region" aria-roledescription="carousel" aria-label="요즘 인기 목록">
+            <!-- Prev / Next buttons -->
+
+            <!-- Track: 가로 스크롤/슬라이드 트랙 -->
+            <ul class="hotspots__track"
+                aria-live="polite"
+                aria-atomic="false">
+                <!-- 카드: 항목 1개 -->
+                <!-- (Thymeleaf 예시: th:each="c : ${hotList}") -->
+                <li class="hotcard" th:each="c : ${topCafes}">
+                    <a class="hotcard__link" th:href="@{|/cafe/detail/${c.id}|}">
+                        <figure class="hotcard__figure">
+<!--                            <img class="hotcard__img"-->
+<!--                                 th:src=""-->
+<!--                                 th:alt="${c.name}"-->
+<!--                                 loading="lazy"-->
+<!--                                 decoding="async" />-->
+                            <!-- 필요 시 라벨/뱃지 -->
+                            <img class="hotcard__img" th:src="${imageMap[c.id]} ?: '/images/DBimg.PNG'"
+                                 loading="lazy" alt="카페 대표 이미지">
+
+                        </figure>
+
+                        <div class="hotcard__body">
+                            <h3 class="hotcard__title" th:text="${c.name}">카페명</h3>
+
+                            <!-- 평점/아이콘 줄 -->
+                            <div class="hotcard__meta" aria-label="평점 정보">
+                                <!-- 별 아이콘 5개 (예시) -->
+                                <span class="hotcard__stars" aria-hidden="true" th:text="|⭐ ${ratingAvgMap[c.id]}|">
+                                 <!-- 서버에서 별 개수 계산 or CSS 마스크로 처리 -->
+                                    ⭐
+                                </span>
+<!--                                <span class="hotcard__rating" th:text="${#numbers.formatDecimal(c.avgRating, 1, 1)}">4.2</span>-->
+                            </div>
+
+                            <!-- 조회수 줄 -->
+                            <div class="hotcard__stats">
+                                <span class="hotcard__views" aria-label="조회수">
+                            <!-- 눈 아이콘 -->
+                                    <span>👁 </span>
+                                    <span class="hotcard__views-num" th:text="${c.hitCount}"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <!-- /카드 반복 끝 -->
+            </ul>
+        </div>
+    </section>
+</div>
+</html>
+
+
+<!--<span class="rating" th:text="|⭐ ${ratingAvgMap[cafeList.id]}|">⭐ 4.5</span>-->
+<!--<span class="likes" th:text="|♥ ${likeCountMap[cafeList.id]}| ?: 0">♥ 0</span>-->

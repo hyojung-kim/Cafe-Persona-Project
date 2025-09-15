@@ -71,7 +71,8 @@ public class CafeListController {
     ) {
         // 기존 코드 : var paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow);
         Page<CafeMatchDto> paging = cafeListService.getCafes(kw, page, size, sort, dir, parking, openNow, keyList);
-
+        
+        //키워드 렌더링용
         List<Keyword> all = keywordService.findAllOrderByTypeAndName(); // 네 엔티티/레포에 맞춰 사용
         Map<KeywordType, List<Keyword>> keywordsByType  = new LinkedHashMap<>();
         for (Keyword k : all) {
