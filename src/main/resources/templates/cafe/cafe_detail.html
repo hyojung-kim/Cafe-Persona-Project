@@ -1,63 +1,143 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/cafe_detail_con1.css}">
     <!-- 카페명 + 영업상태 -->
-    <h2>
-        <span th:text="${cafe.name}">카페명</span>
+    <main class="container-1">
 
-        <span th:if="${openNow != null}"
-              class="badge"
-              th:classappend="${openNow} ? ' badge--open' : ' badge--closed'"
-              th:text="${openNow} ? '[영업중]' : '[마감]'">영업중</span>
+        <!-- ===== 헤더: 이미지 + 정보 카드 ===== -->
+        <section class="hero" aria-labelledby="cafeTitle">
+            <!-- 이미지 -->
+            <div class="hero__imgwrap">
+                <img class="hero__img" th:each="img : ${cafe.images}" th:src="${img.imgUrl}" alt="이미지">
+            </div>
 
-        <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
-        <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
-    </h2>
+            <!-- 정보 카드 -->
+            <article class="card">
+                <div>
+                      <span class="title" id="cafeTitle" th:text="${cafe.name}"></span>
+                      <span th:if="${openNow != null}"
+                          class=""
+                          th:classappend="${openNow} ? 'status open' : 'status closed'"
+                          th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
+                </div>
+                <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
+                <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
 
-    <!-- 주소 + 영업시간 -->
-    <p>
-        <strong>주소:</strong>
-        <span th:text="${cafe.address1}">대전 서구 둔산동 101</span>
-        <span th:if="${cafe.address2}" th:text="| ${cafe.address2}|"></span>
-    </p>
+                <div class="stats">
+                    <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
+                    <span class="stat" th:text="|리뷰 ${reviewCount}|">리뷰 0</span>
+                    <span class="stat" th:text="|👁 조회수 ${cafe.hitCount}"|>조회 0</span>
+                    <div id="likeBox"
+                         th:data-cafe-id="${cafe.id}"
+                         th:data-liked="${liked}">
+                        <button id="likeBtn" type="button" aria-label="좋아요 토글">
+                            <span class="label-liked" th:if="${liked}">
+                                <i class="fa-solid fa-bookmark" id="activeBookmark"></i>
+                            </span>
+                            <span class="label-unliked" th:if="${!liked}">
+                                <i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i>
+                            </span>
+                        </button>
+                        <span>
+                            북마크 저장 : <b id="likeCount" th:text="${likeCount}">0</b>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-grid__row">
+                    <div class="title-2">주소</div>
+                    <span class="info-grid__value">
+                        <span class="link" th:text="${cafe.address1}"></span>
+                    </span>
+                </div>
+                <div class="chips">
+                    <div class="title-2" id="">현재 카페의 키워드</div>
+                    <span class="chip-kw" th:each="k : ${detailKeyword}" th:text="${k.name}">합리적인</span>
+                </div>
+                <span th:if="${#lists.isEmpty(detailKeyword)}" class="chip--empty">
+                    등록된 키워드가 없습니다.
+                </span>
+            </article>
+        </section>
 
-    <p>
-        <strong>영업시간:</strong>
-        <span th:if="${cafe.openTime != null and cafe.closeTime != null}"
-              th:text="|${#temporals.format(cafe.openTime,'HH:mm')} ~ ${#temporals.format(cafe.closeTime,'HH:mm')}|">
-          09:00 ~ 22:00
-        </span>
-        <span th:unless="${cafe.openTime != null and cafe.closeTime != null}" class="muted">미등록</span>
-    </p>
+        <!-- ===== 카페 소개 ===== -->
+        <section class="store" aria-labelledby="storeTitle">
+            <!-- 제목 -->
+            <header class="store__header">
+                <h2 id="storeTitle" class="store__title">카페 소개</h2>
+            </header>
 
-    <p>
-        <strong>주차:</strong>
-        <span th:text="${cafe.parkingYn} ? '가능' : '불가'">가능</span>
-    </p>
 
-    <!-- URL 링크 -->
-    <p>
-        <strong>웹사이트:</strong>
-        <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
-        <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
-    </p>
+            <div class="section-aside">
+                <!-- 정보 그리드 -->
+                <section class="store__info" aria-label="기본 정보">
+                    <!-- 소개 문단 -->
+                    <div class="store__intro">
+                        <p class="intro" th:if="${#strings.isEmpty(cafe.intro)}">등록된 소개글이 없습니다.</p>
+                        <p class="intro" th:unless="${#strings.isEmpty(cafe.intro)}" th:text="${cafe.intro}"></p>
+                    </div>
+                    <ul class="info-grid">
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">영업시간</span>
+                            <span class="info-grid__value">
+                            <!-- 상태 배지 + 시간 -->
+                            <span th:if="${openNow != null}"
+                                  class=""
+                                  th:classappend="${openNow} ? 'status open' : 'status closed'"
+                                  th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
+                            <span th:if="${cafe.openTime != null and cafe.closeTime != null}"
+                                  th:text="|${#temporals.format(cafe.openTime,'HH:mm')} ~ ${#temporals.format(cafe.closeTime,'HH:mm')}|">
+                                09:00 ~ 22:00
+                            </span>
+                        </span>
+                        </li>
 
-    <span class="muted">조회수: <strong th:text="${cafe.hitCount}">0</strong></span>
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">전화번호</span>
+                            <span class="info-grid__value">
+                            <span th:if="${cafe.phoneNum}" th:text="${cafe.phoneNum}"></span>
+                            <span th:unless="${cafe.phoneNum}" class="muted">없음</span>
+                        </span>
+                        </li>
 
-    <div id="likeBox"
-         th:data-cafe-id="${cafe.id}"
-         th:data-liked="${liked}">
-        <button id="likeBtn" type="button" aria-label="좋아요 토글">
-            <span class="label-liked" th:if="${liked}">♥ 좋아요 취소</span>
-            <span class="label-unliked" th:if="${!liked}">♡ 좋아요</span>
-        </button>
-        <span style="margin-left:8px;">
-            좋아요 수: <b id="likeCount" th:text="${likeCount}">0</b>
-        </span>
-        <span id="bookmark-badge"
-              th:if="${bookmarked}"
-              title="내 북마크에 있음"
-              aria-label="북마크됨">★ 북마크</span>
-    </div>
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">편의시설</span>
+                            <span class="info-grid__value">
+                            <span class="chip-kw">
+                            <strong>주차 </strong>
+                            <span th:text="${cafe.parkingYn} ? '가능' : '불가'">가능</span>
+                            </span>
+                        </span>
+                        </li>
+
+                        <li class="info-grid__row">
+                            <span class="info-grid__label">웹사이트</span>
+                            <span class="info-grid__value">
+                            <a th:if="${cafe.siteUrl}" th:href="${cafe.siteUrl}" target="_blank" rel="noopener">바로가기</a>
+                            <span th:unless="${cafe.siteUrl}" class="muted">없음</span>
+                        </span>
+                        </li>
+                    </ul>
+                </section>
+
+                <aside class="menu-section">
+                    <h3 class="title-2">메뉴 목록</h3>
+                    <ul class="menu-list">
+                        <li class="menu-item" th:each="m : ${menus}">
+                            <span class="menu-name" th:text="${m.name}">메뉴명</span>
+                            <span class="menu-price"
+                                  th:text="${#numbers.formatInteger(m.price,0,'COMMA')} + ' 원'">0 원</span>
+                            <span th:unless="${m.price}" class="muted">메뉴 없음</span>
+                        </li>
+                    </ul>
+                </aside>
+            </div>
+
+        </section>
+
+
+
+    </main>
 
     <script src="/js/cafe-like.js"></script>
 
@@ -67,13 +147,13 @@
     </div>
 
     <!-- mybookmark페이지에서 이동해 왔을 때 뒤로가기 버튼 생성 -->
-    <div th:if="${param.from != null and param.from[0] == 'bookmark'}"  style="margin-top: 16px;">
+    <div th:if="${param.from != null and param.from[0] == 'bookmark'}" style="margin-top: 16px;">
         <a th:href="@{/mypage/my/bookmark}" class="btn btn-secondary">
             내 북마크로 돌아가기
         </a>
     </div>
     <div style="margin-top:8px;">
-        <a class="btn" th:href="@{/cafe/map/{cafeId}(cafeId=${cafe.id})}">카페 위치 보기</a>
+        <a class="btn2" th:href="@{/cafe/map/{cafeId}(cafeId=${cafe.id})}">카페 위치 보기</a>
     </div>
 </div>
 </html>

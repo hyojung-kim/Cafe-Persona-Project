@@ -1,13 +1,18 @@
 package com.team.cafe.list.hj;
 
+import com.team.cafe.Menu.Menu;
+import com.team.cafe.Menu.MenuService;
 import com.team.cafe.bookmark.BookmarkService;
 import com.team.cafe.bookmark.LikeBookmarkFacade;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.keyword.hj.Keyword;
+import com.team.cafe.keyword.hj.KeywordRow;
 import com.team.cafe.keyword.hj.KeywordService;
 import com.team.cafe.keyword.hj.KeywordType;
+import com.team.cafe.like.CafeLikeCount;
 import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
+import com.team.cafe.review.dto.CafeWithRating;
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
@@ -30,6 +35,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequestMapping("/cafe")
 @RequiredArgsConstructor
@@ -44,13 +50,14 @@ public class CafeListController {
     private final LikeBookmarkFacade likeBookmarkFacade;
     private final BookmarkService bookmarkService;
     private final KeywordService keywordService;
+    private final MenuService menuService;
 
     @Value("{kakao.api.key}")
     private String kakaoApiKey;
 
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "3") int size,
+                       @RequestParam(defaultValue = "8") int size,
                        @RequestParam(required = false) String kw,
                        @RequestParam(defaultValue = "createdAt") String sort,
                        @RequestParam(defaultValue = "desc") String dir,
@@ -76,6 +83,21 @@ public class CafeListController {
 
         // 대표 이미지 URL 맵 생성
         Map<Long, String> imageMap = cafeImageService.getImageUrlMap(ids);
+        // 좋아요 갯수 ids로 가져오기
+        List<CafeLikeCount> likeCount = likeService.findLikeCountsByCafeIds(ids);
+        // 별점평균 갸져오기 ids로
+        List<CafeWithRating> ratingAvg = cafeListService.getCafesWithAvgRating(ids);
+
+        //map으로 리턴
+        Map<Long, Long> likeCountMap = likeCount.stream()
+                .collect(Collectors.toMap(CafeLikeCount::getCafeId, CafeLikeCount::getCnt));
+
+        //map으로 리턴
+        Map<Long, Double> ratingAvgMap = ratingAvg.stream()
+                .collect(Collectors.toMap(
+                        CafeWithRating::getId,
+                        r -> r.getAvgRating() != null ? r.getAvgRating() : 0.0
+                ));
 
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
@@ -85,6 +107,8 @@ public class CafeListController {
         model.addAttribute("parking", parking);
         model.addAttribute("openNow", openNow);
         model.addAttribute("imageMap", imageMap);
+        model.addAttribute("likeCountMap", likeCountMap);
+        model.addAttribute("ratingAvgMap", ratingAvgMap);
         //키워드 모델
         model.addAttribute("keywordsByType", keywordsByType);
         model.addAttribute("selectedKeys", keyList);
@@ -101,8 +125,11 @@ public class CafeListController {
                          Principal principal,
                          HttpSession session,
                          Model model) {
-
-        Cafe cafe = cafeListService.getById(cafeId);
+        //기존코드 주석
+        //Cafe cafe = cafeListService.getById(cafeId);
+        Cafe cafe = cafeImageService.getDetailImg(cafeId);
+        List<KeywordRow> detailKeyword = keywordService.findKeywordRowsByCafeId(cafeId);
+        List<Menu> menus = menuService.findForDetail(cafeId);
         boolean bookmarked = false;
 
         cafeListService.increaseViewOncePerSession(cafeId, session);
@@ -138,6 +165,8 @@ public class CafeListController {
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("openNow", openNow);
         model.addAttribute("bookmarked", bookmarked);
+        model.addAttribute("detailKeyword", detailKeyword);
+        model.addAttribute("menus", menus);
 
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -147,6 +176,7 @@ public class CafeListController {
 
         // 템플릿에서 ${reviews}로 사용
         model.addAttribute("reviews", reviews);
+
 
         // 분리한 템플릿 경로와 일치
         return "cafe/cafe_detail";

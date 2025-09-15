@@ -1,5 +1,6 @@
 package com.team.cafe.cafeListImg.hj;
 
+import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,11 @@ public class CafeImageService {
                 CafeImage::getImgUrl,
                 (a, b) -> a
         ));
+    }
+
+    public Cafe getDetailImg(Long cafeId) {
+        return cafeImageRepository.findByIdWithImages(cafeId)
+                .orElseThrow(() -> new IllegalArgumentException("no cafe: " + cafeId));
     }
 
 }
