@@ -23,37 +23,6 @@ public class CafeListService {
     private final CafeListRepository cafeListRepository;
     private final ReviewRepository reviewRepository; // ⬅️ 리뷰 조회용
 
-//    public List<Cafe> getAllCafes() {
-//        return cafeListRepository.findAll();
-//    }
-
-//    public Page<Cafe> getCafes2(String kw, int page, int size, String sort, String dir,
-//                               Boolean parking, Boolean openNow) {
-//        Sort sortSpec = buildSort(sort, dir);
-//        Pageable pageable = PageRequest.of(page, size, sortSpec);
-//        String kwTrim = (kw == null) ? null : kw.trim();
-//
-//        // 현재 시간(한국)
-//        LocalTime now = null;
-//        if (Boolean.TRUE.equals(openNow)) {
-//            now = LocalTime.now(java.time.ZoneId.of("Asia/Seoul"));
-//        }
-//
-//        return cafeListRepository.searchWithFilters(kwTrim, parking, now, pageable);
-//    }
-
-     //허용된 정렬 키만 사용
-//    private Sort buildSort(String sort, String dir) {
-//        String key = (sort == null || sort.isBlank()) ? "createdAt" : sort;
-//        Sort.Direction direction = "asc".equalsIgnoreCase(dir) ? Sort.Direction.ASC : Sort.Direction.DESC;
-//
-//        return switch (key) {
-//            case "likeCount" -> Sort.by(direction, "likeCount");
-//            case "hit" -> Sort.by(direction, "hitCount");
-//            case "createdAt" -> Sort.by(direction, "createdAt");
-//            default -> Sort.by(Sort.Direction.DESC, "createdAt");
-//        };
-//    }
 
     /**
      * PK 타입 Long 통일

@@ -107,7 +107,7 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
     @Query(value = """
     SELECT c.cafe_id AS id,
            c.cafe_name AS cafeName,
-           COALESCE(AVG(r.rating * 1.0), 0.0) AS avgRating   -- Double로 강제
+           AVG(r.rating) AS avgRating
     FROM cafe c
     LEFT JOIN reviews r ON r.cafe_id = c.cafe_id
     WHERE c.cafe_id IN (:ids)
