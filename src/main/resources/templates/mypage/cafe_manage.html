@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" th:href="@{/css/cafe-manage.css}">
 </head>
-<body>
 <div layout:fragment="content">
+<body>
+
 <div class="g-container" th:with="biz=${user != null and user.businessUser != null ? user.businessUser : null}">
     <!-- 헤더 -->
     <div class="header">
@@ -167,4 +168,5 @@
 <!-- JS 연결 -->
 <script src="/js/cafe_manage.js?v=DEV1"></script>
 </body>
+</div>
 </html>
