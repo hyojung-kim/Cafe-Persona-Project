@@ -28,6 +28,10 @@ public class BookmarkController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user: " + username));
         Long userId = user.getId();
 
+        // menubar 합치는 과정에서 파싱 터져서 모델값만 추가 했습니다
+        model.addAttribute("user", user);
+        model.addAttribute("isBusiness", user.getBusinessUser() != null);
+
 
         // 로그인한 사용자 ID로 북마크 목록 조회
         List<Bookmark> bookmark = bookmarkService.getBookmarksByUser(userId);

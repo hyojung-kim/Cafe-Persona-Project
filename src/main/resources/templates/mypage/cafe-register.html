@@ -9,12 +9,12 @@
 
 <body>
 <div layout:fragment="content" class="page--with-navbar">
-    <div class="g-container">
+    <div class="regis-container">
 
         <!-- 헤더 -->
         <div class="card page-header">
             <h1 th:text="${mode}=='edit' ? '사업장 수정' : '사업장 등록'">사업장 등록</h1>
-            <p>기본 정보만 먼저 등록하세요. 상세 정보(메뉴/운영시간/사진)는 이후에 추가할 수 있어요.</p>
+            <p>기본 정보만 먼저 등록하세요. <br> 상세 정보(메뉴/운영시간/사진)는 이후에 추가할 수 있어요.</p>
         </div>
 
         <!-- 알림 -->
@@ -95,10 +95,9 @@
                         </div>
 
                         <div class="form-group" style="display:flex; gap:12px; align-items:center;">
-                            <label style="margin-right:8px;">주차</label>
+                            <label style="margin-right:8px;">주차 가능 여부</label>
                             <label style="display:flex; align-items:center; gap:6px;">
-                                <input type="checkbox" name="parkingYn" th:checked="${form != null and form.parkingYn}"/>
-                                가능
+                                <input type="checkbox" class="parking" name="parkingYn" th:checked="${form != null and form.parkingYn}"/>
                             </label>
                         </div>
 
@@ -107,9 +106,9 @@
                             <label>가게 사진</label>
 
                             <!-- label-for 패턴: 클릭만으로 파일창 오픈 -->
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <label for="photos" class="btn" id="btn-photo-pick" style="cursor:pointer;">사진 등록하기</label>
-                                <small class="text-muted">JPG/PNG 권장, 최대 10장 · 1장당 5MB 이내</small>
+                            <div style="display:flex; gap:8px;">
+                                <label for="photos" class="photo_input_btn" id="btn-photo-pick" style="cursor:pointer;">사진 등록하기</label>
+                                <small class="text-muted">JPG/PNG 권장, 최대 10장 · 1장당 5MB 이내,</small>
                                 <small class="text-muted">첫 번째 사진이 대표 이미지로 등록됩니다.</small>
 
                             </div>
