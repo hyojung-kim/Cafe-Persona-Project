@@ -91,6 +91,7 @@ public class ReviewController {
             meOpt.ifPresent(me -> likedMap.put(rv.getId(), reviewLikeService.isLiked(rv.getId(), me.getId())));
         }
 
+
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("reviewCount", reviewCount);
@@ -98,7 +99,9 @@ public class ReviewController {
         model.addAttribute("likedMap", likedMap);
         model.addAttribute("likeCountMap", likeCountMap);
 
+
         return "review/list";
+
     }
 
     /* =======================

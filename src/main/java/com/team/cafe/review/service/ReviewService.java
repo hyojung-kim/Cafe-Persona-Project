@@ -171,4 +171,13 @@ public class ReviewService {
         }
         return urls;
     }
+
+
+    public List<Review> findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(Long cafeId) {
+        return reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(cafeId);
+    }
+
+    public List<Review> findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(Long cafeId) {
+        return reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+    }
 }

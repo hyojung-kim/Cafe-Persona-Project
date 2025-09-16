@@ -3,6 +3,7 @@ package com.team.cafe.Find;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserRepository;
 import com.team.cafe.user.sjhy.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class FindController {
             model.addAttribute("showVerification", true);
             // 인증 메일 발송 알림
             model.addAttribute("showAlert", true);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | MessagingException e) {
             model.addAttribute("emailError",true);
 
         }
@@ -111,7 +112,7 @@ public class FindController {
             model.addAttribute("showVerification", true);
             // 인증 메일 발송 알림
             model.addAttribute("showAlert", true);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | MessagingException e) {
             model.addAttribute("emailError", true);
         }
         return "login/find_password";
