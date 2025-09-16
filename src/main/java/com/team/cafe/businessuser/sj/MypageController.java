@@ -1,6 +1,11 @@
 package com.team.cafe.businessuser.sj;
 
 import com.team.cafe.businessuser.sj.owner.cafe.CafeManageService;
+import com.team.cafe.businessuser.sj.BusinessUserRepository;
+import com.team.cafe.cafeListImg.hj.CafeImage;
+import com.team.cafe.cafeListImg.hj.CafeImageService;
+import com.team.cafe.list.hj.Cafe;
+import com.team.cafe.list.hj.CafeListRepository;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.ServletException;
@@ -13,12 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,18 +32,15 @@ public class MypageController {
     /* =========================
        Constants (Session Keys)
        ========================= */
-    /** 비번 재확인용 1회 토큰 */
     private static final String REAUTH_TOKEN_KEY = "MYPAGE_REAUTH_TOKEN";
-    /** (기존) 카페 등록 플로우 POST 가드 */
-    private static final String CAFE_FLOW_FLAG = "CAFE_FLOW_OK";
-    /** ✅ 등록 성공 후, /manage 1회 통과 플래그 */
+    private static final String CAFE_FLOW_FLAG   = "CAFE_FLOW_OK";
     private static final String MANAGE_PASS_ONCE = "MANAGE_PASS_ONCE";
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-    private final CafeManageService cafeManageService;
     private final BusinessUserRepository businessUserRepository;
-    private final BusinessUserService businessUserService;
+    private final CafeImageService cafeImageService;
+    private final CafeListRepository cafeListRepository;
 
     /* =========================
        Reauth Token
@@ -59,7 +59,6 @@ public class MypageController {
         return userService.getUser(username);
     }
 
-    /** 템플릿에서 ${user} 사용 */
     @ModelAttribute("user")
     public SiteUser injectUser() { return currentUserOrNull(); }
 
@@ -91,8 +90,8 @@ public class MypageController {
     }
 
     private String normalizedCurrentWithoutReauth(HttpServletRequest req) {
-        String rawPath = req.getRequestURI();           // may include ctx-path
-        String pathNoSemi = rawPath.split(";", 2)[0];   // strip ;jsessionid
+        String rawPath = req.getRequestURI();
+        String pathNoSemi = rawPath.split(";", 2)[0];
         if (pathNoSemi.length() > 1 && pathNoSemi.endsWith("/")) {
             pathNoSemi = pathNoSemi.substring(0, pathNoSemi.length() - 1);
         }
@@ -118,16 +117,12 @@ public class MypageController {
             path = path.substring(0, path.length() - 1);
         }
 
-        // 이미 ctx로 시작하면 다시 붙이지 않음
         if (!ctx.isEmpty() && path.startsWith(ctx)) {
             return path + query;
         }
-
-        // 일반 케이스: ctx + path
         return ctx + path + query;
     }
 
-    /** 재인증 토큰 get/clear */
     private ReauthToken getReauthToken(HttpServletRequest req) {
         HttpSession s = req.getSession(false);
         if (s == null) return null;
@@ -139,14 +134,11 @@ public class MypageController {
         if (s != null) s.removeAttribute(REAUTH_TOKEN_KEY);
     }
 
-    /** ✅ 재인증 소모 (정확한 URL & nonce 일치 시) */
     private boolean requireReauthConsume(HttpServletRequest req) {
-
         String nonceParam = req.getParameter("reauth");
         if (nonceParam == null || nonceParam.isBlank()) return false;
         ReauthToken t = getReauthToken(req);
         if (t == null) return false;
-
 
         String curr = normalizedCurrentWithoutReauth(req);
         if (!safeUrlEqualsIgnoreReauthAndCtx(req, t.allowExactUrl(), curr)) {
@@ -158,7 +150,6 @@ public class MypageController {
         return true;
     }
 
-    /** ctx 유무, reauth 파라미터, 파라미터 순서/인코딩 차이를 무시하고 동등 비교 */
     private boolean safeUrlEqualsIgnoreReauthAndCtx(HttpServletRequest req, String a, String b) {
         try {
             String ctx = (req.getContextPath() == null) ? "" : req.getContextPath();
@@ -166,49 +157,33 @@ public class MypageController {
             UrlParts ua = parseAndNormalizeUrl(a, ctx);
             UrlParts ub = parseAndNormalizeUrl(b, ctx);
 
-            // 경로 동일?
             if (!Objects.equals(ua.path, ub.path)) return false;
-
-            // 쿼리 파라미터 동등? (reauth 제외, 다중값은 정렬 비교)
             return Objects.equals(ua.params, ub.params);
         } catch (Exception e) {
-            return a.equals(b); // 최후의 보루
+            return a.equals(b);
         }
     }
 
     private static class UrlParts {
         final String path;
         final Map<String, List<String>> params;
-        UrlParts(String p, Map<String, List<String>> q) {
-            this.path = p;
-            this.params = q;
-        }
+        UrlParts(String p, Map<String, List<String>> q) { this.path = p; this.params = q; }
     }
 
     private UrlParts parseAndNormalizeUrl(String raw, String ctx) {
-        // raw: "/app/mypage/cafe/manage?x=1&reauth=...&y=a+b"
         String noSemi = raw.split(";", 2)[0];
 
         String path, qs;
         int q = noSemi.indexOf('?');
-        if (q >= 0) {
-            path = noSemi.substring(0, q);
-            qs   = noSemi.substring(q + 1);
-        } else {
-            path = noSemi;
-            qs   = "";
-        }
+        if (q >= 0) { path = noSemi.substring(0, q); qs = noSemi.substring(q + 1); }
+        else { path = noSemi; qs = ""; }
 
-        // 트레일링 슬래시 제거
         if (path.length() > 1 && path.endsWith("/")) path = path.substring(0, path.length() - 1);
-
-        // ✅ ctx 정규화: 이미 ctx로 시작하면 그대로, 아니면 붙여줌
         if (ctx != null && !ctx.isEmpty() && !path.startsWith(ctx)) {
             path = ctx + (path.startsWith("/") ? path : ("/" + path));
         }
 
-        // 쿼리 파라미터 파싱 (reauth 제외), 값은 디코드 후 정렬
-        Map<String, List<String>> map = new TreeMap<>(); // 키 정렬
+        Map<String, List<String>> map = new TreeMap<>();
         if (!qs.isEmpty()) {
             for (String kv : qs.split("&")) {
                 if (kv.isBlank()) continue;
@@ -216,40 +191,30 @@ public class MypageController {
                 String k = idx >= 0 ? kv.substring(0, idx) : kv;
                 String v = idx >= 0 ? kv.substring(idx + 1) : "";
                 k = urlDecode(k);
-                if ("reauth".equalsIgnoreCase(k)) continue; // ✅ 제외
+                if ("reauth".equalsIgnoreCase(k)) continue;
                 v = urlDecode(v);
                 map.computeIfAbsent(k, _k -> new ArrayList<>()).add(v);
             }
         }
-        // 다중값 정렬
-        for (List<String> vs : map.values()) {
-            Collections.sort(vs);
-        }
-
+        for (List<String> vs : map.values()) Collections.sort(vs);
         return new UrlParts(path, map);
     }
 
-
     private String urlDecode(String s) {
         try {
-            // application/x-www-form-urlencoded 규칙(+ -> space)
-            return java.net.URLDecoder.decode(s, java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            return s;
-        }
+            return java.net.URLDecoder.decode(s, StandardCharsets.UTF_8);
+        } catch (Exception e) { return s; }
     }
 
-    /** ✅ 등록 직후 /manage 1회 통과 consume */
     private boolean consumeManagePassOnce(HttpServletRequest req) {
         HttpSession s = req.getSession(false);
         if (s == null) return false;
         Object flag = s.getAttribute(MANAGE_PASS_ONCE);
         if (!Boolean.TRUE.equals(flag)) return false;
-        s.removeAttribute(MANAGE_PASS_ONCE); // consume
+        s.removeAttribute(MANAGE_PASS_ONCE);
         return true;
     }
 
-    /** 재인증 페이지로 리다이렉트(현재 URL을 continue로) */
     private String redirectToVerifyWithContinue(HttpServletRequest req) {
         String target = normalizedCurrentWithoutReauth(req);
         String encoded = URLEncoder.encode(target, StandardCharsets.UTF_8);
@@ -280,9 +245,6 @@ public class MypageController {
         return "mypage/account";
     }
 
-    /* =========================
-       Verify Password Flow
-       ========================= */
     @GetMapping("/mypage/verify_password")
     public String verifyPasswordPage(@RequestParam(value = "continue", required = false) String cont,
                                      HttpServletRequest request,
@@ -290,7 +252,6 @@ public class MypageController {
                                      Model model) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
-        // 뒤→앞 접근 시 항상 새로 확인
         HttpSession session = request.getSession(false);
         if (session != null) session.removeAttribute(REAUTH_TOKEN_KEY);
 
@@ -319,13 +280,9 @@ public class MypageController {
         request.getSession(true).setAttribute(REAUTH_TOKEN_KEY, new ReauthToken(nonce, allowExactUrl));
 
         String sep = (baseNoReauth.contains("?")) ? "&" : "?";
-        String redirectUrl = baseNoReauth + sep + "reauth=" + URLEncoder.encode(nonce, StandardCharsets.UTF_8);
-        return "redirect:" + redirectUrl;
+        return "redirect:" + baseNoReauth + sep + "reauth=" + URLEncoder.encode(nonce, StandardCharsets.UTF_8);
     }
 
-    /* =========================
-       Account Update (Protected)
-       ========================= */
     @PostMapping("/mypage/account/update")
     public String updateAccount(@RequestParam String nickname,
                                 @RequestParam String email,
@@ -371,21 +328,61 @@ public class MypageController {
        Cafe Manage (Protected)
        ========================= */
     @GetMapping("/mypage/cafe/manage")
-    public String cafeManage(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String cafeManage(HttpServletRequest request,
+                             HttpServletResponse response,
+                             @RequestParam(name = "cafeId", required = false) Long cafeId,
+                             Model model) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
-        // ✅ 등록 직후 1회 패스 소비
+
+        // 등록 직후 1회 패스 소비 → 없으면 재인증 필요
         if (!consumeManagePassOnce(request)) {
-            // 1회 패스가 없다면 정상 재인증 소모 요구
             if (!requireReauthConsume(request)) {
                 return redirectToVerifyWithContinue(request);
             }
         }
-
         setNoCache(response);
-        BusinessUser business = businessUserRepository.findByUserId(user.getId()).orElse(null);
+
+        // 사업자 정보
+        var business = businessUserRepository.findByUserId(user.getId()).orElse(null);
         model.addAttribute("business", business);
-        return "mypage/cafe_manage";
+
+        // 1) 볼 카페 결정
+        if (cafeId == null) {
+            // (권장) 로그인 사용자의 카페 1개 선택
+            cafeId = cafeListRepository.findByBusinessUser_User_Id(user.getId())
+                    .map(Cafe::getId)
+                    .orElse(null);
+
+            // (보조) 그래도 없으면 가장 최근 카페 1개
+            if (cafeId == null) {
+                Cafe latest = cafeListRepository.findTopByOrderByIdDesc();
+                cafeId = (latest != null) ? latest.getId() : null;
+            }
+        }
+
+        // 2) 카페/사진 로드
+        if (cafeId != null) {
+            Cafe cafe = cafeListRepository.findById(cafeId).orElse(null);
+            if (cafe != null) {
+                var photos = cafeImageService.findAllByCafeId(cafeId);
+                model.addAttribute("cafe", cafe);
+                model.addAttribute("photos", photos);
+                model.addAttribute("photoCount", photos.size());
+                model.addAttribute("isRegistered", true);
+            } else {
+                model.addAttribute("photos", List.of());
+                model.addAttribute("photoCount", 0);
+                model.addAttribute("isRegistered", false);
+            }
+        } else {
+            model.addAttribute("photos", List.of());
+            model.addAttribute("photoCount", 0);
+            model.addAttribute("isRegistered", false);
+        }
+
+        return "mypage/cafe_manage"; // 템플릿 파일명과 정확히 일치
     }
+
 
 }

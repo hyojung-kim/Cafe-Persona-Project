@@ -161,3 +161,20 @@ a.btn:focus, button.btn:focus,
 /* ----------------- 안전 여백 유틸(선택) ----------------- */
 /* 네브바 80px와 겹칠 수 있는 페이지에서 래퍼에 클래스만 추가해서 해결 */
 .page--with-navbar{ padding-top: 80px; }
+
+
+/* 이미지 감싸는 div */
+.hero__imgwrap {
+    width: 150px;       /* 원하는 너비 */
+    height: 100px;      /* 원하는 높이 */
+    overflow: hidden;   /* 이미지 넘치면 잘라냄 */
+    border-radius: 8px; /* 모서리 둥글게 (선택) */
+}
+
+/* 실제 이미지 */
+.hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율 유지하면서 채우기 */
+    display: block;
+}

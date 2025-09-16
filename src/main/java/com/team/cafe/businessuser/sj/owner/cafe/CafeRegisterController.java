@@ -1,5 +1,6 @@
 package com.team.cafe.businessuser.sj.owner.cafe;
 
+import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -21,6 +24,7 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Controller
@@ -31,39 +35,28 @@ public class CafeRegisterController {
     private final CafeListRepository cafeListRepository;
     private final CafeImageService cafeImageService;
 
-    // 폼 열기 (GET)
+    /* ========== 등록 폼 ========== */
     @GetMapping("/register")
     public String showCafeRegister(Principal principal,
                                    HttpServletResponse response,
                                    Model model) {
-        // 로그인 체크
-        if (principal == null) {
-            return "redirect:/user/login";
-        }
-
-        // 캐시 방지(선택)
+        if (principal == null) return "redirect:/user/login";
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-
-        // 폼 바인딩 객체
+        model.addAttribute("mode", "create");
         model.addAttribute("form", new CafeRegisterRequest());
         return "mypage/cafe-register";
     }
 
-    // 저장 (POST) - 가게 + 사진 함께
+    /* ========== 등록 저장 ========== */
     @PostMapping(value = "/register", consumes = "multipart/form-data")
     @Transactional
-    public String registerCafe(
-            @ModelAttribute("form") CafeRegisterRequest req,
-            @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
-            RedirectAttributes ra,
-            Principal principal
-    ) {
-        if (principal == null) {
-            return "redirect:/user/login";
-        }
+    public String registerCafe(@ModelAttribute("form") CafeRegisterRequest req,
+                               @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
+                               RedirectAttributes ra,
+                               Principal principal) {
+        if (principal == null) return "redirect:/user/login";
 
         try {
-            // 1) Cafe 저장
             Cafe cafe = new Cafe();
             cafe.setName(req.getName());
             cafe.setPhoneNum(req.getPhoneNum());
@@ -72,20 +65,16 @@ public class CafeRegisterController {
             cafe.setAddress2(req.getAddress2());
             cafe.setDistrict(req.getDistrict());
             cafe.setCity(req.getCity());
-            cafe.setLat(req.getLat());
-            cafe.setLng(req.getLng());
             cafe.setOpenTime(req.getOpenTime());
             cafe.setCloseTime(req.getCloseTime());
             cafe.setParkingYn(req.isParkingYn());
             cafe.setHitCount(0);
+            cafe.setIntro(req.getIntro()); // ✅ 소개 저장
 
-            cafe = cafeListRepository.save(cafe); // ID 확보
-            log.info("[CafeRegister] saved cafe id={}", cafe.getId());
+            cafe = cafeListRepository.save(cafe);
 
-            // 2) 이미지 저장
             if (photos != null && !photos.isEmpty()) {
                 cafeImageService.saveCafeImages(cafe.getId(), photos);
-                log.info("[CafeRegister] saved {} images for cafe {}", photos.size(), cafe.getId());
             }
 
             ra.addFlashAttribute("toast", "사업장 등록 완료");
@@ -102,26 +91,93 @@ public class CafeRegisterController {
         }
     }
 
-    // 요청 DTO (HTML name과 매칭)
-    @Getter
-    @Setter
-    public static class CafeRegisterRequest {
-        private String name;
-        private String phoneNum;
-        private String siteUrl;
-        private String address1;
-        private String address2;
-        private String district;
-        private String city;
-        private BigDecimal lat;
-        private BigDecimal lng;
+    /* ========== 수정 폼(프리필) ========== */
+    @GetMapping("/edit/{cafeId}")
+    public String showEdit(@PathVariable Long cafeId,
+                           Principal principal,
+                           HttpServletResponse response,
+                           Model model) {
+        if (principal == null) return "redirect:/user/login";
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
 
-        @DateTimeFormat(pattern="HH:mm")
-        private LocalTime openTime;
+        Cafe cafe = cafeListRepository.findById(cafeId)
+                .orElseThrow(() -> new IllegalArgumentException("카페 없음: " + cafeId));
 
-        @DateTimeFormat(pattern="HH:mm")
-        private LocalTime closeTime;
+        // 폼 바인딩 값 미리 채우기
+        CafeRegisterRequest form = new CafeRegisterRequest();
+        form.setName(cafe.getName());
+        form.setPhoneNum(cafe.getPhoneNum());
+        form.setSiteUrl(cafe.getSiteUrl());
+        form.setAddress1(cafe.getAddress1());
+        form.setAddress2(cafe.getAddress2());
+        form.setDistrict(cafe.getDistrict());
+        form.setCity(cafe.getCity());
+        form.setOpenTime(cafe.getOpenTime());
+        form.setCloseTime(cafe.getCloseTime());
+        form.setParkingYn(cafe.isParkingYn());
+        form.setIntro(cafe.getIntro()); // ✅ 소개 프리필
 
-        private boolean parkingYn;
+        List<CafeImage> photos = cafeImageService.findAllByCafeId(cafeId);
+
+        model.addAttribute("mode", "edit");
+        model.addAttribute("cafe", cafe);
+        model.addAttribute("form", form);
+        model.addAttribute("photos", photos);
+        model.addAttribute("photoCount", photos.size());
+        return "mypage/cafe-register"; // 같은 템플릿 재사용
     }
+
+    /* ========== 수정 저장 ========== */
+    @PostMapping(value = "/update", consumes = "multipart/form-data")
+    @Transactional
+    public String updateCafe(@RequestParam("cafeId") Long cafeId, // ← 폼의 hidden과 이름 맞추기
+                             @ModelAttribute("form") CafeRegisterRequest req,
+                             @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
+                             RedirectAttributes ra,
+                             Principal principal) {
+        if (principal == null) return "redirect:/user/login";
+
+        try {
+            Cafe cafe = cafeListRepository.findById(cafeId)
+                    .orElseThrow(() -> new IllegalArgumentException("카페 없음: " + cafeId));
+
+            // 업데이트
+            cafe.setName(req.getName());
+            cafe.setPhoneNum(req.getPhoneNum());
+            cafe.setSiteUrl(req.getSiteUrl());
+            cafe.setAddress1(req.getAddress1());
+            cafe.setAddress2(req.getAddress2());
+            cafe.setDistrict(req.getDistrict());
+            cafe.setCity(req.getCity());
+
+            cafe.setOpenTime(req.getOpenTime());
+            cafe.setCloseTime(req.getCloseTime());
+            cafe.setParkingYn(req.isParkingYn());
+            cafe.setIntro(req.getIntro());
+
+            cafeListRepository.save(cafe);
+
+            // 새 사진 추가(삭제는 별도 기능로 분리 권장)
+            if (photos != null && !photos.isEmpty()) {
+                cafeImageService.saveCafeImages(cafeId, photos);
+            }
+
+            ra.addFlashAttribute("toast", "사업장 정보가 수정되었습니다.");
+            return "redirect:/mypage/cafe/manage?cafeId=" + cafeId;
+
+        } catch (IOException e) {
+            log.error("Image save failed", e);
+            ra.addFlashAttribute("error", "이미지 저장 실패: " + e.getMessage());
+            return "redirect:/mypage/cafe/edit/" + cafeId;
+        } catch (Exception e) {
+            log.error("Update failed", e);
+            ra.addFlashAttribute("error", "수정 중 오류: " + e.getMessage());
+            return "redirect:/mypage/cafe/edit/" + cafeId;
+        }
+    }
+
+
+
+
+
 }

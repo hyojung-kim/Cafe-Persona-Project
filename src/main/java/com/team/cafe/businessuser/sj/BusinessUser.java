@@ -16,6 +16,7 @@ public class BusinessUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     private Long id;
 
     @OneToOne
