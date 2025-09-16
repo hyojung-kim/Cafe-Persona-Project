@@ -19,10 +19,9 @@ import java.util.stream.Collectors;
 /**
  * CafeImageService - 카페 이미지 저장/조회
  *
- * - 저장 루트는 절대경로(app.upload.dir) 하위의 /uploads/cafes/{cafeId}/ 로 고정
- * - 정적 서빙은 properties의
- *     spring.web.resources.static-locations=classpath:/static/,file:${app.upload.dir}/
- *   과 매칭되도록 URL은 /uploads/cafes/... 형태로 저장
+ * - 정적 서빙: spring.web.resources.static-locations=classpath:/static/,file:${app.upload.dir}/
+ * - 실제 저장: ${app.upload.dir}/cafes/{cafeId}/{filename}
+ * - 공개 URL : /cafes/{cafeId}/{filename}
  */
 @Service
 @RequiredArgsConstructor
@@ -33,49 +32,41 @@ public class CafeImageService {
 
     /** application.properties: app.upload.dir=${user.home}/cafe-review/uploads */
     @Value("${app.upload.dir}")
-    private String uploadRoot; // 절대경로 루트
+    private String uploadRoot; // 절대경로 루트(= 정적 루트)
 
-    /** 최종 물리 저장 루트: ${app.upload.dir}/uploads/cafes */
+    /** 최종 물리 저장 루트: ${app.upload.dir}/cafes */
     private Path physicalRoot() {
-        // 예) /Users/you/cafe-review/uploads/uploads/cafes
-        return Paths.get(uploadRoot).resolve("uploads").resolve("cafes");
+        // ✅ uploads를 또 붙이지 않는다! (이미 app.upload.dir 자체가 정적 루트이기 때문)
+        return Paths.get(uploadRoot).resolve("cafes");
     }
 
-    /**
-     * 이번 페이지의 카페들에 대한 대표 이미지 URL 맵 (cafeId -> imgUrl)
-     * - 같은 카페에 이미지가 여러 장 있어도 첫 값 유지
-     * - 이미지가 없으면 키 자체가 없음
-     */
+    /** 목록 페이지용: cafeId -> 대표 이미지 URL(없으면 키 없음) */
     public Map<Long, String> getImageUrlMap(Collection<Long> cafeIds) {
         if (cafeIds == null || cafeIds.isEmpty()) return Map.of();
 
         List<CafeImage> images = cafeImageRepository.findByCafe_IdIn(cafeIds);
 
-        // 중복 키는 첫 값 유지(유니크 제약 있으면 중복 자체가 없음)
         return images.stream().collect(Collectors.toMap(
                 img -> img.getCafe().getId(),
                 CafeImage::getImgUrl,
-                (a, b) -> a,                    // 중복키: 첫 값 유지
+                (a, b) -> a, // 같은 카페 여러 장이면 첫 값 유지
                 LinkedHashMap::new
         ));
     }
 
+    /** 상세에서 카페만 필요하면 이 정도면 충분 (필요하면 repo에 fetch join 메서드 추가) */
     public Cafe getDetailImg(Long cafeId) {
-        return cafeImageRepository.findByIdWithImages(cafeId)
+        return cafeListRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("no cafe: " + cafeId));
     }
 
-    /** 단일 카페의 모든 이미지 조회 */
+    /** 단일 카페의 모든 이미지 */
     public List<CafeImage> findAllByCafeId(Long cafeId) {
         if (cafeId == null) return List.of();
         return cafeImageRepository.findAllByCafe_Id(cafeId);
     }
 
-    /**
-     * 카페 이미지 저장
-     * - 파일은 ${app.upload.dir}/uploads/cafes/{cafeId}/ 에 저장
-     * - DB에는 /uploads/cafes/{cafeId}/{filename} 형태의 URL 저장
-     */
+    /** 저장: 파일 -> ${app.upload.dir}/cafes/{cafeId}/ , DB URL -> /cafes/{cafeId}/{filename} */
     @Transactional
     public List<CafeImage> saveCafeImages(Long cafeId, List<MultipartFile> files) throws IOException {
         if (cafeId == null) throw new IllegalArgumentException("cafeId가 필요합니다.");
@@ -84,8 +75,8 @@ public class CafeImageService {
         Cafe cafe = cafeListRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("카페가 존재하지 않습니다: " + cafeId));
 
-        Path dir = physicalRoot().resolve(String.valueOf(cafeId));
-        Files.createDirectories(dir); // 디렉터리 보장
+        Path dir = physicalRoot().resolve(String.valueOf(cafeId)); // ${app.upload.dir}/cafes/{cafeId}
+        Files.createDirectories(dir);
 
         List<CafeImage> saved = new ArrayList<>();
 
@@ -97,10 +88,11 @@ public class CafeImageService {
             String filename = UUID.randomUUID().toString() + (ext != null && !ext.isBlank() ? "." + ext.toLowerCase() : "");
 
             Path dest = dir.resolve(filename);
-            Files.createDirectories(dest.getParent()); // 안전빵
-            f.transferTo(dest.toFile());               // 실제 저장
+            Files.createDirectories(dest.getParent());
+            f.transferTo(dest.toFile());
 
-            String url = "/uploads/cafes/" + cafeId + "/" + filename; // 정적 서빙 URL
+            // ✅ 정적 루트(file:${app.upload.dir}/)와 1:1 매칭되는 URL
+            String url = "/cafes/" + cafeId + "/" + filename;
 
             CafeImage entity = CafeImage.builder()
                     .cafe(cafe)
@@ -112,4 +104,57 @@ public class CafeImageService {
 
         return saved;
     }
+
+    @Transactional
+    public void deleteByIds(List<Long> ids) throws IOException {
+        if (ids == null || ids.isEmpty()) return;
+
+        List<CafeImage> images = cafeImageRepository.findAllById(ids);
+
+        for (CafeImage img : images) {
+            try {
+                // 1) 파일 시스템에서 삭제
+                String url = Optional.ofNullable(img.getImgUrl()).orElse(""); // 예: /cafes/12/uuid.jpg
+                String relative = url.startsWith("/") ? url.substring(1) : url; // cafes/12/uuid.jpg
+
+                // 파일명
+                String filename = relative.lastIndexOf('/') >= 0 ? relative.substring(relative.lastIndexOf('/') + 1) : null;
+
+                // cafeId (엔티티에 붙어있으면 그걸 우선 사용)
+                Long cafeId = (img.getCafe() != null ? img.getCafe().getId() : null);
+                if (cafeId == null) {
+                    // URL에서 파싱 (cafes/{cafeId}/{filename})
+                    String[] parts = relative.split("/");
+                    if (parts.length >= 3 && "cafes".equals(parts[0])) {
+                        try { cafeId = Long.parseLong(parts[1]); } catch (NumberFormatException ignore) {}
+                    }
+                }
+
+                if (filename != null && cafeId != null) {
+                    Path filePath = physicalRoot().resolve(String.valueOf(cafeId)).resolve(filename).normalize();
+                    Path root = physicalRoot().normalize();
+
+                    // 안전 가드(루트 밖 삭제 방지)
+                    if (filePath.startsWith(root)) {
+                        Files.deleteIfExists(filePath);
+                    }
+                }
+            } catch (Exception e) {
+                // 파일이 없거나 접근 문제는 경고만 남기고 계속 진행 (DB는 어쨌든 정리)
+                // 필요시 log level 조정
+                System.out.println("이미지 파일 삭제 경고: " + img.getImgUrl() + " / " + e.getMessage());
+            }
+        }
+
+        // 2) DB에서 레코드 삭제
+        cafeImageRepository.deleteAll(images);
+    }
+
+    /** 단건 삭제가 필요하면 편의 메서드도 함께 */
+    @Transactional
+    public void deleteById(Long id) throws IOException {
+        if (id == null) return;
+        deleteByIds(Collections.singletonList(id));
+    }
+
 }

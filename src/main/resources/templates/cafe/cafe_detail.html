@@ -3,6 +3,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/cafe_detail_con1.css}">
 
+
     <head>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     </head>
@@ -184,6 +185,27 @@
         .review-content-text {
             font-size: 16px;
         }
+
+        /* 이미지 영역 박스랑 비율 맞추는 css 입니다 */
+
+/* 공통: 이미지를 박스 전체로 꽉 채우기 */
+.hero__imgwrap {
+  position: relative;
+  height: 450px;
+  width: 444px;
+  overflow: hidden;
+  border-radius: 16px;
+  line-height: 0;         /* inline 이미지 하단 여백 제거 */
+}
+
+.hero__img {
+  height: 100%;
+  object-fit: cover;       /* 박스 꽉 채우되 잘라냄 */
+  display: block;          /* 인라인 이미지 기본 여백 제거 */
+  max-height: 450px;
+}
+
+
     </style>
 
     <!-- 카페명 + 영업상태 -->
@@ -193,8 +215,16 @@
         <section class="hero" aria-labelledby="cafeTitle">
             <!-- 이미지 -->
             <div class="hero__imgwrap">
-                <img class="hero__img" th:each="img : ${cafe.images}" th:src="${img.imgUrl}" alt="이미지">
+                <div th:each="img : ${images}">
+                    <!-- 대표 1장만 -->
+                    <img th:src="${#lists.isEmpty(images)} ? '/images/DBimg.PNG' : @{${images.get(0).imgUrl}}"
+                         class="hero__img" alt="카페 대표 이미지">
+                </div>
             </div>
+
+
+
+
 
             <!-- 정보 카드 -->
             <article class="card">

@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 
-// CafeRegisterRequest.java
+
 @Getter
 @Setter
 public class CafeRegisterRequest {
@@ -20,5 +20,7 @@ public class CafeRegisterRequest {
     private LocalTime openTime;
     private LocalTime closeTime;
     private boolean parkingYn;
+    private String intro;
+
 }
 
