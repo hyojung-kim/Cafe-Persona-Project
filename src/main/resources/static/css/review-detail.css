@@ -50,9 +50,13 @@ body {
   background-color: var(--danger);
   color: #fff;
 }
-.badge.bg-info {
-  background-color: var(--muted) !important;
-  color: #fff;
+.review-page .badge.bg-info {
+  background-color: var(--bean-light) !important;
+  color: var(--bean-dark) !important;
+  border: 1px solid var(--bean-dark);
+  font-weight: 500;
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
 }
 
 .review-page {
