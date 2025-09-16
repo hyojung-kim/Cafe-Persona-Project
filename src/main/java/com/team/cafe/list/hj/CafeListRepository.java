@@ -30,38 +30,54 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
 
 
     @Query(value = """
-    SELECT c.*
-    FROM cafe c
-    LEFT JOIN cafe_keyword ck ON ck.cafe_id = c.cafe_id
-    WHERE (:kw IS NULL OR :kw = '' OR
-       LOWER(c.cafe_name) LIKE LOWER(CONCAT('%', :kw, '%'))
-       /* 필요시 확장:
-       OR LOWER(c.city)     LIKE LOWER(CONCAT('%', :kw, '%'))
-       OR LOWER(c.district) LIKE LOWER(CONCAT('%', :kw, '%'))
-       OR LOWER(c.address1) LIKE LOWER(CONCAT('%', :kw, '%')) */
-    )
-    AND (
-        :parking IS NULL
-        OR c.parking_yn = CASE WHEN :parking THEN 1 ELSE 0 END
-      )
-    AND (
-        :now IS NULL
-        OR (
-             (c.open_time <= c.close_time AND c.open_time <= :now AND :now <= c.close_time)
-             OR
-             (c.open_time >  c.close_time AND (:now >= c.open_time OR :now <= c.close_time))
-           )
-      )
-    AND ( :size = 0 OR ck.keyword_id IN (:keyList) )
-    GROUP BY c.cafe_id
-    HAVING ( :size = 0 OR COUNT(DISTINCT ck.keyword_id) = :size )
-    ORDER BY
-      CASE WHEN :sort = 'name'      AND :dir = 'ASC'  THEN c.cafe_name  END ASC,
-      CASE WHEN :sort = 'name'      AND :dir = 'DESC' THEN c.cafe_name  END DESC,
-      CASE WHEN :sort = 'hit'       AND :dir = 'ASC'  THEN c.hit_count  END ASC,
-      CASE WHEN :sort = 'hit'       AND :dir = 'DESC' THEN c.hit_count  END DESC,
-      CASE WHEN :sort = 'createdAt' AND :dir = 'ASC'  THEN c.created_at END ASC,
-      CASE WHEN :sort = 'createdAt' AND :dir = 'DESC' THEN c.created_at END DESC
+            SELECT
+                c.cafe_id,
+                c.cafe_name,
+                c.city,
+                c.district,
+                c.address1,
+                c.address2,
+                c.open_time,
+                c.close_time,
+                c.parking_yn,
+                c.hit_count,
+                c.created_at,
+                c.updated_at,
+                MAX(c.created_at) AS created_at_max,
+                MAX(c.hit_count)  AS hit_count_max
+            FROM cafe c
+            LEFT JOIN cafe_keyword ck ON ck.cafe_id = c.cafe_id
+            WHERE (:kw IS NULL OR :kw = ''
+                   OR LOWER(c.cafe_name) LIKE LOWER(CONCAT('%', :kw, '%'))
+                   OR LOWER(c.city)      LIKE LOWER(CONCAT('%', :kw, '%'))
+                   OR LOWER(c.district)  LIKE LOWER(CONCAT('%', :kw, '%'))
+                   OR LOWER(c.address1)  LIKE LOWER(CONCAT('%', :kw, '%'))
+            )
+            AND (
+                :parking IS NULL
+                OR c.parking_yn = CASE WHEN :parking THEN 1 ELSE 0 END
+            )
+            AND (
+                :now IS NULL
+                OR (
+                     (c.open_time <= c.close_time AND c.open_time <= :now AND :now <= c.close_time)
+                     OR
+                     (c.open_time >  c.close_time AND (:now >= c.open_time OR :now <= c.close_time))
+                   )
+            )
+            AND ( :size = 0 OR ck.keyword_id IN (:keyList) )
+            GROUP BY
+                c.cafe_id, c.cafe_name, c.city, c.district, c.address1, c.address2,
+                c.open_time, c.close_time, c.parking_yn, c.hit_count, c.created_at, c.updated_at
+            HAVING ( :size = 0 OR COUNT(DISTINCT ck.keyword_id) = :size )
+            ORDER BY
+                CASE WHEN :sort = 'name'      AND :dir = 'ASC'  THEN c.cafe_name    END ASC,
+                CASE WHEN :sort = 'name'      AND :dir = 'DESC' THEN c.cafe_name    END DESC,
+                CASE WHEN :sort = 'hit'       AND :dir = 'ASC'  THEN hit_count_max  END ASC,
+                CASE WHEN :sort = 'hit'       AND :dir = 'DESC' THEN hit_count_max  END DESC,
+                CASE WHEN :sort = 'createdAt' AND :dir = 'ASC'  THEN created_at_max END ASC,
+                CASE WHEN :sort = 'createdAt' AND :dir = 'DESC' THEN created_at_max END DESC,
+                c.created_at DESC;
    
     """,
             countQuery = """
