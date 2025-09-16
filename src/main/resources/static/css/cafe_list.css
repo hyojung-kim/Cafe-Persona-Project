@@ -76,7 +76,7 @@
   font-weight: 600; /* 글자 굵게 */
 }
 
-.filter-panel__footer {
+.filter-panel__foot {
   display: flex;
   justify-content: space-between; /* 좌측: 선택 개수 / 우측: 버튼 */
   align-items: center;

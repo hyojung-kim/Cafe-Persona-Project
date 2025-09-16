@@ -6,6 +6,11 @@
               font-family: 'Noto Sans KR'
           }
 
+          .my-3 {
+              border-radius: 20px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
           .container.my-3 .show-id a {
               text-decoration:none;
               color: inherit;
@@ -27,7 +32,7 @@
                   font-weight: bold;
           }
            /* email 필드 스타일 */
-          .email-box > .form-control {
+          .email-box > .form-control-num {
               width: 100%;
               padding: 12px 10px;
 
@@ -37,7 +42,7 @@
               letter-spacing: normal;
           }
 
-          .email-box > .form-control::placeholder {
+          .email-box > .form-control-num::placeholder {
               letter-spacing: 0.3em;
               color: #ccc;
           }

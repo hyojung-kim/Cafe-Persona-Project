@@ -7,11 +7,11 @@
     <div class="login-header-text">Login</div>
     <form th:action="@{/user/login}" method="post" id="loginForm" onsubmit="return validateLoginConfirm()">
         <div class="mb-3 input-with-clear">
-            <input type="text" name="username" id="username" placeholder="ID" class="form-control text-box-id">
+            <input type="text" name="username" id="username" placeholder="ID" class="form-control-num text-box-id">
             <span class="clear-btn">&times;</span>
         </div>
         <div class="mb-1 input-with-toggle">
-            <input type="password" name="password" id="password" placeholder="PASSWORD" class="form-control">
+            <input type="password" name="password" id="password" placeholder="PASSWORD" class="form-control-num">
             <i class="bi bi-eye toggle-btn"></i>
         </div>
         <small th:if="${param.error}" id="loginConfirmError" class="form-text text-danger d-block">
