@@ -312,6 +312,10 @@
   font-weight: bold;
   color: #333;
   margin: 0;
+  flex: 1;                 /* 남는 공간을 다 차지 */
+  overflow: hidden;        /* 넘치면 숨기기 */
+  text-overflow: ellipsis; /* ... 처리 */
+  white-space: nowrap;     /* 줄바꿈 방지 */
 }
 
 .status {
@@ -319,6 +323,9 @@
   font-weight: 600;
   padding: 0.2rem 0.6rem;
   border-radius: 10px;
+  flex-shrink: 0;          /* 줄어들지 않음 */
+  min-width: 60px;         /* 고정 최소 폭 */
+  text-align: center;      /* 글자 가운데 정렬 */
 }
 
 .status.open {

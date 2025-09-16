@@ -77,10 +77,14 @@
            th:if="${review.images != null and !#lists.isEmpty(review.images)}">
     <div class="card-body">
       <h3 class="h6 mb-3">첨부 이미지</h3>
-      <div class="row row-cols-2 row-cols-md-3 g-2">
-        <div class="col" th:each="img : ${review.images}">
-          <img th:src="${img.imageUrl}" alt="review image" class="img-fluid rounded"/>
+      <div id="reviewImageSlider" class="review-image-slider">
+        <div class="slider-track">
+          <div class="slide" th:each="img : ${review.images}">
+            <img th:src="@{${img.imageUrl}}" alt="review image" class="review-image"/>
+          </div>
         </div>
+        <button class="slider-btn prev-btn" type="button">&#10094;</button>
+        <button class="slider-btn next-btn" type="button">&#10095;</button>
       </div>
     </div>
   </section>
@@ -99,6 +103,7 @@
   <!-- ★ 방어 스크립트: 빈/잘못된 script/link를 실시간 제거하고 원인 로그 출력 -->
 
   <!-- ✅ 레이아웃 삽입 슬롯 없어도 직접 로드 -->
+  <script th:src="@{/js/review-image-slider.js}" defer></script>
   <script th:src="@{/js/review-like.js}" defer></script>
 </div>
 
