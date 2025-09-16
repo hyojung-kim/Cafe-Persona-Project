@@ -14,6 +14,7 @@ import com.team.cafe.like.LikeService;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.review.dto.CafeWithRating;
 import com.team.cafe.review.repository.ReviewRepository;
+import com.team.cafe.review.service.ReviewLikeService;
 import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
@@ -32,10 +33,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestMapping("/cafe")
@@ -52,8 +50,7 @@ public class CafeListController {
     private final BookmarkService bookmarkService;
     private final KeywordService keywordService;
     private final MenuService menuService;
-    // hy 추가
-    private final ReviewRepository reviewRepository;
+    private final ReviewLikeService reviewLikeService;
 
     @Value("{kakao.api.key}")
     private String kakaoApiKey;
@@ -154,7 +151,7 @@ public class CafeListController {
          
         }
 
-        
+
         long likeCount = likeService.getLikeCount(cafeId);
         boolean openNow = cafeListService.isOpenNow(cafe);
 
@@ -166,15 +163,30 @@ public class CafeListController {
         Pageable pageable = PageRequest.of(reviewPage, reviewSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
 
+
         // 최신 리뷰 4개 hy
         List<Review> latestReviews;
 
         if ("hit".equals(sort)) {
             // 인기순
-            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(cafeId);
+            latestReviews = reviewService.findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(cafeId);
         } else {
             // 최신순 (기본값)
-            latestReviews = reviewRepository.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+            latestReviews = reviewService.findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(cafeId);
+        }
+
+        // latestReviews에 있는 각 리뷰의 좋아요 수를 가져와서 맵에 저장
+        Map<Long, Long> likeCountMap = new HashMap<>();
+        for (Review review : latestReviews) {
+            likeCountMap.put(review.getId(), reviewLikeService.getLikeCount(review.getId()));
+        }
+
+        // 로그인한 사용자가 각 리뷰에 좋아요를 눌렀는지 확인하는 맵 생성
+        Map<Long, Boolean> likedMap = new HashMap<>();
+        if (loginUser != null) {
+            for (Review review : latestReviews) {
+                likedMap.put(review.getId(), reviewLikeService.isLiked(review.getId(), loginUser.getId()));
+            }
         }
         // 콘솔에서 리뷰 개수 확인 hy
         System.out.println("리뷰 개수: " + latestReviews.size());
@@ -182,6 +194,8 @@ public class CafeListController {
         System.out.println("현재 카페 ID: " + cafeId);
         // 콘솔 확인용 hy
         System.out.println("sort 파라미터: " + sort);
+
+
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("liked", liked);
@@ -205,6 +219,8 @@ public class CafeListController {
         // 템플릿에서 ${latestReviews}로 사용 hy
         model.addAttribute("latestReviews", latestReviews);
         model.addAttribute("sort", sort);
+        model.addAttribute("likeCountMap", likeCountMap);
+        model.addAttribute("likedMap", likedMap);
 
         // 분리한 템플릿 경로와 일치
         return "cafe/cafe_detail";
