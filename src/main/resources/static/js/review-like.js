@@ -3,13 +3,39 @@ $(function () {
   const csrfToken  = $('meta[name="_csrf"]').attr('content');
   const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
-  function setLikedUI(box, btn, liked) {
-    box.attr('data-liked', liked ? 'true' : 'false');
-    btn.html(
-      liked ? '<span class="label-liked">♥ 좋아요 취소</span>'
-            : '<span class="label-unliked">♡ 좋아요</span>'
-    );
+  function applyButtonLabel(btn, liked) {
+    const likeLabel = btn.data('labelLike') || '좋아요';
+    const unlikeLabel = btn.data('labelUnlike') || '좋아요 취소';
+    const label = liked ? unlikeLabel : likeLabel;
+
+    btn.text(label);
+    btn.attr({
+      'aria-pressed': liked ? 'true' : 'false',
+      'aria-label': label,
+      title: label
+    });
   }
+
+  function setLikedUI(box, btn, liked) {
+    const likedState = !!liked;
+    box.attr('data-liked', likedState ? 'true' : 'false');
+    box.data('liked', likedState);
+    btn.toggleClass('on', likedState);
+    applyButtonLabel(btn, likedState);
+  }
+
+  $('.review-like-box').each(function () {
+    const box = $(this);
+    const btn = box.find('.review-like-btn');
+
+    if (!btn.length) {
+      return;
+    }
+
+    const likedData = box.data('liked');
+    const likedState = likedData === true || likedData === 'true';
+    setLikedUI(box, btn, likedState);
+  });
 
   $(document).on('click', '.review-like-btn', function () {
     const btn = $(this);

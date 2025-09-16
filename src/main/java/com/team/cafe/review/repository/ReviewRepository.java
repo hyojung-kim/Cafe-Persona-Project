@@ -55,7 +55,69 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 리뷰를 최신순 4개 가져오기 hy
     List<Review> findTop4ByCafe_IdAndActiveTrueOrderByCreatedAtDesc(Long cafeId);
 
-    // 리뷰를 좋아요 순으로 정렬하기
+    /**
+     * 주어진 카페에서 좋아요 수 기준 상위 리뷰들의 첫 번째 이미지 URL 목록.
+     */
+    @Query("""
+        SELECT ri.imageUrl
+        FROM Review r
+        JOIN r.images ri
+        WHERE r.cafe.id = :cafeId
+          AND r.active = true
+          AND ri.sortOrder = 0
+        ORDER BY size(r.likedUsers) DESC, r.createdAt DESC
+        """)
+    List<String> findTopImageUrlsByCafeOrderByLikes(@Param("cafeId") Long cafeId, Pageable pageable);
+    /**
+     * 리뷰 내용 또는 작성자 닉네임으로 검색 (user + images 즉시 로딩)
+     */
+    @EntityGraph(attributePaths = {"user", "images"})
+    @Query("""
+      SELECT r FROM Review r
+      LEFT JOIN r.user u
+      WHERE r.cafe.id = :cafeId
+        AND r.active = true
+        AND (
+              lower(r.content) LIKE lower(concat('%', :keyword, '%'))
+           OR lower(u.nickname) LIKE lower(concat('%', :keyword, '%'))
+        )
+      """)
+    Page<Review> searchByCafeIdAndKeyword(@Param("cafeId") Long cafeId,
+                                          @Param("keyword") String keyword,
+                                          Pageable pageable);
+
+    /**
+     * 좋아요 순으로 정렬된 리뷰 목록 (user + images 즉시 로딩)
+     */
+    @EntityGraph(attributePaths = {"user", "images"})
+    @Query("""
+      SELECT r FROM Review r
+      WHERE r.cafe.id = :cafeId
+        AND r.active = true
+      ORDER BY size(r.likedUsers) DESC, r.createdAt DESC
+      """)
+    Page<Review> findByCafe_IdAndActiveTrueOrderByLikes(@Param("cafeId") Long cafeId,
+                                                        Pageable pageable);
+
+
+    /**
+     * 좋아요 순으로 정렬된 검색 결과 (user + images 즉시 로딩)
+     */
+    @EntityGraph(attributePaths = {"user", "images"})
+    @Query("""
+      SELECT r FROM Review r
+      LEFT JOIN r.user u
+      WHERE r.cafe.id = :cafeId
+        AND r.active = true
+        AND (
+              lower(r.content) LIKE lower(concat('%', :keyword, '%'))
+           OR lower(u.nickname) LIKE lower(concat('%', :keyword, '%'))
+        )
+      ORDER BY size(r.likedUsers) DESC, r.createdAt DESC
+      """)
+    Page<Review> searchByCafeIdAndKeywordOrderByLikes(@Param("cafeId") Long cafeId,
+                                                      @Param("keyword") String keyword,
+                                                      Pageable pageable);
     @Query("""
    SELECT r FROM Review r
    LEFT JOIN r.likedUsers lu
@@ -67,3 +129,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @EntityGraph(attributePaths = {"user", "images"})
     List<Review> findTop4ByCafe_IdAndActiveTrueOrderByLikesDesc(@Param("cafeId") Long cafeId);
 }
+

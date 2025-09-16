@@ -8,6 +8,7 @@ import com.team.cafe.review.repository.ReviewRepository;
 import com.team.cafe.user.sjhy.SiteUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,16 +43,48 @@ public class ReviewService {
     /** 카페별 활성 리뷰 페이징 + user/images 즉시 로딩(N+1 방지) */
     @Transactional(readOnly = true)
     public Page<Review> getActiveReviewsByCafeWithUserImages(Long cafeId, Pageable pageable) {
-        Objects.requireNonNull(cafeId, "cafeId is required");
-        return reviewRepository.findByCafe_IdAndActiveTrueFetchUserImages(cafeId, pageable);
+        return getActiveReviewsByCafeWithUserImages(cafeId, pageable, null);
     }
 
+    /** 카페별 활성 리뷰 검색 + user/images 즉시 로딩 */
+    @Transactional(readOnly = true)
+    public Page<Review> getActiveReviewsByCafeWithUserImages(Long cafeId,
+                                                             Pageable pageable,
+                                                             String keyword) {
+        Objects.requireNonNull(cafeId, "cafeId is required");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return reviewRepository.findByCafe_IdAndActiveTrueFetchUserImages(cafeId, pageable);
+        }
+        return reviewRepository.searchByCafeIdAndKeyword(cafeId, keyword.trim(), pageable);
+    }
+
+    /** 좋아요 순 정렬을 지원하는 검색 */
+    @Transactional(readOnly = true)
+    public Page<Review> getActiveReviewsByCafeWithUserImagesOrderByLikes(Long cafeId,
+                                                                         Pageable pageable,
+                                                                         String keyword) {
+        Objects.requireNonNull(cafeId, "cafeId is required");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return reviewRepository.findByCafe_IdAndActiveTrueOrderByLikes(cafeId, pageable);
+        }
+        return reviewRepository.searchByCafeIdAndKeywordOrderByLikes(cafeId, keyword.trim(), pageable);
+    }
 
     /** 사용자별 활성 리뷰 페이징 */
     @Transactional(readOnly = true)
     public Page<Review> getActiveReviewsByUser(Long userId, Pageable pageable) {
         Objects.requireNonNull(userId, "userId is required");
         return reviewRepository.findByUser_IdAndActiveTrue(userId, pageable);
+    }
+
+    /**
+     * 좋아요를 많이 받은 리뷰의 첫 번째 이미지 URL 목록을 반환한다.
+     */
+    @Transactional(readOnly = true)
+    public List<String> getTopReviewImageUrlsByLikes(Long cafeId, int limit) {
+        Objects.requireNonNull(cafeId, "cafeId is required");
+        Pageable pageable = PageRequest.of(0, limit);
+        return reviewRepository.findTopImageUrlsByCafeOrderByLikes(cafeId, pageable);
     }
 
     // ========================= 생성 =========================

@@ -17,7 +17,6 @@
 
   // ===== 이미지 URL/파일 합산 미리보기 및 개수 제한 =====
   var grid = document.getElementById('previewGrid');
-  var urlInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="imageUrl"]'));
   var fileInput = document.querySelector('input[type="file"][name="images"]');
   var form = document.getElementById('reviewEditForm');
   var submitBtn = form ? form.querySelector('button[type="submit"]') : null;
@@ -52,7 +51,7 @@
 
   function currentUrlValues() {
     // 비어있지 않은 URL만 카운트/미리보기 대상으로
-    return urlInputs
+    return Array.prototype.slice.call(document.querySelectorAll('input[name="imageUrl"]'))
       .map(function (inp) { return (inp.value || '').trim(); })
       .filter(function (v) { return v.length > 0; });
   }
@@ -109,11 +108,6 @@
     }
   }
 
-  // URL 입력 변경 시 미리보기 갱신
-  urlInputs.forEach(function (inp) {
-    inp.addEventListener('input', renderPreview);
-  });
-
   // 파일 변경 시 미리보기 갱신 + 즉시 제한 안내
   if (fileInput) {
     fileInput.addEventListener('change', function () {
@@ -149,5 +143,14 @@
 
   // 초기 렌더
   renderPreview();
+
+  // 기존 이미지 삭제 처리
+  window.removeExistingImage = function (btn) {
+    var wrapper = btn.closest('.existing-image');
+    if (wrapper) {
+      wrapper.remove();
+      renderPreview();
+    }
+  };
 })();
 
