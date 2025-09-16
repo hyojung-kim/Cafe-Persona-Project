@@ -17,7 +17,7 @@
             }
 
             /* input 필드 스타일 */
-            input.form-control {
+            input.form-control-num {
                 width: 100%;
                 padding: 12px 10px;
                 border-radius: 12px;
@@ -26,7 +26,7 @@
                 letter-spacing: normal;
             }
 
-            input.form-control::placeholder {
+            input.form-control-num::placeholder {
                 letter-spacing: 0.3em;
                 color: #ccc;
             }
