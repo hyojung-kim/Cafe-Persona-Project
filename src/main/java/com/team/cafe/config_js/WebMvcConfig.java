@@ -45,5 +45,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:" + base);
         // 실제 파일이 저장된 위치 (로컬 디렉토리)
         // "file:" 접두어 → 로컬 파일 시스템 경로임을 명시
+        registry.addResourceHandler("/cafes/**")
+                .addResourceLocations("file:" + base + "cafes/");
+
     }
 }
