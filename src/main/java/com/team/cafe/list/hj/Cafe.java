@@ -3,6 +3,7 @@ package com.team.cafe.list.hj;
 
 import com.team.cafe.Menu.Menu;
 import com.team.cafe.bookmark.Bookmark;
+import com.team.cafe.businessuser.sj.BusinessUser;
 import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.keyword.hj.CafeKeyword;
 import com.team.cafe.review.domain.BaseEntity;
@@ -23,6 +24,7 @@ import java.util.Set;
 @Setter
 @Entity
 public class Cafe extends BaseEntity {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -136,5 +138,15 @@ public class Cafe extends BaseEntity {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Comment("메뉴 목록")
     private List<Menu> Menu = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "business_user_id",               // FK 컬럼명 (cafe 테이블)
+            referencedColumnName = "id",             // business 테이블의 PK
+            columnDefinition = "BIGINT UNSIGNED",    // ★ FK 컬럼 타입을 business.id와 동일하게
+            foreignKey = @ForeignKey(name = "fk_cafe_business")
+    )
+    private BusinessUser businessUser;
+
 
 }

@@ -2,6 +2,7 @@ package com.team.cafe;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,8 +29,12 @@ public class SecurityConfig {
                                 "/js/**",            // 정적 JS
                                 "/images/**",        // 정적 이미지
                                 "/webjars/**",       // webjars (사용 시)
-                                "/h2-console/**"     // H2 콘솔
+                                "/h2-console/**",    // H2 콘솔
+                                "/cafes/**",
+                                "/uploads/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/mypage/cafe/photo/**").authenticated()
+
                         .anyRequest().permitAll()   // 현재는 전부 공개 (필요 시 authenticated()로 조정)
                 )
 
