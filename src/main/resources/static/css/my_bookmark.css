@@ -1,0 +1,24 @@
+.main_con {
+display: flex;
+    gap: 20px;
+}
+
+.main_con .bookmark_h3 {
+font-size: 24px;
+margin-bottom: 60px;
+}
+
+.main_con .bookmark_card {
+  display: flex;
+  flex-direction: column;
+  width: 65%;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.06);
+  padding-left: 20px;
+}
+
+.container {
+margin-top: 24px !important;
+margin-bottom: 24px !important;
+}
