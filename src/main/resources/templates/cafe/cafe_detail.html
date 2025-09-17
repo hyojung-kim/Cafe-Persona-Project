@@ -16,10 +16,18 @@
         <section class="hero" aria-labelledby="cafeTitle">
             <!-- 이미지 -->
 
-            <div th:each="img : ${images}" class="hero__imgwrap">
-                    <!-- 대표 1장만 -->
-                    <img th:src="${#lists.isEmpty(images)} ? '/images/DBimg.PNG' : @{${images.get(0).imgUrl}}"
-                         class="hero__img" alt="카페 대표 이미지">
+            <div class="hero__imgwrap">
+                <!-- 리스트가 null이거나 비었을 때 -->
+                <img th:if="${#lists.isEmpty(images)}"
+                     th:src="@{/images/DBimg.PNG}"
+                     class="hero__img"
+                     alt="기본 대표 이미지">
+
+                <!-- 리스트에 값이 있을 때 (대표 1장만) -->
+                <img th:if="${!#lists.isEmpty(images)}"
+                     th:src="${images.get(0).imgUrl}"
+                     class="hero__img"
+                     alt="카페 대표 이미지">
             </div>
 
 
