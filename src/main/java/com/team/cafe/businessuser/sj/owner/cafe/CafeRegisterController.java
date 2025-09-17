@@ -1,9 +1,12 @@
 package com.team.cafe.businessuser.sj.owner.cafe;
 
+import com.team.cafe.businessuser.sj.BusinessUser;
+import com.team.cafe.businessuser.sj.BusinessUserRepository;
 import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
+import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,10 @@ public class CafeRegisterController {
 
     private final CafeListRepository cafeListRepository;
     private final CafeImageService cafeImageService;
+    private final UserService userService;
+    private final BusinessUserRepository businessUserRepository;
+
+
 
     /* ========== 등록 폼 ========== */
     @GetMapping("/register")
@@ -57,6 +64,17 @@ public class CafeRegisterController {
         if (principal == null) return "redirect:/user/login";
 
         try {
+            // 1) 현재 사업자 조회
+            var user = userService.getUser(principal.getName());
+            var business = businessUserRepository.findByUserId(user.getId())
+                    .orElseThrow(() -> new IllegalStateException("사업자 회원이 아닙니다."));
+
+            // 2) 이미 보유시 재등록 방지(1:1 정책)
+            if (business.getCafe() != null) {
+                ra.addFlashAttribute("toast", "이미 등록된 카페가 있습니다.");
+                return "redirect:/mypage/cafe/manage?cafeId=" + business.getCafe().getId();
+            }
+
             Cafe cafe = new Cafe();
             cafe.setName(req.getName());
             cafe.setPhoneNum(req.getPhoneNum());
@@ -71,7 +89,11 @@ public class CafeRegisterController {
             cafe.setHitCount(0);
             cafe.setIntro(req.getIntro()); // ✅ 소개 저장
 
+            cafe.setBusinessUser(business);
             cafe = cafeListRepository.save(cafe);
+
+            business.setCafe(cafe);
+            businessUserRepository.save(business);
 
             if (photos != null && !photos.isEmpty()) {
                 cafeImageService.saveCafeImages(cafe.getId(), photos);

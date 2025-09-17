@@ -39,10 +39,18 @@
 
                 <!-- 휴대폰 번호 표시 -->
                 <p>
-                <strong class="account_text">휴대폰 번호:</strong>
-                <span id="phoneDisplay" th:text="${user.phone}"></span>
-                <button class="phone" id="openPhoneModal" type="button">수정</button>
-            </p>
+                    <strong class="account_text">휴대폰 번호:</strong>
+                    <span id="phoneDisplay"
+                          th:text="${(user != null)
+                   ? ((user.businessUser != null
+                        and !#strings.isEmpty(user.businessUser.representativePhone))
+                        ? user.businessUser.representativePhone
+                        : user.phone)
+                   : ''}">
+  </span>
+                    <button class="phone" id="openPhoneModal" type="button">수정</button>
+                </p>
+
 
                 <p class="border_bottom">
                     <strong class="account_text">비밀번호 :</strong>

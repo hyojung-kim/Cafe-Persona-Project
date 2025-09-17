@@ -1,8 +1,6 @@
 package com.team.cafe.businessuser.sj;
 
-import com.team.cafe.businessuser.sj.owner.cafe.CafeManageService;
 import com.team.cafe.businessuser.sj.BusinessUserRepository;
-import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
@@ -33,7 +31,6 @@ public class MypageController {
        Constants (Session Keys)
        ========================= */
     private static final String REAUTH_TOKEN_KEY = "MYPAGE_REAUTH_TOKEN";
-    private static final String CAFE_FLOW_FLAG   = "CAFE_FLOW_OK";
     private static final String MANAGE_PASS_ONCE = "MANAGE_PASS_ONCE";
 
     private final UserService userService;
@@ -225,11 +222,10 @@ public class MypageController {
        My Page - Main
        ========================= */
     @GetMapping("/mypage")
-    public String mypage(HttpServletResponse response, Model model) {
+    public String mypage(HttpServletResponse response) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
         setNoCache(response);
-        model.addAttribute("isBusiness", user.getBusinessUser() != null);
         return "mypage/mypage-main";
     }
 
@@ -349,13 +345,11 @@ public class MypageController {
 
         // 1) 볼 카페 결정
         if (cafeId == null) {
-            // (권장) 로그인 사용자의 카페 1개 선택
-            cafeId = cafeListRepository.findByBusinessUser_User_Id(user.getId())
-                    .map(Cafe::getId)
-                    .orElse(null);
-
-            // (보조) 그래도 없으면 가장 최근 카페 1개
-            if (cafeId == null) {
+            var businessUser = businessUserRepository.findByUserId(user.getId()).orElse(null);
+            if (business != null && business.getCafe() != null) {
+                cafeId = business.getCafe().getId();
+            } else {
+                // (보조) 그래도 없으면 가장 최근 카페 1개
                 Cafe latest = cafeListRepository.findTopByOrderByIdDesc();
                 cafeId = (latest != null) ? latest.getId() : null;
             }
@@ -381,8 +375,6 @@ public class MypageController {
             model.addAttribute("isRegistered", false);
         }
 
-        return "mypage/cafe_manage"; // 템플릿 파일명과 정확히 일치
+        return "mypage/cafe_manage";
     }
-
-
 }
