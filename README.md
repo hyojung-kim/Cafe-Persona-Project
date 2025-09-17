@@ -1,7 +1,7 @@
 ![](https://velog.velcdn.com/images/rlagywnd05/post/587b98a9-c7dd-483e-81dc-c9630d4a35b8/image.png)
 
 
-
+```
 Cafe-Persona-Project/
 ├── build.gradle / settings.gradle       # Gradle 설정
 ├── src/
@@ -77,7 +77,7 @@ Cafe-Persona-Project/
 │   │
 │   └── test/java/com/team/cafe/   # 단위 테스트
 └── README.md
-
+```
 
 
 
