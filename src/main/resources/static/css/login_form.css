@@ -1,10 +1,17 @@
 
            /* 전체 컨테이너 중앙 정렬 */
             .container.my-4{
-                max-width: 500px; /* 폼 너비 제한 */
+                max-width: 600px; /* 폼 너비 제한 */
                 margin: 0 auto;   /* 화면 중앙 정렬 */
                 padding-top: 50px; /* 위쪽 여백 */
-                font-family: 'Noto Sans KR'
+                font-family: 'Noto Sans KR';
+                padding-left: 50px;
+                padding-right: 50px;
+            }
+             .my-4 {
+                border-radius: 20px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                margin: 0 10px;
             }
 
             /* 로그인 헤드 */
@@ -119,6 +126,7 @@
             .find-wrap > a {
                 width: 32%;
                 margin-right: 2%;
+                margin-left: 2%;
                 margin-bottom: 10px;
                 font-size: 12px;
                 color: #5f5f5f;

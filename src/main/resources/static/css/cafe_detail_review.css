@@ -79,7 +79,7 @@
         display: block;
         font-weight: bold;
         color: #e68a00;
-        font-size: 13px;
+        font-size: 12px;
         margin-bottom: 4px;
         }*/
 
@@ -137,19 +137,47 @@
 
         /* 필터 드롭다운 스타일 */
         .filter-bar__sort select {
+          background-color: #EEEAE6;
+          color: black;
         padding: 8px;
         border: 1px solid #bfbfbf;
         border-radius: 4px;
-        font-size: 14px;
+        font-size: 12px;
         /* 필터와 리뷰 섹션 간 간격 */
         cursor: pointer;
-
         }
+
+        /* 드롭다운 option 스타일 */
+        .filter-bar__sort select option {
+          background-color: #EEEAE6; /* 드롭다운 배경 */
+          color: black;              /* 글자 색상 */
+        }
+
+        .filter-bar__sort select option:hover {
+          background-color: #4B3A31;
+          color: white;
+        }
+        /* 선택된 option */
+        .filter-bar__sort select option:checked {
+          background-color: #4B3A31;
+          color: white;
+        }
+
+.review-summary {
+    position: relative; /* 자식 요소 기준 */
+    padding: 8px;       /* 여유 공간 */
+}
+
+.filter-bar__sort {
+    position: absolute;
+    top: -20px;        /* 상단에 고정 */
+    right: 10px;      /* 오른쪽에 고정 */
+}
 
         /* 리뷰 카운트 및 평균 별점 */
         .review-summary p {
         margin-bottom: 8px;
-        font-size: 14px;
+        font-size: 12px;
         color: #555;
         }
 
@@ -174,11 +202,11 @@
         }
 
         .review-stars i {
-        font-size: 15px;
+        font-size: 16px;
         }
         .review-score {
         margin-left: 2px;
-        font-size: 14px;
+        font-size: 12px;
         color: #e68a00;
         }
 
@@ -189,5 +217,5 @@
         gap: 4px;
         }
         .review-likes-info i {
-        font-size: 15px;
+        font-size: 16px;
         }
