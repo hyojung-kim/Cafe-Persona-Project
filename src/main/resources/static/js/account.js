@@ -1,116 +1,111 @@
-/* ================= CSRF 설정 ================= */
-const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+document.addEventListener("DOMContentLoaded", () => {
+// ================== 휴대폰 번호 수정  ==================
+document.addEventListener("DOMContentLoaded", () => {
+  const updatePhoneBtn = document.getElementById("updatePhoneBtn");
+  const phoneModal = document.getElementById("phoneModal");
+  const phoneDisplay = document.getElementById("phoneDisplay");
 
-/* ================= 모달 열기/닫기 ================= */
-const modal = document.getElementById("passwordModal");
-const openBtn = document.getElementById("openPasswordModal");
-const closeBtn = document.getElementById("closePasswordModal");
+  // 3-4-4 입력 합쳐둔 hidden
+  const hidden = document.getElementById("phone");
 
-openBtn?.addEventListener("click", () => modal.classList.add("show"));
-closeBtn?.addEventListener("click", () => modal.classList.remove("show"));
+  // CSRF 메타에서 가져오기(없으면 빈 값)
+  const csrfMeta = document.querySelector('meta[name="_csrf"]');
+  const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+  const csrfToken  = csrfMeta ? csrfMeta.content : "";
+  const csrfHeader = csrfHeaderMeta ? csrfHeaderMeta.content : "X-CSRF-TOKEN";
 
-/* ================= 비밀번호 검증 ================= */
-function validatePassword(pw) {
-    const regex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-    return regex.test(pw);
-}
+  if (updatePhoneBtn && hidden) {
+    updatePhoneBtn.addEventListener("click", async () => {
+      const newPhone = (hidden.value || "").trim(); // 예: 010-1234-5678
 
-function validatePasswordConfirm(pw, pwConfirm) {
-    return pw === pwConfirm;
-}
-
-/* ================= 비밀번호 변경 AJAX ================= */
-document.getElementById("updatePasswordBtn")?.addEventListener("click", async () => {
-    const pw = document.getElementById("newPassword").value.trim();
-    const pwConfirm = document.getElementById("confirmPassword").value.trim();
-
-    if (!validatePassword(pw)) {
-        alert("비밀번호 조건을 확인해주세요.");
+      // 간단한 형식 체크 (필요 없으면 제거)
+      if (!/^\d{2,3}-\d{3,4}-\d{4}$/.test(newPhone)) {
+        alert("휴대폰 번호 형식을 확인해주세요. (예: 010-1234-5678)");
         return;
-    }
-    if (!validatePasswordConfirm(pw, pwConfirm)) {
-        alert("비밀번호 확인이 일치하지 않습니다.");
-        return;
-    }
+      }
 
-    try {
-        const res = await fetch("/mypage/account/update-password", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                [csrfHeader]: csrfToken
-            },
-            body: `newPassword=${encodeURIComponent(pw)}`
-        });
-
-        const result = await res.text();
-if (result === "success") {
-    alert("비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
-    modal.classList.remove("show");
-    window.location.href = "/user/login"; // 로그인 페이지로 이동
-} else {
-    alert("비밀번호 변경에 실패했습니다.");
-}
-
-    } catch (err) {
-        console.error(err);
-        alert("서버 오류 발생");
-    }
-});
-
-
-/* ================= 휴대폰 번호 모달 열기/닫기 ================= */
-const phoneModal = document.getElementById("phoneModal");
-const openPhoneBtn = document.getElementById("openPhoneModal");
-const closePhoneBtn = document.getElementById("closePhoneModal");
-
-openPhoneBtn?.addEventListener("click", () => phoneModal.classList.add("show"));
-closePhoneBtn?.addEventListener("click", () => phoneModal.classList.remove("show"));
-
-/* ================= 휴대폰 번호 변경 AJAX ================= */
-document.getElementById("updatePhoneBtn")?.addEventListener("click", async () => {
-    const newPhone = document.getElementById("newPhone").value.trim();
-
-    if (!newPhone) {
-        alert("휴대폰 번호를 입력해주세요.");
-        return;
-    }
-
-    try {
+      try {
         const res = await fetch("/mypage/account/update-phone", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                [csrfHeader]: csrfToken
-            },
-            body: `phone=${encodeURIComponent(newPhone)}`
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            [csrfHeader]: csrfToken
+          },
+          body: `phone=${encodeURIComponent(newPhone)}`
         });
 
         const result = await res.text();
 
         if (result === "success") {
-            alert("휴대폰 번호가 변경되었습니다.");
-            phoneModal.classList.remove("show");
-
-            // 화면에 표시된 번호 갱신
-            const phoneDisplay = document.getElementById("phoneDisplay");
-            if (phoneDisplay) phoneDisplay.textContent = newPhone;
+          alert("휴대폰 번호가 변경되었습니다.");
+          // 화면 갱신
+          if (phoneDisplay) phoneDisplay.textContent = newPhone;
+          // 모달 닫기
+          phoneModal.classList.remove("show");
         } else {
-            alert("휴대폰 번호 변경에 실패했습니다.");
+          // 재인증 요구 정책이면 서버가 "fail"을 보낼 수 있음 → verify_password로 유도
+          if (confirm("변경에 실패했습니다. 보안 인증을 다시 진행할까요?")) {
+            const cont = location.pathname + location.search;
+            location.href = "/mypage/verify_password?continue=" + encodeURIComponent(cont);
+          }
         }
-    } catch (err) {
-        console.error(err);
-        alert("서버 오류 발생");
-    }
+      } catch (e) {
+        console.error(e);
+        alert("서버 오류가 발생했습니다.");
+      }
+    });
+  }
 });
 
-  // BFCache로 돌아온 경우(뒤/앞 이동), 서버로 다시 요청 보내도록 강제
-  window.addEventListener('pageshow', async (evt) => {
-    if (evt.persisted) {
-      location.replace('/mypage/verify_password?continue=' + encodeURIComponent(location.pathname + location.search));
-    }
-  });
 
 
 
+
+  // 모달 요소
+  const phoneModal = document.getElementById("phoneModal");
+  const openPhoneBtn = document.getElementById("openPhoneModal");
+  const closePhoneBtn = document.getElementById("closePhoneModal");
+
+  if (openPhoneBtn && phoneModal) {
+    openPhoneBtn.addEventListener("click", () => {
+      phoneModal.classList.add("show");
+    });
+  }
+  if (closePhoneBtn && phoneModal) {
+    closePhoneBtn.addEventListener("click", () => {
+      phoneModal.classList.remove("show");
+    });
+  }
+
+  // 3-4-4 입력
+  const p1 = document.getElementById("phone1");
+  const p2 = document.getElementById("phone2");
+  const p3 = document.getElementById("phone3");
+  const hidden = document.getElementById("phone");
+
+  if (p1 && p2 && p3 && hidden) {
+    const inputs = [p1, p2, p3];
+    inputs.forEach((input, idx) => {
+      input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "");
+        const max = parseInt(input.maxLength || "4", 10);
+        if (idx < 2 && input.value.length === max) {
+          inputs[idx + 1].focus();
+        }
+        hidden.value = `${p1.value}-${p2.value}-${p3.value}`;
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && input.value.length === 0 && idx > 0) {
+          inputs[idx - 1].focus();
+        }
+      });
+    });
+  }
+
+  // 비번 모달도 동일 패턴으로
+  const pwModal = document.getElementById("passwordModal");
+  const openPwBtn = document.getElementById("openPasswordModal");
+  const closePwBtn = document.getElementById("closePasswordModal");
+  if (openPwBtn && pwModal) openPwBtn.addEventListener("click", () => pwModal.classList.add("show"));
+  if (closePwBtn && pwModal) closePwBtn.addEventListener("click", () => pwModal.classList.remove("show"));
+});

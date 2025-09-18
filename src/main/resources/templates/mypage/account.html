@@ -67,45 +67,65 @@
     </div>
 </div>
 
-<!-- 비밀번호 변경 모달 -->
-<div id="passwordModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5>비밀번호 변경</h5>
-            <span id="closePasswordModal" class="close-btn">&times;</span>
+
+
+
+
+
+
+    <!-- 비밀번호 변경 모달 -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>비밀번호 변경</h5>
+                <span id="closePasswordModal" class="close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label>새 비밀번호:</label>
+                <input type="password" id="newPassword" placeholder="새 비밀번호 입력">
+                <label>비밀번호 확인:</label>
+                <input type="password" id="confirmPassword" placeholder="비밀번호 확인">
+            </div>
+            <div class="modal-footer">
+                <button id="updatePasswordBtn" type="button">수정</button>
+            </div>
         </div>
-        <div class="modal-body">
-            <label>새 비밀번호:</label>
-            <input type="password" id="newPassword" placeholder="새 비밀번호 입력">
-            <label>비밀번호 확인:</label>
-            <input type="password" id="confirmPassword" placeholder="비밀번호 확인">
+    </div>
+
+    <!-- 휴대폰 번호 변경 모달 -->
+    <div id="phoneModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>휴대폰 번호 변경</h5>
+                <span id="closePhoneModal" class="close-btn">&times;</span>
+            </div>
+
+            <div class="modal-body phone-input-group">
+                <label>새 휴대폰 번호:</label>
+                <div class="phone-inputs">
+                    <input type="text" id="phone1" maxlength="3" class="phone-box" placeholder="010">
+                    -
+                    <input type="text" id="phone2" maxlength="4" class="phone-box" placeholder="1234">
+                    -
+                    <input type="text" id="phone3" maxlength="4" class="phone-box" placeholder="5678">
+                </div>
+                <!-- 서버로 보낼 합쳐진 값 -->
+                <input type="hidden" id="phone">
+            </div>
+
+            <div class="modal-footer">
+                <button id="updatePhoneBtn" type="button">수정</button>
+            </div>
         </div>
-        <div class="modal-footer">
-            <button id="updatePasswordBtn" type="button">수정</button>
-        </div>
+    </div>
+
+    <!-- JS 연결 -->
+    <div layout:fragment="scripts">
+        <script th:src="@{/js/account.js}" defer></script>
     </div>
 </div>
 
-<!-- 휴대폰 번호 변경 모달 -->
-<div id="phoneModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5>휴대폰 번호 변경</h5>
-            <span id="closePhoneModal" class="close-btn">&times;</span>
-        </div>
-        <div class="modal-body">
-            <label>새 휴대폰 번호:</label>
-            <input type="text" id="newPhone" placeholder="휴대폰 번호 입력">
-        </div>
-        <div class="modal-footer">
-            <button id="updatePhoneBtn" type="button">수정</button>
-        </div>
-    </div>
-</div>
 
-
-<!-- JS 연결 -->
-<script th:src="@{/js/account.js}"></script>
 
 </body>
 </html>
