@@ -8,8 +8,10 @@ import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -309,14 +311,26 @@ public class MypageController {
 
     @PostMapping("/mypage/account/update-phone")
     @ResponseBody
-    public String updatePhone(HttpServletRequest request,
+    @Transactional
+    public String updatePhone(@AuthenticationPrincipal UserDetails principal,
                               @RequestParam String phone) {
-        SiteUser user = currentUserOrNull();
+        if (principal == null) return "fail"; // 필요시 401로 변경
+        SiteUser user = userService.getUser(principal.getUsername());
+
         if (user == null) return "fail";
-        if (!requireReauthConsume(request)) return "fail";
 
         user.setPhone(phone);
         userService.save(user);
+
+        // 2) 비즈니스 유저 대표번호도 함께 업데이트
+        businessUserRepository.findByUserId(user.getId()).ifPresent(biz -> {
+            biz.setRepresentativePhone(phone);
+            businessUserRepository.save(biz); // ← 엔티티 말고 레포지토리로 save
+        });
+
+
+
+
         return "success";
     }
 
