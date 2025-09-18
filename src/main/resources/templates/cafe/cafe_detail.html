@@ -1,5 +1,6 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
+
     <link rel="stylesheet" th:href="@{/css/cafe_detail_review.css}">
     <link rel="stylesheet" th:href="@{/css/cafe_detail_con1.css}">
 
@@ -7,30 +8,26 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     </head>
 
+
     <!-- 카페명 + 영업상태 -->
     <main class="container-1">
 
         <!-- ===== 헤더: 이미지 + 정보 카드 ===== -->
         <section class="hero" aria-labelledby="cafeTitle">
             <!-- 이미지 -->
-            <div class="hero__imgwrap">
-                <th:block th:if="${#lists.isEmpty(cafe.images)}">
-                    <img class="hero__img" src="/images/DBimg.PNG" alt="이미지 없음">
-                </th:block>
 
-                <th:block th:unless="${#lists.isEmpty(cafe.images)}">
-                    <img class="hero__img"
-                         th:each="img : ${cafe.images}"
-                         th:src="${img.imgUrl}"
-                         alt="이미지">
-                </th:block>
+            <div th:each="img : ${images}" class="hero__imgwrap">
+                <!-- 대표 1장만 -->
+                <img th:src="${#lists.isEmpty(images)} ? '/images/DBimg.PNG' : @{${images.get(0).imgUrl}}"
+                     class="hero__img" alt="카페 대표 이미지">
             </div>
+
 
             <!-- 정보 카드 -->
             <article class="card">
                 <div>
-                      <span class="title" id="cafeTitle" th:text="${cafe.name}"></span>
-                      <span th:if="${openNow != null}"
+                    <span class="title" id="cafeTitle" th:text="${cafe.name}"></span>
+                    <span th:if="${openNow != null}"
                           class=""
                           th:classappend="${openNow} ? 'status open' : 'status closed'"
                           th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
@@ -39,9 +36,9 @@
                 <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
 
                 <div class="stats">
-                    <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
+                    <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}" |>★ 4.5</span>
                     <span class="stat" th:text="|리뷰 ${reviewCount}|">리뷰 0</span>
-                    <span class="stat" th:text="|👁 조회수 ${cafe.hitCount}"|>조회 0</span>
+                    <span class="stat" th:text="|👁 조회수 ${cafe.hitCount}" |>조회 0</span>
                     <div id="likeBox"
                          th:data-cafe-id="${cafe.id}"
                          th:data-liked="${liked}">
@@ -150,73 +147,108 @@
         </section>
 
 
-
     </main>
 
     <script src="/js/cafe-like.js"></script>
 
 
     <div style="margin-top:8px;">
-        <a class="btn" th:href="@{/cafe/map/{cafeId}(cafeId=${cafe.id})}">카페 위치 보기</a>
+        <h2 th:text="|${cafe.name} 위치|">카페 위치</h2>
+        <div style="margin-bottom:10px; display:flex; gap:8px">
+            <input id="address-input" type="text" th:value="${cafe.address1}"
+                   style="flex:1; padding:8px; border:1px solid var(--line); border-radius:4px"
+                   placeholder="주소 검색"/>
+            <button id="search-btn" type="button" class="btn">검색</button>
+        </div>
+
+        <div id="map" style="width:100%;height:500px;"></div>
+
+        <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8ed22f8047c9ec337686bbb083546da6&libraries=services"></script>
+        <script>
+            var container = document.getElementById('map');
+            var options = {
+              center: new kakao.maps.LatLng(37.5665, 126.9780), // 지도를 열 때 보일 좌표 (여기서는 서울 시청)
+              level: 3                                          // 확대 레벨(1~14)
+            };
+            var map = new kakao.maps.Map(container, options);
+            var marker = new kakao.maps.Marker({
+                map: map
+            });
+
+            var places = new kakao.maps.services.Places();
+
+            function searchAndDisplay() {
+                var keyword = document.getElementById('address-input').value;
+                if (!keyword) return;
+                places.keywordSearch(keyword, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        var first = result[0];
+                        var coords = new kakao.maps.LatLng(first.y, first.x);
+                        map.setCenter(coords);
+                        marker.setPosition(coords);
+                    }
+                });
+            }
+
+            document.getElementById('search-btn').addEventListener('click', searchAndDisplay);
+            document.getElementById('address-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    searchAndDisplay();
+                }
+            });
+
+            if (document.getElementById('address-input').value) {
+                searchAndDisplay();
+            }
+        </script>
     </div>
     <!-- 하단: 리뷰 리스트 페이지로 이동 (스타일 없음) -->
     <!--  기본순 - 최신순 , 인기순 - 리뷰 좋아요 갯수 순  -->
     <div style="margin-top:16px;">
-
-        <div class="review-summary">
-<!--            &lt;!&ndash;   소수점 첫째자리까지만  &ndash;&gt;-->
-<!--            <p>평균 별점 :-->
-<!--                <span>-->
-<!--        &lt;!&ndash; 채워진 별 &ndash;&gt;-->
-<!--        <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avgRating))}">-->
-<!--            <i class="fa-solid fa-star"></i>-->
-<!--        </span>-->
-
-<!--                    &lt;!&ndash; 반 별 (0.5 이상일 때) &ndash;&gt;-->
-<!--        <span th:if="${avgRating - T(java.lang.Math).floor(avgRating) >= 0.5}">-->
-<!--            <i class="fa-solid fa-star-half-stroke"></i>-->
-<!--        </span>-->
-
-<!--                    &lt;!&ndash; 빈 별 &ndash;&gt;-->
-<!--        <span th:each="i : ${#numbers.sequence( 1, 5 - T(java.lang.Math).floor(avgRating) - (avgRating - T(java.lang.Math).floor(avgRating) >= 0.5 ? 1 : 0)-->
-<!--        )}">-->
-<!--            <i class="fa-regular fa-star"></i>-->
-<!--        </span>-->
-<!--    </span>-->
-<!--                <span th:text="${T(java.lang.Math).floor(avgRating * 10) / 10}"></span></p>-->
-
+        <div class="review-summary"><div class="review-header">
+            <div class="review-subject">Review (<span th:text="${reviewCount}"></span>)
+            </div>
             <form th:action="@{/cafe/detail/{id}(id=${cafe.id})}" id="filterForm" method="get"
-                  class="filter-form"></form>
-            <label class="filter-bar__sort">
-                <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
-                    <option value="createdAt" th:selected="${sort} == 'createdAt'">최신순</option>
-                    <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
-                </select>
-            </label>
-
+                  class="filter-form">
+                <label class="filter-bar__sort">
+                    <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
+                        <option value="createdAt" th:selected="${sort} == 'createdAt'">최신순</option>
+                        <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
+                    </select>
+                </label>
+            </form>
+        </div>
             <div class="review-container">
-                <div class="review-subject">Review (<span th:text="${reviewCount}"></span>)</div>
+
+
                 <a th:each="review : ${latestReviews}"
                    th:href="@{/cafes/{id}/reviews(id=${cafe.id})}"
                    class="review-item"
                    style="display: block; text-decoration: none; color: inherit;">
 
                     <div class="review-item-inner">
-                        <div class="review-image-placeholder">
-                        </div>
+                        <!--  대표, 대체 이미지  -->
+                        <div class="review-image-placeholder"></div>
+                        <!--                        <div th:if="${#lists.isEmpty(review.images) == false}">-->
+                        <!--                            <img th:each="img : ${review.images}"-->
+                        <!--                                 th:src="@{/uploads/{file}(file=${img.fileName})}"-->
+                        <!--                                 alt="리뷰 이미지" />-->
+                        <!--                        </div>-->
+
                         <div class="review-content">
                             <div class="review-stars">
                                 <div class="rating-group">
-                                <!-- 1부터 5까지 반복 -->
-                                <span th:each="i : ${#numbers.sequence(1,5)}">
+                                    <!-- 1부터 5까지 반복 -->
+                                    <span th:each="i : ${#numbers.sequence(1,5)}">
                                     <!-- 꽉 찬 별 -->
                                     <i class="fa-solid fa-star" th:if="${review.rating >= i}"></i>
-                                    <!-- 반 별 -->
-                                    <i class="fa-solid fa-star-half-stroke" th:if="${review.rating >= i - 0.5 and review.rating < i}"></i>
-                                    <!-- 빈 별 -->
+                                        <!-- 반 별 -->
+                                    <i class="fa-solid fa-star-half-stroke"
+                                       th:if="${review.rating >= i - 0.5 and review.rating < i}"></i>
+                                        <!-- 빈 별 -->
                                     <i class="fa-regular fa-star" th:if="${review.rating < i - 0.5}"></i>
                                 </span>
-                                <span class="review-score" th:text="${review.rating}"></span>
+                                    <span class="review-score" th:text="${review.rating}"></span>
                                 </div>
                                 <div class="review-likes-info">
                                     <i class="fa-solid fa-heart" style="color: #eb4747;"></i>
@@ -228,8 +260,8 @@
                         </div>
                     </div>
                 </a>
+
             </div>
-            <!-- 더보기 버튼 -->
             <button type="button" class="more-reviews-button"
                     th:onclick="location.href='/cafes/' + [[${cafe.id}]] + '/reviews'">더보기
             </button>
