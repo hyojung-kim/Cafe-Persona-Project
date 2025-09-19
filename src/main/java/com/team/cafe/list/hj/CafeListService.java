@@ -27,6 +27,7 @@ public class CafeListService {
     /**
      * PK 타입 Long 통일
      */
+    @Transactional(readOnly = true)
     public Cafe getById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("id is null");
@@ -65,6 +66,7 @@ public class CafeListService {
      */
     public Boolean isOpenNow(Cafe cafe) {
         if (cafe.getOpenTime() == null || cafe.getCloseTime() == null) {
+
             return null;
         }
         LocalTime now = LocalTime.now();
@@ -86,6 +88,7 @@ public class CafeListService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Page<CafeMatchDto> getCafes(String kw,
                                        int page, int size,
                                        String sort, String dir,

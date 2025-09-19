@@ -57,19 +57,7 @@ public class CafeRegisterController {
         if (principal == null) return "redirect:/user/login";
 
         try {
-            Cafe cafe = new Cafe();
-            cafe.setName(req.getName());
-            cafe.setPhoneNum(req.getPhoneNum());
-            cafe.setSiteUrl(req.getSiteUrl());
-            cafe.setAddress1(req.getAddress1());
-            cafe.setAddress2(req.getAddress2());
-            cafe.setDistrict(req.getDistrict());
-            cafe.setCity(req.getCity());
-            cafe.setOpenTime(req.getOpenTime());
-            cafe.setCloseTime(req.getCloseTime());
-            cafe.setParkingYn(req.isParkingYn());
-            cafe.setHitCount(0);
-            cafe.setIntro(req.getIntro()); // ✅ 소개 저장
+            Cafe cafe = getCafe(req);
 
             cafe = cafeListRepository.save(cafe);
 
@@ -89,6 +77,24 @@ public class CafeRegisterController {
             ra.addFlashAttribute("error", "등록 중 오류: " + e.getMessage());
             return "redirect:/mypage/cafe/register";
         }
+    }
+
+    private static Cafe getCafe(CafeRegisterRequest req) {
+        Cafe cafe = new Cafe();
+        cafe.setGooglePlaceId(null);
+        cafe.setName(req.getName());
+        cafe.setPhoneNum(req.getPhoneNum());
+        cafe.setSiteUrl(req.getSiteUrl());
+        cafe.setAddress1(req.getAddress1());
+        cafe.setAddress2(req.getAddress2());
+        cafe.setDistrict(req.getDistrict());
+        cafe.setCity(req.getCity());
+        cafe.setOpenTime(req.getOpenTime());
+        cafe.setCloseTime(req.getCloseTime());
+        cafe.setParkingYn(req.isParkingYn());
+        cafe.setHitCount(0);
+        cafe.setIntro(req.getIntro()); // ✅ 소개 저장
+        return cafe;
     }
 
     /* ========== 수정 폼(프리필) ========== */
