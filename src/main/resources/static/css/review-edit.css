@@ -1,5 +1,3 @@
-@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
-
 :root {
   --ink: #2F1F1B;
   --ink-soft: #75645B;
@@ -12,6 +10,7 @@
   --shadow: 0 18px 40px rgba(53, 36, 27, 0.14);
   --radius-lg: 28px;
   --radius-md: 18px;
+  --star-empty: #E1D8D0;
 }
 
 body {
@@ -203,12 +202,10 @@ body {
 }
 
 .rate {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 0.15rem;
   border: 0;
-  margin-right: 5px;
-  overflow: hidden;
-  vertical-align: middle;
-  position: relative;
 }
 
 .rate > input {
@@ -216,30 +213,53 @@ body {
 }
 
 .rate > label {
-  float: right;
-  color: #ddd;
-}
-
-.rate > label:before {
-  display: inline-block;
-  font-size: 1.1rem;
-  padding: .3rem .2rem;
-  margin: 0;
+  position: relative;
+  display: block;
+  width: 1.4rem;
+  height: 1.4rem;
   cursor: pointer;
-  font-family: FontAwesome;
-  content: "\f005 ";
+  flex-shrink: 0;
 }
 
-.rate .half:before {
-  content: "\f089 ";
+.rate > label::before,
+.rate > label::after {
+  content: "";
   position: absolute;
-  padding-right: 0;
+  inset: 0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M12 2.25l2.64 6.59 7.11.55-5.38 4.64 1.66 6.97L12 17.77l-6.03 3.23 1.66-6.97-5.38-4.64 7.11-.55L12 2.25z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M12 2.25l2.64 6.59 7.11.55-5.38 4.64 1.66 6.97L12 17.77l-6.03 3.23 1.66-6.97-5.38-4.64 7.11-.55L12 2.25z'/%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
 }
 
-.rate input:checked ~ label,
-.rate label:hover,
-.rate label:hover ~ label {
-  color: var(--accent) !important;
+.rate > label::before {
+  background-color: var(--star-empty);
+}
+
+.rate > label::after {
+  background-color: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.2s ease;
+}
+
+.rate > input:checked ~ label::after,
+.rate label:hover::after,
+.rate label:hover ~ label::after {
+  transform: scaleX(1);
+}
+
+.rate > input:checked + label.half::after,
+.rate label.half:hover::after {
+  transform: scaleX(0.5);
+}
+
+.rate label.half:hover ~ label::after {
+  transform: scaleX(1);
+}
+
+.rate.read-only,
+.rate.read-only > label {
+  cursor: default;
 }
 
 .rate.read-only {
