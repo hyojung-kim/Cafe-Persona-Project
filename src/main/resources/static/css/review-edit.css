@@ -102,10 +102,9 @@
 }
 
 .review-edit__footer {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: clamp(1.2rem, 2vw, 1.8rem);
-  align-items: start;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .review-edit__upload {
@@ -179,10 +178,15 @@
   gap: 0.6rem;
   align-items: center;
   justify-content: flex-end;
+  margin-top: clamp(1rem, 2vw, 1.4rem);
 }
 
-.review-edit__actions .review-submit-btn {
+.review-edit__actions .btn {
   min-width: 130px;
+}
+
+.review-edit__delete-form {
+  margin: 0;
 }
 
 .review-edit__existing {
@@ -299,4 +303,3 @@
     justify-content: center;
   }
 }
-

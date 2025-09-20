@@ -46,6 +46,7 @@
               <div class="rating-picker__star-wrapper">
                 <div class="rating-stars rating-stars--interactive"
                      data-rating-display
+                     aria-hidden="true"
                      th:style="'--rating:' + ${#numbers.formatDecimal(form.rating != null ? form.rating : review.rating, 1, 1)}"></div>
                 <div class="rate rating-picker__choices"
                      id="editRatingChoices"
@@ -74,7 +75,8 @@
                 </div>
               </div>
               <div class="rating-picker__value-group">
-                <span class="rating-picker__value" id="editRatingValue">0.0</span>
+                <span class="rating-picker__value" id="editRatingValue"
+                      th:text="${#numbers.formatDecimal(form.rating != null ? form.rating : review.rating, 1, 1)}">0.0</span>
                 <span class="rating-picker__value-caption">/ 5.0</span>
               </div>
             </div>
@@ -110,11 +112,6 @@
                 aria-live="polite"
                 aria-label="선택한 새 이미지 목록"></ul>
           </div>
-
-          <div class="review-edit__actions">
-            <button class="btn btn-primary review-submit-btn" type="submit">수정 완료</button>
-            <a th:href="@{|/reviews/${review.id}|}" class="btn btn-outline-secondary btn-sm">취소</a>
-          </div>
         </div>
 
         <div class="review-edit__existing"
@@ -134,11 +131,17 @@
         </div>
       </form>
 
-      <form th:action="@{|/reviews/${review.id}/delete|}" method="post" class="review-edit__delete"
-            onsubmit="return confirm('정말 삭제하시겠습니까?');">
-        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <button type="submit" class="btn btn-danger btn-sm">리뷰 삭제</button>
-      </form>
+      <div class="review-edit__actions" role="group" aria-label="리뷰 수정 액션">
+        <button class="btn btn-primary review-submit-btn" type="submit" form="reviewEditForm">수정 완료</button>
+        <form th:action="@{|/reviews/${review.id}/delete|}"
+              method="post"
+              class="review-edit__delete-form"
+              onsubmit="return confirm('정말 삭제하시겠습니까?');">
+          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button type="submit" class="btn btn-danger">리뷰 삭제</button>
+        </form>
+        <a th:href="@{|/reviews/${review.id}|}" class="btn btn-outline-secondary">취소</a>
+      </div>
     </div>
   </section>
 </div>

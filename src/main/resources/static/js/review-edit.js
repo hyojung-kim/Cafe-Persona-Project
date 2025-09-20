@@ -36,6 +36,7 @@
   const ratingDisplay = form.querySelector('[data-rating-display]');
   const ratingValue = document.getElementById('editRatingValue');
   const ratingChoices = form.querySelector('.rating-picker__choices');
+  const starWrapper = form.querySelector('.rating-picker__star-wrapper');
 
   const ratingValues = ratingInputs
     .map((input) => Number.parseFloat(input.value))
@@ -103,6 +104,59 @@
   if (ratingChoices) {
     ratingChoices.addEventListener('pointerleave', resetRatingDisplay);
     ratingChoices.addEventListener('mouseleave', resetRatingDisplay);
+  }
+
+  const findRatingInput = (value) => {
+    const numericValue = Number.parseFloat(value);
+    if (!Number.isFinite(numericValue)) return null;
+    return ratingInputs.find((input) => {
+      const inputValue = Number.parseFloat(input.value);
+      return Number.isFinite(inputValue) && Math.abs(inputValue - numericValue) < 0.001;
+    }) || null;
+  };
+
+  const getRatingFromPosition = (clientX) => {
+    if (!starWrapper || !ratingValues.length) return null;
+    const rect = starWrapper.getBoundingClientRect();
+    const width = rect.width;
+    if (!width || Number.isNaN(width)) return null;
+    const ratio = (clientX - rect.left) / width;
+    const clamped = Math.min(0.999999, Math.max(0, ratio));
+    const index = Math.min(ratingValues.length - 1, Math.floor(clamped * ratingValues.length));
+    return ratingValues[index] ?? null;
+  };
+
+  if (starWrapper && ratingInputs.length) {
+    starWrapper.addEventListener('pointermove', (event) => {
+      if (event.pointerType && event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+      const hoveredRating = getRatingFromPosition(event.clientX);
+      if (hoveredRating != null) {
+        syncRatingDisplay(hoveredRating);
+      }
+    });
+
+    starWrapper.addEventListener('pointerleave', resetRatingDisplay);
+
+    starWrapper.addEventListener('pointerdown', (event) => {
+      if (event.button != null && event.pointerType === 'mouse' && event.button !== 0) {
+        return;
+      }
+      const selectedRating = getRatingFromPosition(event.clientX);
+      if (selectedRating == null) return;
+      const targetInput = findRatingInput(selectedRating);
+      if (!targetInput) return;
+
+      event.preventDefault();
+      targetInput.checked = true;
+      targetInput.dispatchEvent(new Event('change', { bubbles: true }));
+      syncRatingDisplay(selectedRating);
+    });
+
+    starWrapper.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.tagName === 'LABEL' && event.detail !== 0) {
+        event.preventDefault();
+      }
+    });
   }
 
   // ===== 새 이미지 파일 목록 관리 =====
