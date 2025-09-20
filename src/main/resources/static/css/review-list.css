@@ -198,6 +198,17 @@ body {
   background: var(--surface);
 }
 
+.review-section.review-create {
+  background: linear-gradient(135deg, rgba(244, 229, 217, 0.95), rgba(255, 247, 240, 0.95));
+  border: 1px solid rgba(47, 31, 27, 0.12);
+  box-shadow: 0 28px 68px rgba(47, 31, 27, 0.3);
+}
+
+.review-section.review-create .card-body {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(4px);
+}
+
 .review-section.review-search {
   background: linear-gradient(135deg, #F0DCC6, #F8E7D7);
   border: 1px solid rgba(47, 31, 27, 0.12);
