@@ -10,5 +10,5 @@ public class CafeApplication {
 		SpringApplication.run(CafeApplication.class, args);
 	}
 
-	// 브랜치 푸쉬용 수정
+	// 브랜치 푸쉬용
 }
