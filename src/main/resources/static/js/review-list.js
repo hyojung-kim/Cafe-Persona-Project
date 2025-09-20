@@ -11,6 +11,111 @@
   const ratingDisplay = document.querySelector('[data-rating-display]');
   const ratingValue = document.getElementById('createRatingValue');
   const starWrapper = form.querySelector('.rating-picker__star-wrapper');
+  const imageInput = document.getElementById('createImages');
+  const imageList = document.getElementById('reviewImageList');
+  const selectedFiles = [];
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_FILE_COUNT = imageInput ? Number.parseInt(imageInput.getAttribute('data-max-files') || '10', 10) : 10;
+
+  const syncSelectedFileView = () => {
+    if (!imageList) return;
+    imageList.innerHTML = '';
+
+    if (!selectedFiles.length) {
+      const empty = document.createElement('li');
+      empty.className = 'review-create__file-empty';
+      empty.textContent = '선택된 이미지가 없습니다.';
+      imageList.appendChild(empty);
+      return;
+    }
+
+    selectedFiles.forEach((file, index) => {
+      const item = document.createElement('li');
+      item.className = 'review-create__file-item';
+
+      const name = document.createElement('span');
+      name.className = 'review-create__file-name';
+      name.textContent = file.name;
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'review-create__file-remove';
+      remove.setAttribute('data-index', String(index));
+      remove.setAttribute('aria-label', `${file.name} 삭제`);
+      remove.innerHTML = '&times;';
+
+      item.append(name, remove);
+      imageList.appendChild(item);
+    });
+  };
+
+  const syncImageInput = () => {
+    if (!imageInput || typeof DataTransfer === 'undefined') return;
+    const dt = new DataTransfer();
+    selectedFiles.forEach((file) => dt.items.add(file));
+    imageInput.files = dt.files;
+  };
+
+  if (imageList) {
+    imageList.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target.closest('.review-create__file-remove') : null;
+      if (!target) return;
+      const index = Number.parseInt(target.getAttribute('data-index') || '', 10);
+      if (!Number.isInteger(index) || index < 0 || index >= selectedFiles.length) return;
+      selectedFiles.splice(index, 1);
+      syncImageInput();
+      syncSelectedFileView();
+      if (imageInput) {
+        imageInput.focus();
+      }
+    });
+  }
+
+  if (imageInput) {
+    syncSelectedFileView();
+
+    imageInput.addEventListener('change', (event) => {
+      const input = event.currentTarget;
+      if (!(input instanceof HTMLInputElement) || !input.files) return;
+
+      const newFiles = Array.from(input.files);
+      if (!newFiles.length) return;
+
+      const messages = [];
+
+      newFiles.forEach((file) => {
+        if (file.size > MAX_FILE_SIZE) {
+          messages.push(`"${file.name}"은(는) 10MB를 초과하여 제외되었습니다.`);
+          return;
+        }
+        if (selectedFiles.length >= MAX_FILE_COUNT) {
+          messages.push(`이미지는 최대 ${MAX_FILE_COUNT}장까지 선택할 수 있습니다.`);
+          return;
+        }
+        const isDuplicate = selectedFiles.some((existing) => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified);
+        if (isDuplicate) {
+          messages.push(`"${file.name}"은(는) 이미 선택된 이미지입니다.`);
+          return;
+        }
+        selectedFiles.push(file);
+      });
+
+      syncImageInput();
+      syncSelectedFileView();
+
+      input.value = '';
+
+      if (messages.length) {
+        alert(messages.filter((value, index, arr) => arr.indexOf(value) === index).join('\n'));
+      }
+    });
+
+    form.addEventListener('reset', () => {
+      selectedFiles.length = 0;
+      syncImageInput();
+      syncSelectedFileView();
+    });
+  }
 
   const ratingValues = ratingInputs
     .map((input) => Number.parseFloat(input.value))
@@ -171,6 +276,9 @@
       // 3) 폼 리셋
       form.reset();
       form.classList.remove('was-validated');
+      selectedFiles.length = 0;
+      syncImageInput();
+      syncSelectedFileView();
       if (ratingInputs.length) {
         syncRating(getCheckedRating());
       } else {

@@ -76,7 +76,9 @@
       <div id="reviewImageSlider" class="review-image-slider">
         <div class="slider-track">
           <div class="slide" th:each="img : ${review.images}">
-            <img th:src="@{${img.imageUrl}}" alt="review image" class="review-image"/>
+            <div class="review-image-wrapper">
+              <img th:src="@{${img.imageUrl}}" alt="review image" class="review-image"/>
+            </div>
           </div>
         </div>
         <button class="slider-btn prev-btn" type="button" aria-label="이전 이미지">&#10094;</button>

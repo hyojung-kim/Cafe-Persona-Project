@@ -215,12 +215,66 @@ body {
   width: min(280px, 60vw);
 }
 
-.review-image-slider .review-image {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+.review-image-wrapper {
+  --image-aspect-ratio: 1;
+  position: relative;
+  display: block;
   border-radius: 20px;
   box-shadow: 0 18px 36px rgba(47, 31, 27, 0.18);
+  background: var(--surface-alt);
+}
+
+.review-image-wrapper::before {
+  content: "";
+  display: block;
+  width: 100%;
+  padding-bottom: calc(var(--image-aspect-ratio, 0.75) * 100%);
+}
+
+.review-image-wrapper .review-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.review-magnifier {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 25px 45px -20px rgba(26, 22, 18, 0.55);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 200% 200%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.9);
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  overflow: hidden;
+}
+
+.review-magnifier::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 60%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.8;
+}
+
+.review-magnifier.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  box-shadow: 0 30px 60px -25px rgba(26, 22, 18, 0.65);
 }
 
 .review-image-slider .slider-btn {

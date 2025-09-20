@@ -151,8 +151,12 @@
         <div class="review-create__footer">
           <div class="review-create__upload">
             <label class="form-label" for="createImages">사진 첨부</label>
-            <input id="createImages" type="file" name="images" class="form-control" accept="image/*" multiple>
+            <input id="createImages" type="file" name="images" class="form-control" accept="image/*" multiple data-max-files="10">
             <p class="upload-hint">최대 10장, 10MB 이하 이미지를 올릴 수 있습니다.</p>
+            <ul id="reviewImageList"
+                class="review-create__file-list"
+                aria-live="polite"
+                aria-label="선택한 이미지 목록"></ul>
           </div>
           <button class="btn btn-primary review-submit-btn" type="submit">리뷰 등록</button>
         </div>
