@@ -161,7 +161,7 @@
   </section>
 
   <!-- 리뷰 검색 및 정렬 -->
-  <section class="card shadow-sm mb-3 review-section">
+  <section class="card shadow-sm mb-3 review-section review-search">
     <div class="card-body review-toolbar">
       <div class="filter-group" role="group">
         <a class="filter-chip"
@@ -202,38 +202,44 @@
           <header class="review-card__header">
             <div class="review-card__identity">
               <div class="avatar" th:text="${rv.user != null && !#strings.isEmpty(rv.user.nickname) ? #strings.substring(rv.user.nickname,0,1) : '게'}">닉</div>
-              <div>
+              <div class="review-card__identity-text">
                 <span class="nickname" th:text="${rv.user != null ? rv.user.nickname : '알 수 없음'}">작성자</span>
                 <div class="meta">
                   <time th:text="${#temporals.format(rv.createdAt,'yyyy.MM.dd HH:mm')}">2025.09.01 10:30</time>
-                  <span class="dot" aria-hidden="true">·</span>
-                  <span class="review-card__rating">
-                    <span class="rating-stars rating-stars--sm"
-                          aria-hidden="true"
-                          th:style="'--rating:' + ${#numbers.formatDecimal(rv.rating,1,1)}"></span>
-                    <span class="visually-hidden"
-                          th:text="${'별점 ' + #numbers.formatDecimal(rv.rating,1,1) + '점'}">별점</span>
-                  </span>
                 </div>
               </div>
             </div>
-            <div class="review-card__likes review-like-box"
-                 th:with="isLiked=${likedMap[rv.id] != null ? likedMap[rv.id] : false}"
-                 th:data-review-id="${rv.id}"
-                 th:data-liked="${isLiked}">
-              <button type="button"
-                      class="btn_like review-like-btn"
-                      th:classappend="${isLiked} ? ' on' : ''"
-                      data-label-like="좋아요"
-                      data-label-unlike="좋아요 취소"
-                      th:attr="aria-pressed=${isLiked}, aria-label=${isLiked} ? '좋아요 취소' : '좋아요'">
-                좋아요
-              </button>
-              <span class="review-like-count" th:text="${likeCountMap[rv.id]}">0</span>
+            <div class="review-card__meta">
+              <div class="review-card__score"
+                   th:attr="aria-label=${'이 리뷰의 평점 ' + #numbers.formatDecimal(rv.rating,1,1) + '점'}">
+                <div class="rating-badge">
+                  <span class="rating-badge__value" th:text="${#numbers.formatDecimal(rv.rating,1,1)}">4.5</span>
+                  <span class="rating-badge__unit">/5</span>
+                </div>
+                <span class="rating-stars rating-stars--md"
+                      aria-hidden="true"
+                      th:style="'--rating:' + ${#numbers.formatDecimal(rv.rating,1,1)}"></span>
+                <span class="visually-hidden"
+                      th:text="${'별점 ' + #numbers.formatDecimal(rv.rating,1,1) + '점'}">별점</span>
+              </div>
+              <div class="review-card__likes review-like-box"
+                   th:with="isLiked=${likedMap[rv.id] != null ? likedMap[rv.id] : false}"
+                   th:data-review-id="${rv.id}"
+                   th:data-liked="${isLiked}">
+                <button type="button"
+                        class="btn_like review-like-btn"
+                        th:classappend="${isLiked} ? ' on' : ''"
+                        data-label-like="좋아요"
+                        data-label-unlike="좋아요 취소"
+                        th:attr="aria-pressed=${isLiked}, aria-label=${isLiked} ? '좋아요 취소' : '좋아요'">
+                  좋아요
+                </button>
+                <span class="review-like-count" th:text="${likeCountMap[rv.id]}">0</span>
+              </div>
             </div>
           </header>
 
-          <div class="review-card__body">
+          <div class="review-card__body review-card__content">
             <p th:text="${#strings.abbreviate(rv.content, 300)}">리뷰 내용</p>
           </div>
 
