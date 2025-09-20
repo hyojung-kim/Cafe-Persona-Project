@@ -1,201 +1,157 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
 :root {
-  --bd: #E2D3C5;
-  --ink: #3B2A23;
-  --muted: #8C7666;
-  --bg: #ffffff;
-  --accent: #C9855A;
-  --danger: #B45F4D;
-  --bean-dark: #4B3A31;
-  --bean-medium: #7E6656;
-  --bean-light: #EEEAE6;
-  --bean-cream: #F8F4EF;
+  --ink: #2F1F1B;
+  --ink-soft: #75645B;
+  --muted: #9C8E87;
+  --surface: #FFFFFF;
+  --surface-alt: #F9F6F3;
+  --accent: #D5835F;
+  --accent-dark: #B56B47;
+  --danger: #D46A6A;
+  --shadow: 0 18px 36px rgba(53, 36, 27, 0.16);
+  --radius-lg: 30px;
+  --radius-md: 18px;
 }
 
 body {
   font-family: "Noto Sans KR", sans-serif;
-  background-color: var(--bg);
+  background: var(--surface-alt);
   color: var(--ink);
-}
-.btn-primary {
-  background-color: var(--accent);
-  border-color: var(--accent);
-}
-.btn-primary:hover {
-  background-color: #6e421a;
-  border-color: #6e421a;
-}
-.btn-secondary {
-  background-color: var(--muted);
-  border-color: var(--muted);
-}
-.btn-secondary:hover {
-  background-color: var(--ink);
-  border-color: var(--ink);
-}
-.btn-outline-secondary {
-  color: var(--ink);
-  border-color: var(--ink);
-}
-.btn-outline-secondary:hover {
-  background-color: var(--ink);
-  color: #fff;
-}
-.btn-outline-danger {
-  color: var(--danger);
-  border-color: var(--danger);
-}
-.btn-outline-danger:hover {
-  background-color: var(--danger);
-  color: #fff;
-}
-.review-page .badge.bg-info {
-  background-color: var(--bean-light) !important;
-  color: var(--bean-dark) !important;
-  border: 1px solid var(--bean-dark);
-  font-weight: 500;
-  padding: 0.4rem 0.65rem;
-  border-radius: 999px;
 }
 
 .review-page {
+  padding-bottom: 3rem;
+}
+
+.summary-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(213, 131, 95, 0.12);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.hero-title {
+  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+  font-weight: 700;
+  margin: 0.5rem 0 0;
+}
+
+.hero-caption {
+  margin-top: 0.5rem;
+  color: var(--ink-soft);
+}
+
+.review-detail {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 2.8rem 3rem;
+  box-shadow: var(--shadow);
+}
+
+.review-detail__hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.hero-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.rating-value {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.rating-number {
+  font-size: 2.2rem;
+}
+
+.rating-unit {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.review-card__likes {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.review-like-count {
+  font-weight: 600;
+  color: var(--accent-dark);
+}
+
+.review-detail__meta {
+  margin: 2.5rem 0 2rem;
+  padding: 1.8rem 2rem;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #FFF, #F4ECE5);
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.meta-value {
+  font-weight: 600;
   color: var(--ink);
 }
 
-.review-page h2,
-.review-page h3,
-.review-page h4 {
-  color: var(--bean-dark);
-  font-weight: 600;
-}
-
-.review-page .text-muted {
-  color: var(--muted) !important;
-}
-
-.review-page .review-section {
-  border: none;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.review-page .review-section .card-body {
-  padding: 24px;
-  background: linear-gradient(180deg, rgba(248, 244, 239, 0.9), rgba(255, 255, 255, 0.95));
-}
-
-.review-page .review-section .card-body + .card-body {
-  border-top: 1px solid rgba(62, 46, 35, 0.08);
-}
-
-@media (max-width: 576px) {
-  .review-page .review-section .card-body {
-    padding: 18px;
-  }
-}
-
-.review-page .review-content-head {
-  display: inline-block;
+.review-detail__content h2,
+.review-detail__gallery h2,
+.existing-images h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
   margin-bottom: 0.75rem;
-  font-weight: 600;
-  color: var(--bean-dark);
 }
 
-.review-page .btn {
-  border-radius: 999px;
-  background-color: var(--bean-light);
-  color: var(--bean-dark);
-  border: 1px solid var(--bean-dark);
-  transition: all 0.2s ease;
-  font-weight: 500;
+.review-detail__content p {
+  line-height: 1.8;
+  color: var(--ink);
+  background: var(--surface-alt);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
 }
 
-.review-page .btn:hover,
-.review-page .btn:focus {
-  background-color: var(--bean-dark);
-  border-color: var(--bean-dark);
-  color: #fff;
-  box-shadow: none;
+.review-detail__gallery {
+  margin-top: 2.2rem;
 }
 
-.review-page .btn.active,
-.review-page .btn:active {
-  background-color: var(--bean-dark) !important;
-  border-color: var(--bean-dark) !important;
-  color: #fff !important;
-}
-
-.review-page .btn.btn-danger,
-.review-page .btn.btn-outline-danger {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-.review-page .btn.btn-danger:hover,
-.review-page .btn.btn-outline-danger:hover {
-  background-color: var(--danger);
-  border-color: var(--danger);
-  color: #fff;
-}
-
-.review-page .review-like-box {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn_like {
-  width: 25px;
-  height: 25px;
-  background: url(https://umings.github.io/images/i_like_off.png) no-repeat center / 25px;
-  cursor: pointer;
-  border: 0;
-  font-size: 0;
-  margin: 25px auto;
-  display: block;
-  padding: 0;
-}
-
-.btn_like.on {
-  background: url(https://umings.github.io/images/i_like_on.png) no-repeat center / 25px;
-  animation: beating 0.5s 1 alternate;
-  color: brown;
-}
-
-@keyframes beating {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.25);
-  }
-  70% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.review-page .review-like-box .btn_like {
+.gallery-caption {
+  color: var(--muted);
+  font-size: 0.9rem;
   margin: 0;
-  display: inline-block;
-}
-
-.review-page .review-like-box .btn_like:focus-visible {
-  outline: 2px solid var(--danger);
-  outline-offset: 4px;
-}
-
-.review-page .review-like-count {
-  font-weight: 600;
-  color: var(--bean-dark);
 }
 
 .review-image-slider {
+  margin-top: 1.2rem;
   position: relative;
   overflow: hidden;
 }
@@ -203,47 +159,84 @@ body {
 .review-image-slider .slider-track {
   display: flex;
   transition: transform 0.3s ease;
+  gap: 0.8rem;
 }
 
 .review-image-slider .slide {
   flex: 0 0 auto;
-  box-sizing: border-box;
-  padding: 0 4px;
+  width: min(280px, 60vw);
 }
 
 .review-image-slider .review-image {
   width: 100%;
-  aspect-ratio: 1/1;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 18px 36px rgba(47, 31, 27, 0.18);
 }
 
 .review-image-slider .slider-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: var(--bean-dark);
-  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: none;
-  padding: 0.35rem 0.65rem;
+  background: rgba(47, 31, 27, 0.85);
+  color: #fff;
+  cursor: pointer;
+}
+
+.review-image-slider .prev-btn { left: 0.5rem; }
+.review-image-slider .next-btn { right: 0.5rem; }
+
+.review-detail__actions {
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.review-detail__actions .btn {
   border-radius: 999px;
 }
 
-.review-image-slider .prev-btn {
-  left: 0;
+.btn_like {
+  width: 32px;
+  height: 32px;
+  background: url(https://umings.github.io/images/i_like_off.png) no-repeat center / 32px;
+  cursor: pointer;
+  border: 0;
+  font-size: 0;
+  padding: 0;
 }
 
-.review-image-slider .next-btn {
-  right: 0;
+.btn_like.on {
+  background: url(https://umings.github.io/images/i_like_on.png) no-repeat center / 32px;
+  animation: beating 0.5s 1 alternate;
+}
+
+@keyframes beating {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.review-card__likes .btn_like:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
 }
 
 .rate {
   display: inline-block;
   border: 0;
-  margin-right: 15px;
+  margin-right: 5px;
   overflow: hidden;
   vertical-align: middle;
+  position: relative;
 }
 
 .rate > input {
@@ -257,7 +250,7 @@ body {
 
 .rate > label:before {
   display: inline-block;
-  font-size: 1rem;
+  font-size: 1.2rem;
   padding: .3rem .2rem;
   margin: 0;
   cursor: pointer;
@@ -277,13 +270,6 @@ body {
   color: var(--accent) !important;
 }
 
-.rate input:checked + label:hover,
-.rate input:checked ~ label:hover,
-.rate input:checked ~ label:hover ~ label,
-.rate label:hover ~ input:checked ~ label {
-  color: var(--accent) !important;
-}
-
 .rate.read-only {
   pointer-events: none;
 }
@@ -292,12 +278,78 @@ body {
   cursor: default;
 }
 
-/* --- White background adjustments for review detail page --- */
-body {
-  background-color: #ffffff;
+.review-page .btn {
+  font-weight: 600;
+  border-radius: 14px;
+  transition: all 0.2s ease;
 }
 
-.review-page .review-section .card-body {
-  background: #ffffff;
+.review-page .btn:hover,
+.review-page .btn:focus-visible {
+  transform: translateY(-1px);
 }
 
+.review-page .btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.review-page .btn-primary:hover,
+.review-page .btn-primary:focus-visible {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+.review-page .btn-secondary {
+  background: #E9E1DC;
+  border-color: #E9E1DC;
+  color: var(--ink);
+}
+
+.review-page .btn-secondary:hover,
+.review-page .btn-secondary:focus-visible {
+  background: var(--ink);
+  color: #fff;
+}
+
+.review-page .btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.review-page .btn-danger:hover,
+.review-page .btn-danger:focus-visible {
+  background: #c24f4f;
+  border-color: #c24f4f;
+}
+
+@media (max-width: 992px) {
+  .review-detail {
+    padding: 2.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .review-detail__hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-rating {
+    align-items: flex-start;
+  }
+
+  .review-detail__meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .review-detail {
+    padding: 2rem;
+  }
+
+  .review-detail__content p {
+    padding: 1.2rem;
+  }
+}

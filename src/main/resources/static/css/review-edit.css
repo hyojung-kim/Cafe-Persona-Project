@@ -1,168 +1,214 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
 :root {
-  --bd: #E2D3C5;
-  --ink: #3B2A23;
-  --muted: #8C7666;
-  --bg: #ffffff;
-  --accent: #C9855A;
-  --danger: #B45F4D;
-  --bean-dark: #4B3A31;
-  --bean-medium: #7E6656;
-  --bean-light: #EEEAE6;
-  --bean-cream: #F8F4EF;
+  --ink: #2F1F1B;
+  --ink-soft: #75645B;
+  --muted: #A49790;
+  --surface: #FFFFFF;
+  --surface-alt: #F8F5F2;
+  --accent: #D5835F;
+  --accent-dark: #B56B47;
+  --danger: #D46A6A;
+  --shadow: 0 18px 40px rgba(53, 36, 27, 0.14);
+  --radius-lg: 28px;
+  --radius-md: 18px;
 }
 
 body {
   font-family: "Noto Sans KR", sans-serif;
-  background-color: var(--bg);
+  background: var(--surface-alt);
   color: var(--ink);
-}
-.btn-primary {
-  background-color: var(--accent);
-  border-color: var(--accent);
-}
-.btn-primary:hover {
-  background-color: #6e421a;
-  border-color: #6e421a;
-}
-.btn-outline-secondary {
-  color: var(--ink);
-  border-color: var(--ink);
-}
-.btn-outline-secondary:hover {
-  background-color: var(--ink);
-  color: #fff;
-}
-.btn-danger {
-  background-color: var(--danger);
-  border-color: var(--danger);
-}
-.btn-outline-danger {
-  color: var(--danger);
-  border-color: var(--danger);
-}
-.btn-outline-danger:hover {
-  background-color: var(--danger);
-  color: #fff;
 }
 
 .review-page {
-  color: var(--ink);
+  padding-bottom: 3rem;
 }
 
-.review-page h3,
-.review-page h4 {
-  color: var(--bean-dark);
+.summary-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(213, 131, 95, 0.12);
+  color: var(--accent);
   font-weight: 600;
 }
 
-.review-page .review-section {
-  border: none;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.hero-title {
+  font-size: clamp(1.8rem, 2.5vw, 2.3rem);
+  font-weight: 700;
+  margin: 0.6rem 0 0;
+}
+
+.hero-caption {
+  color: var(--ink-soft);
+  margin-top: 0.5rem;
+}
+
+.review-edit {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 2.6rem 2.8rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.review-edit__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.review-edit__rating {
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.4rem;
+  border: 1px solid rgba(47, 31, 27, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+}
+
+.review-form__grid {
+  display: grid;
+  gap: 1.6rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+.review-form__rating,
+.review-form__upload {
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(47, 31, 27, 0.08);
+  padding: 1.4rem;
+}
+
+.review-form__rating {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-form__content textarea {
+  min-height: 220px;
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(47, 31, 27, 0.08);
+  padding: 1.2rem 1.4rem;
+  resize: vertical;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+  color: var(--ink);
+}
+
+.upload-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+.review-form__actions {
+  display: flex;
+  gap: 0.7rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.review-form__actions .btn,
+.review-edit__header .btn,
+.delete-form .btn {
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.existing-images {
+  background: linear-gradient(135deg, #FFF, #F2EBE5);
+  border-radius: var(--radius-md);
+  padding: 1.8rem;
+  border: 1px solid rgba(47, 31, 27, 0.08);
+}
+
+.existing-images__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.existing-image {
+  position: relative;
+  border-radius: 18px;
   overflow: hidden;
 }
 
-.review-page .review-section .card-body {
-  padding: 24px;
-  background: linear-gradient(180deg, rgba(248, 244, 239, 0.9), rgba(255, 255, 255, 0.95));
+.existing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-@media (max-width: 576px) {
-  .review-page .review-section .card-body {
-    padding: 18px;
-  }
-}
-
-.review-page .btn {
-  border-radius: 999px;
-  background-color: var(--bean-light);
-  color: var(--bean-dark);
-  border: 1px solid var(--bean-dark);
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-
-.review-page .btn:hover,
-.review-page .btn:focus {
-  background-color: var(--bean-dark);
-  border-color: var(--bean-dark);
-  color: #fff;
-  box-shadow: none;
-}
-
-.review-page .btn.active,
-.review-page .btn:active {
-  background-color: var(--bean-dark) !important;
-  border-color: var(--bean-dark) !important;
-  color: #fff !important;
-}
-
-.review-page .btn.btn-danger,
-.review-page .btn.btn-outline-danger {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-.review-page .btn.btn-danger:hover,
-.review-page .btn.btn-outline-danger:hover {
-  background-color: var(--danger);
-  border-color: var(--danger);
-  color: #fff;
-}
-
-.review-page .form-control,
-.review-page .form-select {
-  border-radius: 14px;
-  border-color: var(--bd);
-  background-color: #fff;
-  color: var(--ink);
-  box-shadow: none;
-}
-
-.review-page textarea.form-control {
-  background-color: var(--bean-cream);
-  border: 1px solid rgba(74, 58, 49, 0.1);
-  min-height: 160px;
-}
-
-.review-page .form-control:focus {
-  border-color: var(--bean-dark);
-  box-shadow: 0 0 0 0.2rem rgba(75, 58, 49, 0.08);
-}
-
-.review-page #contentCounter {
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.review-page .existing-image {
-  background: var(--bean-cream);
-  border-radius: 16px;
-  padding: 8px;
-}
-
-.review-page .existing-image img {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.review-page .existing-image .btn-close {
-  background-color: rgba(75, 58, 49, 0.8);
-  border-radius: 999px;
+.existing-image .btn-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  background: rgba(47, 31, 27, 0.85);
+  border-radius: 50%;
   opacity: 1;
+  filter: invert(1);
 }
 
-.review-page .existing-image .btn-close:hover {
-  background-color: rgba(75, 58, 49, 1);
+.delete-form {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn_like {
+  width: 28px;
+  height: 28px;
+  background: url(https://umings.github.io/images/i_like_off.png) no-repeat center / 28px;
+  cursor: pointer;
+  border: 0;
+  font-size: 0;
+  padding: 0;
+}
+
+.btn_like.on {
+  background: url(https://umings.github.io/images/i_like_on.png) no-repeat center / 28px;
+  animation: beating 0.5s 1 alternate;
+}
+
+@keyframes beating {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
 }
 
 .rate {
   display: inline-block;
   border: 0;
-  margin-right: 15px;
+  margin-right: 5px;
+  overflow: hidden;
+  vertical-align: middle;
+  position: relative;
 }
 
 .rate > input {
@@ -176,7 +222,7 @@ body {
 
 .rate > label:before {
   display: inline-block;
-  font-size: 1rem;
+  font-size: 1.1rem;
   padding: .3rem .2rem;
   margin: 0;
   cursor: pointer;
@@ -196,34 +242,82 @@ body {
   color: var(--accent) !important;
 }
 
-.rate input:checked + label:hover,
-.rate input:checked ~ label:hover,
-.rate input:checked ~ label:hover ~ label,
-.rate label:hover ~ input:checked ~ label {
-  color: var(--accent) !important;
-}
-
 .rate.read-only {
   pointer-events: none;
 }
 
-.rate.read-only > label:before {
-  cursor: default;
+.review-page .btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
-/* --- White background adjustments for review edit page --- */
-body {
-  background-color: #ffffff;
+.review-page .btn-primary:hover,
+.review-page .btn-primary:focus-visible {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
 }
 
-.review-page .review-section .card-body {
-  background: #ffffff;
+.review-page .btn-outline-secondary {
+  color: var(--ink);
+  border-color: rgba(47, 31, 27, 0.2);
 }
 
-.review-page textarea.form-control {
-  background-color: #ffffff;
+.review-page .btn-outline-secondary:hover,
+.review-page .btn-outline-secondary:focus-visible {
+  background: var(--ink);
+  color: #fff;
 }
 
-.review-page .existing-image {
-  background: #ffffff;
+.review-page .btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.review-page .btn-danger:hover,
+.review-page .btn-danger:focus-visible {
+  background: #c24f4f;
+  border-color: #c24f4f;
+}
+
+.review-page .form-control,
+.review-page .btn,
+.review-page .form-select {
+  border-radius: 14px;
+  color: var(--ink);
+}
+
+.review-page .form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(213, 131, 95, 0.15);
+}
+
+@media (max-width: 992px) {
+  .review-form__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .review-edit {
+    padding: 2.2rem;
+  }
+
+  .review-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .review-edit__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .review-form__content textarea {
+    min-height: 180px;
+  }
+}
+
+@media (max-width: 576px) {
+  .review-edit {
+    padding: 1.8rem;
+  }
 }

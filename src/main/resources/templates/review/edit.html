@@ -14,61 +14,90 @@
 
 <div layout:fragment="content" class="container mt-4 review-page">
 
-  <section class="card shadow-sm mb-3 review-section">
-    <div class="card-body">
-      <h3 class="h6 mb-3">리뷰 수정</h3>
-      <form id="reviewEditForm"
-            th:action="@{/reviews/{id}(id=${review.id})}"
-            method="post"
-            enctype="multipart/form-data"
-            th:object="${form}"
-            class="needs-validation" novalidate>
-        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <div class="row g-2">
-          <div class="col-12 col-md-2">
-            <div class="rate">
-              <input type="radio" id="edit-rating10" th:field="*{rating}" value="5.0"><label for="edit-rating10" title="5점"></label>
-              <input type="radio" id="edit-rating9" th:field="*{rating}" value="4.5"><label class="half" for="edit-rating9" title="4.5점"></label>
-              <input type="radio" id="edit-rating8" th:field="*{rating}" value="4.0"><label for="edit-rating8" title="4점"></label>
-              <input type="radio" id="edit-rating7" th:field="*{rating}" value="3.5"><label class="half" for="edit-rating7" title="3.5점"></label>
-              <input type="radio" id="edit-rating6" th:field="*{rating}" value="3.0"><label for="edit-rating6" title="3점"></label>
-              <input type="radio" id="edit-rating5" th:field="*{rating}" value="2.5"><label class="half" for="edit-rating5" title="2.5점"></label>
-              <input type="radio" id="edit-rating4" th:field="*{rating}" value="2.0"><label for="edit-rating4" title="2점"></label>
-              <input type="radio" id="edit-rating3" th:field="*{rating}" value="1.5"><label class="half" for="edit-rating3" title="1.5점"></label>
-              <input type="radio" id="edit-rating2" th:field="*{rating}" value="1.0"><label for="edit-rating2" title="1점"></label>
-              <input type="radio" id="edit-rating1" th:field="*{rating}" value="0.5"><label class="half" for="edit-rating1" title="0.5점"></label>
-            </div>
-          </div>
-          <div class="col-12 col-md-7">
-            <textarea id="content" th:field="*{content}" class="form-control" minlength="5" maxlength="4000"
-                      placeholder="후기를 입력하세요(최소 5자)" required></textarea>
-            <div id="contentCounter" class="text-muted small text-end">0자 / 최소 5자</div>
-          </div>
-          <div class="col-12 col-md-3">
-            <input type="file" name="images" class="form-control" accept="image/*" multiple>
+  <section class="review-edit">
+    <header class="review-edit__header">
+      <div>
+        <span class="summary-label">리뷰 수정</span>
+        <h1 class="hero-title" th:text="|${review.cafe.name} 방문 후기를 다듬어보세요|">리뷰 수정</h1>
+        <p class="hero-caption">이미 작성한 리뷰를 조금 더 세련되게 다듬어보세요.</p>
+      </div>
+      <div class="review-edit__rating">
+        <span class="form-label">현재 평점</span>
+        <span class="rate read-only" th:with="r=${review.rating}">
+          <input type="radio" id="edit-current-rating10" value="5.0" th:checked="${r == 5.0}"><label for="edit-current-rating10" title="5점"></label>
+          <input type="radio" id="edit-current-rating9" value="4.5" th:checked="${r == 4.5}"><label class="half" for="edit-current-rating9" title="4.5점"></label>
+          <input type="radio" id="edit-current-rating8" value="4.0" th:checked="${r == 4.0}"><label for="edit-current-rating8" title="4점"></label>
+          <input type="radio" id="edit-current-rating7" value="3.5" th:checked="${r == 3.5}"><label class="half" for="edit-current-rating7" title="3.5점"></label>
+          <input type="radio" id="edit-current-rating6" value="3.0" th:checked="${r == 3.0}"><label for="edit-current-rating6" title="3점"></label>
+          <input type="radio" id="edit-current-rating5" value="2.5" th:checked="${r == 2.5}"><label class="half" for="edit-current-rating5" title="2.5점"></label>
+          <input type="radio" id="edit-current-rating4" value="2.0" th:checked="${r == 2.0}"><label for="edit-current-rating4" title="2점"></label>
+          <input type="radio" id="edit-current-rating3" value="1.5" th:checked="${r == 1.5}"><label class="half" for="edit-current-rating3" title="1.5점"></label>
+          <input type="radio" id="edit-current-rating2" value="1.0" th:checked="${r == 1.0}"><label for="edit-current-rating2" title="1점"></label>
+          <input type="radio" id="edit-current-rating1" value="0.5" th:checked="${r == 0.5}"><label class="half" for="edit-current-rating1" title="0.5점"></label>
+        </span>
+      </div>
+    </header>
+
+    <form id="reviewEditForm"
+          th:action="@{/reviews/{id}(id=${review.id})}"
+          method="post"
+          enctype="multipart/form-data"
+          th:object="${form}"
+          class="needs-validation review-form" novalidate>
+      <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+      <div class="review-form__grid">
+        <div class="review-form__rating">
+          <label class="form-label">별점 수정</label>
+          <div class="rate">
+            <input type="radio" id="edit-rating10" th:field="*{rating}" value="5.0"><label for="edit-rating10" title="5점"></label>
+            <input type="radio" id="edit-rating9" th:field="*{rating}" value="4.5"><label class="half" for="edit-rating9" title="4.5점"></label>
+            <input type="radio" id="edit-rating8" th:field="*{rating}" value="4.0"><label for="edit-rating8" title="4점"></label>
+            <input type="radio" id="edit-rating7" th:field="*{rating}" value="3.5"><label class="half" for="edit-rating7" title="3.5점"></label>
+            <input type="radio" id="edit-rating6" th:field="*{rating}" value="3.0"><label for="edit-rating6" title="3점"></label>
+            <input type="radio" id="edit-rating5" th:field="*{rating}" value="2.5"><label class="half" for="edit-rating5" title="2.5점"></label>
+            <input type="radio" id="edit-rating4" th:field="*{rating}" value="2.0"><label for="edit-rating4" title="2점"></label>
+            <input type="radio" id="edit-rating3" th:field="*{rating}" value="1.5"><label class="half" for="edit-rating3" title="1.5점"></label>
+            <input type="radio" id="edit-rating2" th:field="*{rating}" value="1.0"><label for="edit-rating2" title="1점"></label>
+            <input type="radio" id="edit-rating1" th:field="*{rating}" value="0.5"><label class="half" for="edit-rating1" title="0.5점"></label>
           </div>
         </div>
+        <div class="review-form__content">
+          <label class="form-label" for="content">리뷰 내용</label>
+          <textarea id="content" th:field="*{content}" class="form-control" minlength="5" maxlength="4000"
+                    placeholder="이용 팁, 추천 메뉴, 분위기 등을 자유롭게 적어주세요." required></textarea>
+          <div id="contentCounter" class="text-muted small text-end">0자 / 최소 5자</div>
+        </div>
+        <div class="review-form__upload">
+          <label class="form-label" for="editImages">사진 다시 첨부</label>
+          <input id="editImages" type="file" name="images" class="form-control" accept="image/*" multiple>
+          <p class="upload-hint">기존 이미지를 유지하거나 새로운 사진을 추가할 수 있어요.</p>
+        </div>
+      </div>
 
-        <div class="row g-2 mt-1" id="existingImageList" th:if="${form.imageUrl != null && !form.imageUrl.isEmpty()}">
-          <div class="col-4 position-relative existing-image" th:each="img : ${form.imageUrl}">
+      <div class="existing-images" id="existingImageList"
+           th:if="${form.imageUrl != null && !form.imageUrl.isEmpty()}">
+        <h2>현재 등록된 이미지</h2>
+        <div class="existing-images__grid">
+          <div class="existing-image" th:each="img : ${form.imageUrl}">
             <input type="hidden" name="imageUrl" th:value="${img}"/>
-            <img th:src="${img}" alt="review image" class="img-fluid rounded">
-            <button type="button" class="btn-close position-absolute top-0 end-0" aria-label="삭제" onclick="removeExistingImage(this)"></button>
+            <img th:src="${img}" alt="review image">
+            <button type="button" class="btn-close" aria-label="삭제" onclick="removeExistingImage(this)"></button>
           </div>
         </div>
+      </div>
 
-        <div class="mt-2">
-          <button class="btn btn-primary btn-sm" type="submit">수정</button>
-          <a th:href="@{|/reviews/${review.id}|}" class="btn btn-outline-secondary btn-sm ms-1">취소</a>
-        </div>
-      </form>
+      <div class="review-form__actions">
+        <button class="btn btn-primary btn-sm" type="submit">수정 완료</button>
+        <a th:href="@{|/reviews/${review.id}|}" class="btn btn-outline-secondary btn-sm">취소</a>
+      </div>
+    </form>
 
-      <form th:action="@{|/reviews/${review.id}/delete|}" method="post" class="text-end mt-2"
-            onsubmit="return confirm('정말 삭제하시겠습니까?');">
-        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <button type="submit" class="btn btn-danger btn-sm">삭제</button>
-      </form>
-    </div>
+    <form th:action="@{|/reviews/${review.id}/delete|}" method="post" class="delete-form"
+          onsubmit="return confirm('정말 삭제하시겠습니까?');">
+      <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      <button type="submit" class="btn btn-danger btn-sm">리뷰 삭제</button>
+    </form>
   </section>
 </div>
 
