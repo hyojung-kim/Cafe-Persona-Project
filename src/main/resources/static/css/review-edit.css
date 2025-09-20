@@ -1,5 +1,164 @@
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
+:root {
+  --bd: #E2D3C5;
+  --ink: #3B2A23;
+  --muted: #8C7666;
+  --bg: #ffffff;
+  --accent: #C9855A;
+  --danger: #B45F4D;
+  --bean-dark: #4B3A31;
+  --bean-medium: #7E6656;
+  --bean-light: #EEEAE6;
+  --bean-cream: #F8F4EF;
+}
+
+body {
+  font-family: "Noto Sans KR", sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+}
+.btn-primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background-color: #6e421a;
+  border-color: #6e421a;
+}
+.btn-outline-secondary {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.btn-outline-secondary:hover {
+  background-color: var(--ink);
+  color: #fff;
+}
+.btn-danger {
+  background-color: var(--danger);
+  border-color: var(--danger);
+}
+.btn-outline-danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn-outline-danger:hover {
+  background-color: var(--danger);
+  color: #fff;
+}
+
+.review-page {
+  color: var(--ink);
+}
+
+.review-page h3,
+.review-page h4 {
+  color: var(--bean-dark);
+  font-weight: 600;
+}
+
+.review-page .review-section {
+  border: none;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.review-page .review-section .card-body {
+  padding: 24px;
+  background: linear-gradient(180deg, rgba(248, 244, 239, 0.9), rgba(255, 255, 255, 0.95));
+}
+
+@media (max-width: 576px) {
+  .review-page .review-section .card-body {
+    padding: 18px;
+  }
+}
+
+.review-page .btn {
+  border-radius: 999px;
+  background-color: var(--bean-light);
+  color: var(--bean-dark);
+  border: 1px solid var(--bean-dark);
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.review-page .btn:hover,
+.review-page .btn:focus {
+  background-color: var(--bean-dark);
+  border-color: var(--bean-dark);
+  color: #fff;
+  box-shadow: none;
+}
+
+.review-page .btn.active,
+.review-page .btn:active {
+  background-color: var(--bean-dark) !important;
+  border-color: var(--bean-dark) !important;
+  color: #fff !important;
+}
+
+.review-page .btn.btn-danger,
+.review-page .btn.btn-outline-danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.review-page .btn.btn-danger:hover,
+.review-page .btn.btn-outline-danger:hover {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.review-page .form-control,
+.review-page .form-select {
+  border-radius: 14px;
+  border-color: var(--bd);
+  background-color: #fff;
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.review-page textarea.form-control {
+  background-color: var(--bean-cream);
+  border: 1px solid rgba(74, 58, 49, 0.1);
+  min-height: 160px;
+}
+
+.review-page .form-control:focus {
+  border-color: var(--bean-dark);
+  box-shadow: 0 0 0 0.2rem rgba(75, 58, 49, 0.08);
+}
+
+.review-page #contentCounter {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.review-page .existing-image {
+  background: var(--bean-cream);
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.review-page .existing-image img {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.review-page .existing-image .btn-close {
+  background-color: rgba(75, 58, 49, 0.8);
+  border-radius: 999px;
+  opacity: 1;
+}
+
+.review-page .existing-image .btn-close:hover {
+  background-color: rgba(75, 58, 49, 1);
+}
+
 .rate {
   display: inline-block;
   border: 0;
@@ -34,17 +193,16 @@
 .rate input:checked ~ label,
 .rate label:hover,
 .rate label:hover ~ label {
-  color: #f73c32 !important;
+  color: var(--accent) !important;
 }
 
 .rate input:checked + label:hover,
 .rate input:checked ~ label:hover,
 .rate input:checked ~ label:hover ~ label,
 .rate label:hover ~ input:checked ~ label {
-  color: #f73c32 !important;
+  color: var(--accent) !important;
 }
 
-/* read-only display */
 .rate.read-only {
   pointer-events: none;
 }
@@ -53,3 +211,19 @@
   cursor: default;
 }
 
+/* --- White background adjustments for review edit page --- */
+body {
+  background-color: #ffffff;
+}
+
+.review-page .review-section .card-body {
+  background: #ffffff;
+}
+
+.review-page textarea.form-control {
+  background-color: #ffffff;
+}
+
+.review-page .existing-image {
+  background: #ffffff;
+}

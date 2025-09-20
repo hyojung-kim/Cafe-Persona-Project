@@ -129,8 +129,9 @@ public class CafeListController {
                          HttpSession session,
                          Model model) {
         //기존코드 주석
-        //Cafe cafe = cafeListService.getById(cafeId);
-        Cafe cafe = cafeImageService.getDetailImg(cafeId);
+        Cafe cafe = cafeListService.getById(cafeId);
+        var images = cafeImageService.findAllByCafeId(cafeId);
+        model.addAttribute("images", images); // 이미지 담을 모델 추가했습니다
         List<KeywordRow> detailKeyword = keywordService.findKeywordRowsByCafeId(cafeId);
         List<Menu> menus = menuService.findForDetail(cafeId);
         boolean bookmarked = false;
@@ -153,7 +154,9 @@ public class CafeListController {
 
 
         long likeCount = likeService.getLikeCount(cafeId);
-        boolean openNow = cafeListService.isOpenNow(cafe);
+        Boolean openNow = null;
+        openNow = cafeListService.isOpenNow(cafe);
+
 
         // 상단 배지용 통계
         double avgRating = cafeListService.getActiveAverageRating(cafeId);

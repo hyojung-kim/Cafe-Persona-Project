@@ -15,7 +15,6 @@ import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -72,14 +71,22 @@ public class ReviewController {
     public String listPage(@PathVariable Long cafeId,
                            @RequestParam(name = "rpage", defaultValue = "0") int page,
                            @RequestParam(name = "rsize", defaultValue = "10") int size,
+                           @RequestParam(name = "keyword", required = false) String keyword,
+                           @RequestParam(name = "sort", defaultValue = "latest") String sort,
                            Model model) {
 
         var cafe = cafeService.getById(cafeId);
         double avgRating = cafeService.getActiveAverageRating(cafeId);
         long reviewCount = cafeService.getActiveReviewCount(cafeId);
 
-        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
+        Page<Review> reviews;
+        if ("likes".equalsIgnoreCase(sort)) {
+            var pageable = PageRequest.of(page, size);
+            reviews = reviewService.getActiveReviewsByCafeWithUserImagesOrderByLikes(cafeId, pageable, keyword);
+        } else {
+            var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+            reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable, keyword);
+        }
 
         var meOpt = currentUserService.getCurrentUser();
         meOpt.ifPresent(me -> model.addAttribute("me", me));
@@ -91,6 +98,7 @@ public class ReviewController {
             meOpt.ifPresent(me -> likedMap.put(rv.getId(), reviewLikeService.isLiked(rv.getId(), me.getId())));
         }
 
+        List<String> topReviewImages = reviewService.getTopReviewImageUrlsByLikes(cafeId, 10);
 
         model.addAttribute("cafe", cafe);
         model.addAttribute("avgRating", avgRating);
@@ -98,10 +106,11 @@ public class ReviewController {
         model.addAttribute("page", reviews);
         model.addAttribute("likedMap", likedMap);
         model.addAttribute("likeCountMap", likeCountMap);
-
+        model.addAttribute("topReviewImages", topReviewImages);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sort", sort);
 
         return "review/list";
-
     }
 
     /* =======================
@@ -111,14 +120,22 @@ public class ReviewController {
     public String listSection(@PathVariable Long cafeId,
                               @RequestParam(name = "rpage", defaultValue = "0") int page,
                               @RequestParam(name = "rsize", defaultValue = "10") int size,
+                              @RequestParam(name = "keyword", required = false) String keyword,
+                              @RequestParam(name = "sort", defaultValue = "latest") String sort,
                               Model model) {
 
         var cafe = cafeService.getById(cafeId);
         double avgRating = cafeService.getActiveAverageRating(cafeId);
         long reviewCount = cafeService.getActiveReviewCount(cafeId);
 
-        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable);
+        Page<Review> reviews;
+        if ("likes".equalsIgnoreCase(sort)) {
+            var pageable = PageRequest.of(page, size);
+            reviews = reviewService.getActiveReviewsByCafeWithUserImagesOrderByLikes(cafeId, pageable, keyword);
+        } else {
+            var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+            reviews = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable, keyword);
+        }
 
         var meOpt = currentUserService.getCurrentUser();
         meOpt.ifPresent(me -> model.addAttribute("me", me));
@@ -136,6 +153,8 @@ public class ReviewController {
         model.addAttribute("page", reviews);
         model.addAttribute("likedMap", likedMap);
         model.addAttribute("likeCountMap", likeCountMap);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sort", sort);
 
         return "review/list :: section";
     }

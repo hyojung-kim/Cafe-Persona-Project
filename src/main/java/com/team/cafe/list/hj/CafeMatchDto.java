@@ -70,7 +70,10 @@ public class CafeMatchDto {
 
 
     public void computeOpenNow(LocalTime now) {
-        if (openTime == null || closeTime == null) { this.openNow = null; return; }
+        if (openTime == null || closeTime == null) {
+            this.openNow = null;
+            return;
+        }
 
         // 24시간 처리(동일 시각) – 필요에 따라 false로 바꿔도 됨
         if (openTime.equals(closeTime)) { this.openNow = true; return; }

@@ -1,13 +1,11 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
-
     <link rel="stylesheet" th:href="@{/css/cafe_detail_review.css}">
     <link rel="stylesheet" th:href="@{/css/cafe_detail_con1.css}">
 
     <head>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     </head>
-
 
     <!-- 카페명 + 영업상태 -->
     <main class="container-1">
@@ -16,29 +14,38 @@
         <section class="hero" aria-labelledby="cafeTitle">
             <!-- 이미지 -->
 
-            <div th:each="img : ${images}" class="hero__imgwrap">
-                <!-- 대표 1장만 -->
-                <img th:src="${#lists.isEmpty(images)} ? '/images/DBimg.PNG' : @{${images.get(0).imgUrl}}"
-                     class="hero__img" alt="카페 대표 이미지">
+            <div class="hero__imgwrap">
+                <!-- 리스트가 null이거나 비었을 때 -->
+                <img th:if="${#lists.isEmpty(images)}"
+                     th:src="@{/images/DBimg.PNG}"
+                     class="hero__img"
+                     alt="기본 대표 이미지">
+
+                <!-- 리스트에 값이 있을 때 (대표 1장만) -->
+                <img th:if="${!#lists.isEmpty(images)}"
+                     th:src="${images.get(0).imgUrl}"
+                     class="hero__img"
+                     alt="카페 대표 이미지">
             </div>
 
 
             <!-- 정보 카드 -->
             <article class="card">
                 <div>
-                    <span class="title" id="cafeTitle" th:text="${cafe.name}"></span>
-                    <span th:if="${openNow != null}"
+                      <span class="title" id="cafeTitle" th:text="${cafe.name}"></span>
+                      <span th:if="${openNow != null}"
                           class=""
                           th:classappend="${openNow} ? 'status open' : 'status closed'"
                           th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
+                      <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
                 </div>
                 <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
-                <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
+
 
                 <div class="stats">
-                    <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}" |>★ 4.5</span>
+                    <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
                     <span class="stat" th:text="|리뷰 ${reviewCount}|">리뷰 0</span>
-                    <span class="stat" th:text="|👁 조회수 ${cafe.hitCount}" |>조회 0</span>
+                    <span class="stat" th:text="|👁 조회수 ${cafe.hitCount}"|>조회 0</span>
                     <div id="likeBox"
                          th:data-cafe-id="${cafe.id}"
                          th:data-liked="${liked}">
@@ -147,6 +154,7 @@
         </section>
 
 
+
     </main>
 
     <script src="/js/cafe-like.js"></script>
@@ -157,7 +165,7 @@
         <div style="margin-bottom:10px; display:flex; gap:8px">
             <input id="address-input" type="text" th:value="${cafe.address1}"
                    style="flex:1; padding:8px; border:1px solid var(--line); border-radius:4px"
-                   placeholder="주소 검색"/>
+                   placeholder="주소 검색" />
             <button id="search-btn" type="button" class="btn">검색</button>
         </div>
 

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅️ Integer → Long
@@ -117,7 +118,12 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // ⬅�
     List<CafeWithRating> getCafesWithAvgRating(List<Long> ids);
 
 
+    // 내(로그인 사용자)의 비즈니스 계정에 연결된 카페를 찾는다
+    Optional<Cafe> findByBusinessUser_User_Id(Long userId);
+    Cafe findTopByOrderByIdDesc();
 
+
+    boolean existsByGooglePlaceId(String googlePlaceId);
 
 
 }

@@ -14,15 +14,14 @@
     <div class="header">
         <div>
             <h1 class="title">사업장 관리</h1>
-            <p class="subtitle">메뉴·운영시간·사진을 손쉽게 업데이트하세요.</p>
-            <span class="badge">사업자 회원 전용</span>
+            <p class="subtitle">메뉴·운영시간·사진을 <br> 손쉽게 업데이트하세요.</p>
         </div>
 
         <div style="display:flex; gap:10px; align-items:center">
             <!-- 등록된 상태면 '수정하기', 아니면 '등록하기' -->
             <a class="btn"
-               th:href="@{/mypage/cafe/register}"
-               th:text="${isRegistered} ? '사업장 수정하기' : '사업장 등록하기'">
+               th:href="${cafe != null} ? @{/mypage/cafe/edit/{id}(id=${cafe.id})} : @{/mypage/cafe/register}"
+               th:text="${cafe != null} ? '사업장 수정하기' : '사업장 등록하기'">
                 사업장 등록하기
             </a>
         </div>
@@ -139,11 +138,9 @@
 
                 <!-- 사진이 있을 때 -->
                 <div th:if="${photos != null and !photos.isEmpty()}"
-                     class="gallery-grid">
+                     class="gallery-grid hero__imgwrap">
                     <div th:each="p : ${photos}" class="gallery-item">
-                        <!-- 이미지 제공 방식에 따라 src 결정 -->
-                        <!-- ① 파일 서버/컨트롤러로 서빙: /cafe-images/{id} 같은 형태 -->
-                        <img th:src="@{/cafe-images/{id}(id=${p.id})}" alt="카페 이미지">
+                        <img th:src="@{${p.imgUrl}}" alt="카페 이미지" class="hero__img">
 
                         <!-- ② 정적 경로/스토리지 경로가 있다면 -->
                         <!-- <img th:src="@{|/uploads/${p.storagePath}|}" alt="카페 이미지"> -->
@@ -152,7 +149,7 @@
 
                 <!-- 사진이 없을 때 빈 상태 -->
                 <div th:if="${photos == null or photos.isEmpty()}" class="empty">
-                    등록된 사진이 없습니다. <a th:href="@{/mypage/cafe/register}">사진 추가하러 가기</a>
+                    등록된 사진이 없습니다.
                 </div>
 
                 <div class="divider"></div>

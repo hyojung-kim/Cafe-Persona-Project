@@ -3,14 +3,14 @@ package com.team.cafe.list.hj;
 
 import com.team.cafe.Menu.Menu;
 import com.team.cafe.bookmark.Bookmark;
+import com.team.cafe.businessuser.sj.BusinessUser;
 import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.keyword.hj.CafeKeyword;
 import com.team.cafe.review.domain.BaseEntity;
 import com.team.cafe.review.domain.Review;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Comment;
 
 import java.math.BigDecimal;
@@ -19,16 +19,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor // JPA 기본 생성자
+@AllArgsConstructor(access = AccessLevel.PUBLIC)  // 전체 args 생성자
+@Builder
 public class Cafe extends BaseEntity {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cafe_id")
     @Comment("카페 PK")
     private Long id;
+
+    @Column(unique = true, nullable = true, length = 100)
+    private String googlePlaceId;  // 구글 Place ID (외부 연동용)
 
     @Column(name = "cafe_name", length = 100, nullable = false)
     @Comment("카페 이름")
@@ -136,5 +144,15 @@ public class Cafe extends BaseEntity {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Comment("메뉴 목록")
     private List<Menu> Menu = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "business_user_id",               // FK 컬럼명 (cafe 테이블)
+            referencedColumnName = "id",             // business 테이블의 PK
+            columnDefinition = "BIGINT UNSIGNED",    // ★ FK 컬럼 타입을 business.id와 동일하게
+            foreignKey = @ForeignKey(name = "fk_cafe_business")
+    )
+    private BusinessUser businessUser;
+
 
 }

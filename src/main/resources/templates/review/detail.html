@@ -11,9 +11,9 @@
   <link rel="stylesheet" th:href="@{/css/review-detail.css}"/>
 </th:block>
 
-<div layout:fragment="content" class="container mt-4">
+<div layout:fragment="content" class="container mt-4 review-page">
 
-  <section class="card shadow-sm mb-3">
+  <section class="card shadow-sm mb-3 review-section">
     <div class="card-body d-flex justify-content-between align-items-start">
       <div>
         <h2 class="h4 mb-1">리뷰 상세</h2>
@@ -57,9 +57,13 @@
         </div>
         <div class="mt-2 review-like-box" th:data-review-id="${review.id}"
              th:data-liked="${liked}">
-          <button type="button" class="btn btn-sm btn-outline-danger review-like-btn">
-            <span class="label-liked" th:if="${liked}">♥ 좋아요 취소</span>
-            <span class="label-unliked" th:if="${!liked}">♡ 좋아요</span>
+          <button type="button"
+                  class="btn_like review-like-btn"
+                  th:classappend="${liked} ? ' on' : ''"
+                  data-label-like="좋아요"
+                  data-label-unlike="좋아요 취소"
+                  th:attr="aria-pressed=${liked}, aria-label=${liked} ? '좋아요 취소' : '좋아요'">
+            좋아요
           </button>
           <span class="review-like-count ms-1" th:text="${likeCount}">0</span>
         </div>
@@ -67,16 +71,13 @@
     </div>
   </section>
 
-  <section class="card shadow-sm mb-3">
+  <section class="card shadow-sm mb-3 review-section">
     <div class="card-body">
+      <b class = "review-content-head">리뷰 내용</b>
       <p class="mb-0" th:text="${review.content}">-</p>
     </div>
-  </section>
-
-  <section class="card shadow-sm mb-3"
-           th:if="${review.images != null and !#lists.isEmpty(review.images)}">
     <div class="card-body">
-      <h3 class="h6 mb-3">첨부 이미지</h3>
+      <b class = "review-content-head">첨부 이미지</b>
       <div id="reviewImageSlider" class="review-image-slider">
         <div class="slider-track">
           <div class="slide" th:each="img : ${review.images}">
@@ -87,9 +88,6 @@
         <button class="slider-btn next-btn" type="button">&#10095;</button>
       </div>
     </div>
-  </section>
-
-  <section class="card shadow-sm">
     <div class="card-body text-end">
       <a class="btn btn-sm btn-primary" th:href="@{|/cafes/${review.cafe.id}/reviews|}">목록</a>
       <a th:if="${canEdit}" class="btn btn-sm btn-secondary ms-1" th:href="@{|/reviews/${review.id}/edit|}">수정</a>
@@ -99,6 +97,8 @@
       </form>
     </div>
   </section>
+
+
 
   <!-- ★ 방어 스크립트: 빈/잘못된 script/link를 실시간 제거하고 원인 로그 출력 -->
 
