@@ -154,7 +154,9 @@ public class CafeListController {
 
 
         long likeCount = likeService.getLikeCount(cafeId);
-        boolean openNow = cafeListService.isOpenNow(cafe);
+        Boolean openNow = null;
+        openNow = cafeListService.isOpenNow(cafe);
+
 
         // 상단 배지용 통계
         double avgRating = cafeListService.getActiveAverageRating(cafeId);

@@ -39,9 +39,10 @@
                           class=""
                           th:classappend="${openNow} ? 'status open' : 'status closed'"
                           th:text="${openNow} ? '[영업중]' : '[영업 마감]'">영업중</span>
+                      <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
                 </div>
                 <!-- 정말 빈칸으로 두고 싶으면 아래 줄을 삭제하세요 -->
-                <span th:if="${openNow == null}" class="muted">영업시간 미등록</span>
+
 
                 <div class="stats">
                     <span class="stat" th:text="|⭐ ${#numbers.formatDecimal(avgRating, 1, 1)}"|>★ 4.5</span>
