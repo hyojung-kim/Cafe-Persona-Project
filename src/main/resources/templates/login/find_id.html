@@ -8,7 +8,7 @@
         <form th:action="@{/user/findId}" method="post">
             <div class="email-box input-with-clear">
                 <label for="email" class="form-label email-text">회원 정보에 등록된 이메일 주소를 입력해주세요. </label>
-                <input type="text" name="email" id="email" th:value="${email}" placeholder="EMAIL" class="form-control">
+                <input type="text" name="email" id="email" th:value="${email}" placeholder="EMAIL" class="form-control-num">
                 <!--                <small id="emailConfirmError" class="form-text text-danger">-->
                 <span class="clear-btn">&times;</span>
             </div>
@@ -33,7 +33,7 @@
             <input type="hidden" name="email" th:value="${email}"/>
             <div class="email-box input-with-clear">
                 <!--            <label for="code" class="form-label">인증번호</label>-->
-                <input type="text" name="code" id="code" class="form-control" placeholder="인증번호를 입력해주세요.">
+                <input type="text" name="code" id="code" class="form-control-num" placeholder="인증번호를 입력해주세요.">
                 <span class="clear-btn">&times;</span>
                 </div>
             <small th:if="${codeError}" id="codeError" class="form-text text-danger d-block">

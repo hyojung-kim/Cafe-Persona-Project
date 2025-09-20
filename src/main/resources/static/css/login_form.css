@@ -1,10 +1,17 @@
 
            /* 전체 컨테이너 중앙 정렬 */
             .container.my-4{
-                max-width: 500px; /* 폼 너비 제한 */
+                max-width: 600px; /* 폼 너비 제한 */
                 margin: 0 auto;   /* 화면 중앙 정렬 */
                 padding-top: 50px; /* 위쪽 여백 */
-                font-family: 'Noto Sans KR'
+                font-family: 'Noto Sans KR';
+                padding-left: 50px;
+                padding-right: 50px;
+            }
+             .my-4 {
+                border-radius: 20px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                margin: 0 10px;
             }
 
             /* 로그인 헤드 */
@@ -17,7 +24,7 @@
             }
 
             /* input 필드 스타일 */
-            input.form-control {
+            input.form-control-num {
                 width: 100%;
                 padding: 12px 10px;
                 border-radius: 12px;
@@ -26,7 +33,7 @@
                 letter-spacing: normal;
             }
 
-            input.form-control::placeholder {
+            input.form-control-num::placeholder {
                 letter-spacing: 0.3em;
                 color: #ccc;
             }
@@ -119,6 +126,7 @@
             .find-wrap > a {
                 width: 32%;
                 margin-right: 2%;
+                margin-left: 2%;
                 margin-bottom: 10px;
                 font-size: 12px;
                 color: #5f5f5f;

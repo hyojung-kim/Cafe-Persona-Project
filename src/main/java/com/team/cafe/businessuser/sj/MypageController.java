@@ -1,8 +1,6 @@
 package com.team.cafe.businessuser.sj;
 
-import com.team.cafe.businessuser.sj.owner.cafe.CafeManageService;
 import com.team.cafe.businessuser.sj.BusinessUserRepository;
-import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
@@ -10,8 +8,10 @@ import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +33,6 @@ public class MypageController {
        Constants (Session Keys)
        ========================= */
     private static final String REAUTH_TOKEN_KEY = "MYPAGE_REAUTH_TOKEN";
-    private static final String CAFE_FLOW_FLAG   = "CAFE_FLOW_OK";
     private static final String MANAGE_PASS_ONCE = "MANAGE_PASS_ONCE";
 
     private final UserService userService;
@@ -225,11 +224,10 @@ public class MypageController {
        My Page - Main
        ========================= */
     @GetMapping("/mypage")
-    public String mypage(HttpServletResponse response, Model model) {
+    public String mypage(HttpServletResponse response) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
         setNoCache(response);
-        model.addAttribute("isBusiness", user.getBusinessUser() != null);
         return "mypage/mypage-main";
     }
 
@@ -313,14 +311,26 @@ public class MypageController {
 
     @PostMapping("/mypage/account/update-phone")
     @ResponseBody
-    public String updatePhone(HttpServletRequest request,
+    @Transactional
+    public String updatePhone(@AuthenticationPrincipal UserDetails principal,
                               @RequestParam String phone) {
-        SiteUser user = currentUserOrNull();
+        if (principal == null) return "fail"; // 필요시 401로 변경
+        SiteUser user = userService.getUser(principal.getUsername());
+
         if (user == null) return "fail";
-        if (!requireReauthConsume(request)) return "fail";
 
         user.setPhone(phone);
         userService.save(user);
+
+        // 2) 비즈니스 유저 대표번호도 함께 업데이트
+        businessUserRepository.findByUserId(user.getId()).ifPresent(biz -> {
+            biz.setRepresentativePhone(phone);
+            businessUserRepository.save(biz); // ← 엔티티 말고 레포지토리로 save
+        });
+
+
+
+
         return "success";
     }
 
@@ -349,13 +359,11 @@ public class MypageController {
 
         // 1) 볼 카페 결정
         if (cafeId == null) {
-            // (권장) 로그인 사용자의 카페 1개 선택
-            cafeId = cafeListRepository.findByBusinessUser_User_Id(user.getId())
-                    .map(Cafe::getId)
-                    .orElse(null);
-
-            // (보조) 그래도 없으면 가장 최근 카페 1개
-            if (cafeId == null) {
+            var businessUser = businessUserRepository.findByUserId(user.getId()).orElse(null);
+            if (business != null && business.getCafe() != null) {
+                cafeId = business.getCafe().getId();
+            } else {
+                // (보조) 그래도 없으면 가장 최근 카페 1개
                 Cafe latest = cafeListRepository.findTopByOrderByIdDesc();
                 cafeId = (latest != null) ? latest.getId() : null;
             }
@@ -381,8 +389,6 @@ public class MypageController {
             model.addAttribute("isRegistered", false);
         }
 
-        return "mypage/cafe_manage"; // 템플릿 파일명과 정확히 일치
+        return "mypage/cafe_manage";
     }
-
-
 }
