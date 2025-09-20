@@ -1,13 +1,11 @@
 <html layout:decorate="~{layout}">
 <div layout:fragment="content">
-
     <link rel="stylesheet" th:href="@{/css/cafe_detail_review.css}">
     <link rel="stylesheet" th:href="@{/css/cafe_detail_con1.css}">
 
     <head>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     </head>
-
 
     <!-- 카페명 + 영업상태 -->
     <main class="container-1">
@@ -215,61 +213,50 @@
     <!-- 하단: 리뷰 리스트 페이지로 이동 (스타일 없음) -->
     <!--  기본순 - 최신순 , 인기순 - 리뷰 좋아요 갯수 순  -->
     <div style="margin-top:16px;">
-
-        <div class="review-summary">
-<!--            &lt;!&ndash;   소수점 첫째자리까지만  &ndash;&gt;-->
-<!--            <p>평균 별점 :-->
-<!--                <span>-->
-<!--        &lt;!&ndash; 채워진 별 &ndash;&gt;-->
-<!--        <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avgRating))}">-->
-<!--            <i class="fa-solid fa-star"></i>-->
-<!--        </span>-->
-
-<!--                    &lt;!&ndash; 반 별 (0.5 이상일 때) &ndash;&gt;-->
-<!--        <span th:if="${avgRating - T(java.lang.Math).floor(avgRating) >= 0.5}">-->
-<!--            <i class="fa-solid fa-star-half-stroke"></i>-->
-<!--        </span>-->
-
-<!--                    &lt;!&ndash; 빈 별 &ndash;&gt;-->
-<!--        <span th:each="i : ${#numbers.sequence( 1, 5 - T(java.lang.Math).floor(avgRating) - (avgRating - T(java.lang.Math).floor(avgRating) >= 0.5 ? 1 : 0)-->
-<!--        )}">-->
-<!--            <i class="fa-regular fa-star"></i>-->
-<!--        </span>-->
-<!--    </span>-->
-<!--                <span th:text="${T(java.lang.Math).floor(avgRating * 10) / 10}"></span></p>-->
-
+        <div class="review-summary"><div class="review-header">
+            <div class="review-subject">Review (<span th:text="${reviewCount}"></span>)
+            </div>
             <form th:action="@{/cafe/detail/{id}(id=${cafe.id})}" id="filterForm" method="get"
-                  class="filter-form"></form>
-            <label class="filter-bar__sort">
-                <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
-                    <option value="createdAt" th:selected="${sort} == 'createdAt'">최신순</option>
-                    <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
-                </select>
-            </label>
-
+                  class="filter-form">
+                <label class="filter-bar__sort">
+                    <select name="sort" th:value="${sort}" form="filterForm" onchange="this.form.submit()">
+                        <option value="createdAt" th:selected="${sort} == 'createdAt'">최신순</option>
+                        <option value="hit" th:selected="${sort} == 'hit'">인기순</option>
+                    </select>
+                </label>
+            </form>
+        </div>
             <div class="review-container">
-                <div class="review-subject">Review (<span th:text="${reviewCount}"></span>)</div>
+
+
                 <a th:each="review : ${latestReviews}"
                    th:href="@{/cafes/{id}/reviews(id=${cafe.id})}"
                    class="review-item"
                    style="display: block; text-decoration: none; color: inherit;">
 
                     <div class="review-item-inner">
-                        <div class="review-image-placeholder">
-                        </div>
+                        <!--  대표, 대체 이미지  -->
+                        <div class="review-image-placeholder"></div>
+                        <!--                        <div th:if="${#lists.isEmpty(review.images) == false}">-->
+                        <!--                            <img th:each="img : ${review.images}"-->
+                        <!--                                 th:src="@{/uploads/{file}(file=${img.fileName})}"-->
+                        <!--                                 alt="리뷰 이미지" />-->
+                        <!--                        </div>-->
+
                         <div class="review-content">
                             <div class="review-stars">
                                 <div class="rating-group">
-                                <!-- 1부터 5까지 반복 -->
-                                <span th:each="i : ${#numbers.sequence(1,5)}">
+                                    <!-- 1부터 5까지 반복 -->
+                                    <span th:each="i : ${#numbers.sequence(1,5)}">
                                     <!-- 꽉 찬 별 -->
                                     <i class="fa-solid fa-star" th:if="${review.rating >= i}"></i>
-                                    <!-- 반 별 -->
-                                    <i class="fa-solid fa-star-half-stroke" th:if="${review.rating >= i - 0.5 and review.rating < i}"></i>
-                                    <!-- 빈 별 -->
+                                        <!-- 반 별 -->
+                                    <i class="fa-solid fa-star-half-stroke"
+                                       th:if="${review.rating >= i - 0.5 and review.rating < i}"></i>
+                                        <!-- 빈 별 -->
                                     <i class="fa-regular fa-star" th:if="${review.rating < i - 0.5}"></i>
                                 </span>
-                                <span class="review-score" th:text="${review.rating}"></span>
+                                    <span class="review-score" th:text="${review.rating}"></span>
                                 </div>
                                 <div class="review-likes-info">
                                     <i class="fa-solid fa-heart" style="color: #eb4747;"></i>
@@ -281,8 +268,8 @@
                         </div>
                     </div>
                 </a>
+
             </div>
-            <!-- 더보기 버튼 -->
             <button type="button" class="more-reviews-button"
                     th:onclick="location.href='/cafes/' + [[${cafe.id}]] + '/reviews'">더보기
             </button>
