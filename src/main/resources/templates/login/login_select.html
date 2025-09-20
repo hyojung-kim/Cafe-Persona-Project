@@ -1,0 +1,25 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content" class="container my-4">
+<div class="login-select-container">
+    <h2>로그인 방식을 선택하세요</h2>
+
+    <div class="login-buttons">
+        <a th:href="@{/user/login}" class="btn btn-primary">일반 로그인</a>
+        <a th:href="@{/business/login}" class="btn btn-secondary">사업자 로그인</a>
+    </div>
+
+    <!-- role mismatch 안내 메시지 -->
+<!--    <div th:if="${param.error}">-->
+<!--        <p th:switch="${param.error}">-->
+<!--                <span th:case="'businessOnUserPage'" class="text-danger">-->
+<!--                    사업자 계정은 <strong>사업자 로그인</strong> 페이지에서 로그인해주세요.-->
+<!--                </span>-->
+<!--            <span th:case="'userOnBusinessPage'" class="text-danger">-->
+<!--                    일반 회원은 <strong>일반 로그인</strong> 페이지에서 로그인해주세요.-->
+<!--                </span>-->
+<!--            <span th:case="*">아이디 또는 비밀번호가 일치하지 않습니다.</span>-->
+<!--        </p>-->
+<!--    </div>-->
+</div>
+</div>
+</html>

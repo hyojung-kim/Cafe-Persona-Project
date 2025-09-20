@@ -9,29 +9,31 @@ import com.team.cafe.user.sjhy.UserService;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/user")
+//@RequestMapping("/user")// hy
 public class UserController {
 
     private final UserService userService;
 
-//    @GetMapping("/login")
-//    public String loginForm() {
-//        return "/login/login_form";
-//    }
+    @GetMapping("/login/select")
+    public String loginSelect() {
+        return "/login/login_select";
+    }
 
-
-
-
-
-    @GetMapping("/login")
+    @GetMapping("/user/login")
     public String kakaoLogin(Model model) {
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         model.addAttribute("redirectUri", redirectUri);
-        return "/login/login_form"; // login.html
+        return "/login/login_form_user"; // login.html
     }
+
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
 
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
+
+    @GetMapping("/business/login")
+    public String businessLoginForm() {
+        return "/login/login_form_business";
+    }
 }
