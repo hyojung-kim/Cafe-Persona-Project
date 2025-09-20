@@ -7,9 +7,9 @@
 
     <style>
         .container.my-4{
-         max-width: 600px; /* 폼 너비 제한 */
+         max-width: 800px; /* 폼 너비 제한 */
          margin: 0 auto;   /* 화면 중앙 정렬 */
-         padding-top: 50px; /* 위쪽 여백 */
+         padding-top: 80px; /* 위쪽 여백 */
          font-family: 'Noto Sans KR';
          padding-left: 50px;
          padding-right: 50px;
@@ -59,6 +59,7 @@
         .login-button-wrapper a {
             color: black;
             font-size: 24px;
+            font-weight: bold;
         }
     </style>
 <div class="login-select-container">
@@ -66,11 +67,11 @@
     <div class="login-button-wrapper">
         <div class="user-login-buttons" onclick="location.href='/user/login'">
             <i class="fa-solid fa-users"></i>
-            <a th:href="@{/user/login}">일반 로그인</a>
+            <a th:href="@{/user/login}">User Login</a>
         </div>
         <div class="business-login-buttons" onclick="location.href='/business/login'">
             <i class="fa-solid fa-building"></i>
-            <a th:href="@{/business/login}" >사업자 로그인</a>
+            <a th:href="@{/business/login}" >Business Login</a>
         </div>
     </div>
 

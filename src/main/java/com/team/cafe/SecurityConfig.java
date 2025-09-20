@@ -1,5 +1,7 @@
 package com.team.cafe;
 
+import com.team.cafe.user.sjhy.CustomAuthenticationFailureHandler;
+import com.team.cafe.user.sjhy.CustomLoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -62,12 +64,14 @@ public class SecurityConfig {
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 )
 
-                // 4) 로그인 설정
+                // 4) 로그인 설정 일반 유저 전용
                 .formLogin(form -> form
                         .loginPage("/user/login")          // GET: 로그인 페이지
                         .loginProcessingUrl("/user/login") // POST: 인증 처리
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/user/login?error")
+//                        .defaultSuccessUrl("/", true)
+//                        .failureUrl("/user/login?error")
+                                .failureHandler(customAuthenticationFailureHandler())
+                                .successHandler(customLoginSuccessHandler())
                 )
 
                 // 5) 로그아웃 설정 (POST 권장)
@@ -88,5 +92,15 @@ public class SecurityConfig {
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public CustomLoginSuccessHandler customLoginSuccessHandler() {
+        return new CustomLoginSuccessHandler();
+    }
+
+    @Bean
+    public CustomAuthenticationFailureHandler customAuthenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
     }
 }
