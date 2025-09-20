@@ -27,7 +27,7 @@
 
 body {
   font-family: "Noto Sans KR", sans-serif;
-  background: var(--surface-alt);
+
   color: var(--ink);
 }
 
@@ -59,7 +59,7 @@ body {
 }
 
 .review-detail {
-  background: var(--surface);
+  background: linear-gradient(135deg, #F4ECE5, #FFF);
   border-radius: var(--radius-lg);
   padding: 2.8rem 3rem;
   box-shadow: var(--shadow);

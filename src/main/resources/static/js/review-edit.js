@@ -1,156 +1,237 @@
 // review-edit.js
 (function () {
-  var MAX_IMAGES = 5;
+  const form = document.getElementById('reviewEditForm');
+  if (!form) return;
 
-  // ===== 글자수 카운터 =====
-  var content = document.getElementById('content');
-  var counter = document.getElementById('contentCounter');
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const imageInput = document.getElementById('editImages');
+  const imageList = document.getElementById('reviewEditFileList');
+  const selectedFiles = [];
+
+  const getMaxFileCount = () => {
+    if (!imageInput) return 10;
+    const parsed = Number.parseInt(imageInput.getAttribute('data-max-files') || '10', 10);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : 10;
+  };
+
+  const getExistingImageInputs = () => {
+    return Array.from(document.querySelectorAll('.review-edit__existing-item input[name="imageUrl"]'));
+  };
+
+  // ===== 글자 수 카운터 =====
+  const content = document.getElementById('content');
+  const counter = document.getElementById('contentCounter');
   if (content && counter) {
-    var updateCount = function () {
-      var len = (content.value || '').trim().length;
-      counter.textContent = len + '자 / 최소 5자';
-      counter.style.color = (len >= 5) ? '#10b981' : '#6b7280';
+    const updateCount = () => {
+      const length = (content.value || '').trim().length;
+      counter.textContent = `${length}자 / 최소 5자`;
+      counter.style.color = length >= 5 ? '#10b981' : '#6b7280';
     };
     content.addEventListener('input', updateCount);
     updateCount();
   }
 
-  // ===== 이미지 URL/파일 합산 미리보기 및 개수 제한 =====
-  var grid = document.getElementById('previewGrid');
-  var fileInput = document.querySelector('input[type="file"][name="images"]');
-  var form = document.getElementById('reviewEditForm');
-  var submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+  // ===== 별점 동기화 =====
+  const ratingInputs = Array.from(form.querySelectorAll('input[name="rating"]'));
+  const ratingDisplay = form.querySelector('[data-rating-display]');
+  const ratingValue = document.getElementById('editRatingValue');
+  const ratingChoices = form.querySelector('.rating-picker__choices');
 
-  // 간단 플레이스홀더 박스 생성
-  function placeholderBox(text) {
-    var empty = document.createElement('div');
-    empty.className = 'rev-thumb';
-    empty.style.display = 'flex';
-    empty.style.alignItems = 'center';
-    empty.style.justifyContent = 'center';
-    empty.style.color = '#9ca3af';
-    empty.style.border = '1px dashed #e5e7eb';
-    empty.textContent = text || 'No Image';
-    return empty;
-  }
+  const ratingValues = ratingInputs
+    .map((input) => Number.parseFloat(input.value))
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b);
 
-  function imgThumb(src) {
-    var img = document.createElement('img');
-    img.className = 'rev-thumb';
-    img.src = src;
-    img.alt = 'preview';
-    img.loading = 'lazy';
-    img.referrerPolicy = 'no-referrer';
-    img.onerror = function () {
-      // 로드 실패 시 플레이스홀더로 교체
-      var parent = img.parentNode;
-      if (parent) parent.replaceChild(placeholderBox('Load Error'), img);
-    };
-    return img;
-  }
+  const minRating = ratingValues.length ? ratingValues[0] : 0;
+  const maxRating = ratingValues.length ? ratingValues[ratingValues.length - 1] : 5;
 
-  function currentUrlValues() {
-    // 비어있지 않은 URL만 카운트/미리보기 대상으로
-    return Array.prototype.slice.call(document.querySelectorAll('input[name="imageUrl"]'))
-      .map(function (inp) { return (inp.value || '').trim(); })
-      .filter(function (v) { return v.length > 0; });
-  }
-
-  function currentFiles() {
-    return (fileInput && fileInput.files) ? Array.from(fileInput.files) : [];
-  }
-
-  function renderPreview() {
-    if (!grid) return;
-
-    var urls = currentUrlValues();
-    var files = currentFiles();
-
-    grid.innerHTML = '';
-
-    // URL 미리보기
-    urls.forEach(function (u) {
-      var box = document.createElement('div');
-      box.appendChild(imgThumb(u));
-      grid.appendChild(box);
-    });
-
-    // 파일 미리보기
-    files.forEach(function (f) {
-      var box = document.createElement('div');
-      try {
-        var objUrl = URL.createObjectURL(f);
-        var img = imgThumb(objUrl);
-        img.onload = function () { URL.revokeObjectURL(objUrl); };
-        img.onerror = function () { URL.revokeObjectURL(objUrl); };
-        box.appendChild(img);
-      } catch (e) {
-        box.appendChild(placeholderBox('File'));
-      }
-      grid.appendChild(box);
-    });
-
-    // 부족한 칸은 플레이스홀더(선택)
-    var total = urls.length + files.length;
-    for (var i = total; i < Math.min(MAX_IMAGES, 5); i++) {
-      grid.appendChild(placeholderBox('Empty'));
+  const syncRatingDisplay = (value) => {
+    const numericValue = Number.parseFloat(value);
+    const fallback = Number.isFinite(numericValue) ? numericValue : minRating;
+    const rating = Math.min(maxRating, Math.max(minRating, fallback));
+    if (ratingDisplay) {
+      ratingDisplay.style.setProperty('--rating', rating.toString());
     }
-
-    // 제한 체크
-    var over = total > MAX_IMAGES;
-    if (submitBtn) submitBtn.disabled = over;
-    if (form) {
-      if (over) {
-        form.setAttribute('data-over-limit', 'true');
-      } else {
-        form.removeAttribute('data-over-limit');
-      }
-    }
-  }
-
-  // 파일 변경 시 미리보기 갱신 + 즉시 제한 안내
-  if (fileInput) {
-    fileInput.addEventListener('change', function () {
-      var urls = currentUrlValues();
-      var files = currentFiles();
-      if (urls.length + files.length > MAX_IMAGES) {
-        // 초과 시 안내하고 제출은 막되, 사용자가 파일 선택을 줄이도록 유도
-        alert('이미지는 URL과 파일 합쳐 최대 ' + MAX_IMAGES + '장까지 가능합니다.');
-      }
-      renderPreview();
-    });
-  }
-
-  // 제출 시 최종 제한 + 글자수 검사
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      if (!form.checkValidity()) {
-        e.preventDefault();
-        e.stopPropagation();
-        form.classList.add('was-validated');
-        return;
-      }
-
-      var total = currentUrlValues().length + currentFiles().length;
-      if (total > MAX_IMAGES) {
-        e.preventDefault();
-        e.stopPropagation();
-        alert('이미지는 최대 ' + MAX_IMAGES + '장까지만 업로드할 수 있어요.');
-        return;
-      }
-    });
-  }
-
-  // 초기 렌더
-  renderPreview();
-
-  // 기존 이미지 삭제 처리
-  window.removeExistingImage = function (btn) {
-    var wrapper = btn.closest('.existing-image');
-    if (wrapper) {
-      wrapper.remove();
-      renderPreview();
+    if (ratingValue) {
+      ratingValue.textContent = rating.toFixed(1);
     }
   };
-})();
 
+  const getCheckedRating = () => {
+    const checked = ratingInputs.find((input) => input.checked);
+    if (checked) return checked.value;
+    const defaultChecked = ratingInputs.find((input) => input.defaultChecked);
+    if (defaultChecked) return defaultChecked.value;
+    return ratingValues.length ? ratingValues[Math.floor(ratingValues.length / 2)] : maxRating;
+  };
+
+  if (ratingInputs.length) {
+    syncRatingDisplay(getCheckedRating());
+    ratingInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        syncRatingDisplay(input.value);
+      });
+    });
+  }
+
+  const interactiveRatingTargets = ratingInputs
+    .map((input) => {
+      if (!input.id) return null;
+      const label = form.querySelector(`label[for="${input.id}"]`);
+      if (!label) return null;
+      return { input, label };
+    })
+    .filter((entry) => entry != null);
+
+  const resetRatingDisplay = () => {
+    syncRatingDisplay(getCheckedRating());
+  };
+
+  interactiveRatingTargets.forEach(({ input, label }) => {
+    const showPreview = () => {
+      syncRatingDisplay(input.value);
+    };
+
+    label.addEventListener('pointerenter', showPreview);
+    label.addEventListener('mouseenter', showPreview);
+    input.addEventListener('focus', showPreview);
+
+    label.addEventListener('pointerdown', showPreview);
+    input.addEventListener('blur', resetRatingDisplay);
+  });
+
+  if (ratingChoices) {
+    ratingChoices.addEventListener('pointerleave', resetRatingDisplay);
+    ratingChoices.addEventListener('mouseleave', resetRatingDisplay);
+  }
+
+  // ===== 새 이미지 파일 목록 관리 =====
+  const renderFileList = () => {
+    if (!imageList) return;
+    imageList.innerHTML = '';
+
+    if (!selectedFiles.length) {
+      const empty = document.createElement('li');
+      empty.className = 'review-edit__file-empty';
+      empty.textContent = '선택된 이미지가 없습니다.';
+      imageList.appendChild(empty);
+      return;
+    }
+
+    selectedFiles.forEach((file, index) => {
+      const item = document.createElement('li');
+      item.className = 'review-edit__file-item';
+
+      const name = document.createElement('span');
+      name.className = 'review-edit__file-name';
+      name.textContent = file.name;
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'review-edit__file-remove';
+      remove.setAttribute('data-index', String(index));
+      remove.setAttribute('aria-label', `${file.name} 삭제`);
+      remove.innerHTML = '&times;';
+
+      item.append(name, remove);
+      imageList.appendChild(item);
+    });
+  };
+
+  const syncImageInput = () => {
+    if (!imageInput || typeof DataTransfer === 'undefined') return;
+    const dt = new DataTransfer();
+    selectedFiles.forEach((file) => dt.items.add(file));
+    imageInput.files = dt.files;
+  };
+
+  if (imageList) {
+    imageList.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target.closest('.review-edit__file-remove') : null;
+      if (!target) return;
+      const index = Number.parseInt(target.getAttribute('data-index') || '', 10);
+      if (!Number.isInteger(index) || index < 0 || index >= selectedFiles.length) return;
+      selectedFiles.splice(index, 1);
+      syncImageInput();
+      renderFileList();
+      if (imageInput) {
+        imageInput.focus();
+      }
+    });
+  }
+
+  if (imageInput) {
+    renderFileList();
+
+    imageInput.addEventListener('change', (event) => {
+      const input = event.currentTarget;
+      if (!(input instanceof HTMLInputElement) || !input.files) return;
+
+      const newFiles = Array.from(input.files);
+      if (!newFiles.length) return;
+
+      const messages = [];
+      const maxCount = getMaxFileCount();
+      const existingCount = getExistingImageInputs().length;
+
+      newFiles.forEach((file) => {
+        if (file.size > MAX_FILE_SIZE) {
+          messages.push(`"${file.name}"은(는) 10MB를 초과하여 제외되었습니다.`);
+          return;
+        }
+        if (existingCount + selectedFiles.length >= maxCount) {
+          messages.push(`이미지는 최대 ${maxCount}장까지 선택할 수 있습니다.`);
+          return;
+        }
+        const isDuplicate = selectedFiles.some((existing) => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified);
+        if (isDuplicate) {
+          messages.push(`"${file.name}"은(는) 이미 선택된 이미지입니다.`);
+          return;
+        }
+        selectedFiles.push(file);
+      });
+
+      syncImageInput();
+      renderFileList();
+      input.value = '';
+
+      if (messages.length) {
+        alert(messages.filter((value, index, arr) => arr.indexOf(value) === index).join('\n'));
+      }
+    });
+  }
+
+  // ===== 기존 이미지 삭제 =====
+  const removeExistingImage = (button) => {
+    const wrapper = button.closest('.review-edit__existing-item');
+    if (!wrapper) return;
+    wrapper.remove();
+  };
+
+  const existingContainer = document.getElementById('existingImageList');
+  if (existingContainer) {
+    existingContainer.addEventListener('click', (event) => {
+      const button = event.target instanceof Element ? event.target.closest('.review-edit__existing-remove') : null;
+      if (!button) return;
+      removeExistingImage(button);
+    });
+  }
+
+  // ===== 제출 시 검증 =====
+  form.addEventListener('submit', (event) => {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+
+    const maxCount = getMaxFileCount();
+    const existingCount = getExistingImageInputs().length;
+    if (existingCount + selectedFiles.length > maxCount) {
+      event.preventDefault();
+      event.stopPropagation();
+      alert(`이미지는 최대 ${maxCount}장까지만 업로드할 수 있어요.`);
+    }
+  });
+})();
