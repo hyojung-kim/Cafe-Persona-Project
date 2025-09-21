@@ -254,9 +254,15 @@
                th:href="@{|/reviews/${rv.id}|}"
                class="gallery-item">
               <img th:src="@{${img.imageUrl}}" alt="review image">
+            </a>
+            <a th:if="${rv.images.size() > 3}"
+               th:href="@{|/reviews/${rv.id}|}"
+               class="gallery-item gallery-item--more"
+               th:attr="aria-label=${'이미지 ' + (rv.images.size() - 3) + '장 더 보기'}">
               <span class="more-count"
-                    th:if="${iter.index == 2 and rv.images.size() > 3}"
-                    th:text="'+' + ${rv.images.size() - 2}">+1</span>
+                    th:text="'+' + ${rv.images.size() - 3}">+1</span>
+              <span class="visually-hidden"
+                    th:text="${'이미지 ' + (rv.images.size() - 3) + '장 더 보기'}">이미지 더 보기</span>
             </a>
           </div>
 
