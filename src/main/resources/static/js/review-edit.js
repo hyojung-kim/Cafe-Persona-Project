@@ -4,15 +4,16 @@
   if (!form) return;
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const DEFAULT_MAX_FILE_COUNT = 5;
   const imageInput = document.getElementById('editImages');
   const imageList = document.getElementById('reviewEditFileList');
   const supportsFileApi = typeof DataTransfer !== 'undefined';
   const selectedFiles = [];
 
   const getMaxFileCount = () => {
-    if (!imageInput) return 10;
-    const parsed = Number.parseInt(imageInput.getAttribute('data-max-files') || '10', 10);
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : 10;
+    if (!imageInput) return DEFAULT_MAX_FILE_COUNT;
+    const parsed = Number.parseInt(imageInput.getAttribute('data-max-files') || '', 10);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : DEFAULT_MAX_FILE_COUNT;
   };
 
   const getExistingImageInputs = () => {
@@ -244,7 +245,7 @@
 
       if (!supportsFileApi) {
         if (existingCount + newFiles.length > maxCount) {
-          messages.push(`이미지는 최대 ${maxCount}장까지 선택할 수 있습니다.`);
+          messages.push(`이미지는 최대 ${maxCount}장까지 선택할 수 있습니다. 등록된 이미지를 삭제한 뒤 다시 시도해 주세요.`);
         }
 
         newFiles.forEach((file) => {
@@ -272,7 +273,7 @@
           return;
         }
         if (existingCount + selectedFiles.length >= maxCount) {
-          messages.push(`이미지는 최대 ${maxCount}장까지 선택할 수 있습니다.`);
+          messages.push(`이미지는 최대 ${maxCount}장까지 선택할 수 있습니다. 등록된 이미지를 삭제한 뒤 다시 시도해 주세요.`);
           return;
         }
         const isDuplicate = selectedFiles.some((existing) => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified);
