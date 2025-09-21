@@ -13,10 +13,83 @@
   const starWrapper = form.querySelector('.rating-picker__star-wrapper');
   const imageInput = document.getElementById('createImages');
   const imageList = document.getElementById('reviewImageList');
+  const certificationNotice = document.getElementById('certifyRequiredMessage');
   const selectedFiles = [];
   const supportsDataTransfer = typeof DataTransfer !== 'undefined';
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const MAX_FILE_COUNT = imageInput ? Number.parseInt(imageInput.getAttribute('data-max-files') || '10', 10) : 10;
+
+  const isLocationCertified = () => {
+    if (!cafeId) return true;
+    return localStorage.getItem('certifiedCafe_' + cafeId) === 'true';
+  };
+
+  const showCertificationNotice = () => {
+    if (!certificationNotice) return;
+    certificationNotice.classList.remove('d-none');
+    certificationNotice.classList.add('d-block');
+  };
+
+  const hideCertificationNotice = () => {
+    if (!certificationNotice) return;
+    certificationNotice.classList.remove('d-block');
+    certificationNotice.classList.add('d-none');
+  };
+
+  const syncCertificationNotice = () => {
+    if (isLocationCertified()) {
+      hideCertificationNotice();
+    }
+  };
+
+  let lastAlertAt = 0;
+  const notifyCertificationRequired = () => {
+    const now = Date.now();
+    if (now - lastAlertAt < 1500) return;
+    lastAlertAt = now;
+    showCertificationNotice();
+  };
+
+  const shouldBlockInputTarget = (target) => {
+    if (!(target instanceof HTMLElement)) return false;
+    if (target.closest('[data-allow-without-certification]')) return false;
+    if (target instanceof HTMLTextAreaElement) return true;
+    if (target instanceof HTMLInputElement) {
+      const blockTypes = ['text', 'search', 'email', 'tel', 'url', 'number', 'password'];
+      const type = (target.getAttribute('type') || 'text').toLowerCase();
+      return blockTypes.includes(type);
+    }
+    return false;
+  };
+
+  const handleBlockedInput = (event) => {
+    const target = event.target;
+    if (!shouldBlockInputTarget(target) || isLocationCertified()) return;
+    event.preventDefault();
+    event.stopPropagation();
+    notifyCertificationRequired();
+    if (target instanceof HTMLElement) {
+      target.blur();
+    }
+  };
+
+  form.addEventListener('beforeinput', handleBlockedInput, true);
+  form.addEventListener('paste', handleBlockedInput, true);
+  form.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab' || event.key === 'Shift' || event.key === 'Escape') return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    handleBlockedInput(event);
+  }, true);
+
+  syncCertificationNotice();
+
+  window.addEventListener('focus', syncCertificationNotice);
+  window.addEventListener('storage', (event) => {
+    if (!cafeId) return;
+    if (event.key === 'certifiedCafe_' + cafeId) {
+      syncCertificationNotice();
+    }
+  });
 
   const refreshReviewSectionUI = () => {
     if (typeof window.syncReviewImageAspectRatios === 'function') {
