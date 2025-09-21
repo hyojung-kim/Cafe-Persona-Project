@@ -14,8 +14,22 @@
   const imageInput = document.getElementById('createImages');
   const imageList = document.getElementById('reviewImageList');
   const selectedFiles = [];
+  const supportsDataTransfer = typeof DataTransfer !== 'undefined';
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const MAX_FILE_COUNT = imageInput ? Number.parseInt(imageInput.getAttribute('data-max-files') || '10', 10) : 10;
+
+  const refreshReviewSectionUI = () => {
+    if (typeof window.syncReviewImageAspectRatios === 'function') {
+      window.syncReviewImageAspectRatios();
+    }
+    if (typeof window.initReviewImageSlider === 'function') {
+      window.initReviewImageSlider();
+    }
+    if (typeof window.initReviewImageMagnifier === 'function') {
+      window.initReviewImageMagnifier();
+    }
+  };
+  window.refreshReviewSectionUI = refreshReviewSectionUI;
 
   const syncSelectedFileView = () => {
     if (!imageList) return;
@@ -50,7 +64,7 @@
   };
 
   const syncImageInput = () => {
-    if (!imageInput || typeof DataTransfer === 'undefined') return;
+    if (!imageInput || !supportsDataTransfer) return;
     const dt = new DataTransfer();
     selectedFiles.forEach((file) => dt.items.add(file));
     imageInput.files = dt.files;
@@ -233,6 +247,12 @@
     e.preventDefault();
 
     const fd = new FormData(form); // rating, content, images[]
+    // 기본 FormData에는 <input type="file">가 가진 FileList가 추가되지만,
+    // Safari(iOS 등)처럼 DataTransfer를 지원하지 않는 환경에서는
+    // 커스텀 선택 로직 때문에 FileList가 비어버릴 수 있다.
+    // selectedFiles 배열을 신뢰 가능한 단일 소스로 사용하도록 강제한다.
+    fd.delete('images');
+    selectedFiles.forEach((file) => fd.append('images', file));
 
     try {
       // 1) AJAX로 리뷰 생성 (컨트롤러가 JSON 반환)
@@ -272,6 +292,7 @@
       if (!newSection || !oldSection) throw new Error('섹션 엘리먼트를 찾을 수 없습니다.');
 
       oldSection.replaceWith(newSection);
+      refreshReviewSectionUI();
 
       // 3) 폼 리셋
       form.reset();

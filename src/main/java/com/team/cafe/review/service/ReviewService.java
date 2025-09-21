@@ -12,8 +12,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -141,16 +145,25 @@ public class ReviewService {
 
         validateRatingAndContent(newRating, newContent);
 
-        List<ReviewImage> copy = new ArrayList<>(review.getImages());
-        for (ReviewImage img : copy) review.removeImage(img);
-
         List<String> urls = sanitizeAndLimitImageUrls(newImageUrls);
+        Map<String, Deque<ReviewImage>> existingByUrl = new LinkedHashMap<>();
+        for (ReviewImage existing : new ArrayList<>(review.getImages())) {
+            existingByUrl
+                    .computeIfAbsent(existing.getImageUrl(), key -> new ArrayDeque<>())
+                    .add(existing);
+            review.removeImage(existing);
+        }
+
         int order = 0;
         for (String url : urls) {
-            ReviewImage imgNew = new ReviewImage();
-            imgNew.setImageUrl(url);
-            imgNew.setSortOrder(order++);
-            review.addImage(imgNew);
+            Deque<ReviewImage> deque = existingByUrl.get(url);
+            ReviewImage image = (deque != null) ? deque.pollFirst() : null;
+            if (image == null) {
+                image = new ReviewImage();
+            }
+            image.setImageUrl(url);
+            image.setSortOrder(order++);
+            review.addImage(image);
         }
 
         review.setRating(newRating);

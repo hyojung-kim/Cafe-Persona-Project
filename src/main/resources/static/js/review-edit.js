@@ -6,6 +6,7 @@
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const imageInput = document.getElementById('editImages');
   const imageList = document.getElementById('reviewEditFileList');
+  const supportsFileApi = typeof DataTransfer !== 'undefined';
   const selectedFiles = [];
 
   const getMaxFileCount = () => {
@@ -164,7 +165,11 @@
     if (!imageList) return;
     imageList.innerHTML = '';
 
-    if (!selectedFiles.length) {
+    const filesForDisplay = supportsFileApi
+      ? selectedFiles
+      : (imageInput && imageInput.files ? Array.from(imageInput.files) : []);
+
+    if (!filesForDisplay.length) {
       const empty = document.createElement('li');
       empty.className = 'review-edit__file-empty';
       empty.textContent = '선택된 이미지가 없습니다.';
@@ -172,7 +177,7 @@
       return;
     }
 
-    selectedFiles.forEach((file, index) => {
+    filesForDisplay.forEach((file, index) => {
       const item = document.createElement('li');
       item.className = 'review-edit__file-item';
 
@@ -193,16 +198,27 @@
   };
 
   const syncImageInput = () => {
-    if (!imageInput || typeof DataTransfer === 'undefined') return;
+    if (!imageInput || !supportsFileApi) return false;
     const dt = new DataTransfer();
     selectedFiles.forEach((file) => dt.items.add(file));
     imageInput.files = dt.files;
+    return true;
   };
 
   if (imageList) {
     imageList.addEventListener('click', (event) => {
       const target = event.target instanceof Element ? event.target.closest('.review-edit__file-remove') : null;
       if (!target) return;
+      if (!supportsFileApi) {
+        if (imageInput) {
+          imageInput.value = '';
+          selectedFiles.length = 0;
+          renderFileList();
+          imageInput.focus();
+        }
+        return;
+      }
+
       const index = Number.parseInt(target.getAttribute('data-index') || '', 10);
       if (!Number.isInteger(index) || index < 0 || index >= selectedFiles.length) return;
       selectedFiles.splice(index, 1);
@@ -215,8 +231,6 @@
   }
 
   if (imageInput) {
-    renderFileList();
-
     imageInput.addEventListener('change', (event) => {
       const input = event.currentTarget;
       if (!(input instanceof HTMLInputElement) || !input.files) return;
@@ -227,6 +241,30 @@
       const messages = [];
       const maxCount = getMaxFileCount();
       const existingCount = getExistingImageInputs().length;
+
+      if (!supportsFileApi) {
+        if (existingCount + newFiles.length > maxCount) {
+          messages.push(`이미지는 최대 ${maxCount}장까지 선택할 수 있습니다.`);
+        }
+
+        newFiles.forEach((file) => {
+          if (file.size > MAX_FILE_SIZE) {
+            messages.push(`"${file.name}"은(는) 10MB를 초과하여 제외되었습니다.`);
+          }
+        });
+
+        if (messages.length) {
+          input.value = '';
+        }
+
+        renderFileList();
+
+        if (messages.length) {
+          alert(messages.filter((value, index, arr) => arr.indexOf(value) === index).join('\n'));
+        }
+
+        return;
+      }
 
       newFiles.forEach((file) => {
         if (file.size > MAX_FILE_SIZE) {
@@ -245,15 +283,20 @@
         selectedFiles.push(file);
       });
 
-      syncImageInput();
+      const synced = syncImageInput();
       renderFileList();
-      input.value = '';
+      if (synced) {
+        input.value = '';
+        syncImageInput();
+      }
 
       if (messages.length) {
         alert(messages.filter((value, index, arr) => arr.indexOf(value) === index).join('\n'));
       }
     });
   }
+
+  renderFileList();
 
   // ===== 기존 이미지 삭제 =====
   const removeExistingImage = (button) => {
