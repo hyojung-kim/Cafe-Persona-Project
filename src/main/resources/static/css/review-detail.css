@@ -27,7 +27,7 @@
 
 body {
   font-family: "Noto Sans KR", sans-serif;
-
+  background: var(--surface-alt);
   color: var(--ink);
 }
 
@@ -211,8 +211,8 @@ body {
 }
 
 .review-image-slider .slide {
-  flex: 0 0 auto;
-  width: min(280px, 60vw);
+  flex: 0 0 calc((100% - 1.6rem) / 3);
+  max-width: calc((100% - 1.6rem) / 3);
 }
 
 .review-image-wrapper {
@@ -382,6 +382,11 @@ body {
   .review-detail {
     padding: 2.4rem;
   }
+
+  .review-image-slider .slide {
+    flex-basis: calc((100% - 0.8rem) / 2);
+    max-width: calc((100% - 0.8rem) / 2);
+  }
 }
 
 @media (max-width: 768px) {
@@ -396,6 +401,13 @@ body {
 
   .review-detail__meta {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .review-image-slider .slide {
+    flex-basis: 100%;
+    max-width: 100%;
   }
 }
 
