@@ -78,7 +78,7 @@
   </div>
 
   <!-- 작성 폼 -->
-  <section class="card shadow-sm mb-3 review-section review-create" sec:authorize="isAuthenticated()">
+  <section class="card shadow-sm mb-3 review-section review-create review-create--locked" sec:authorize="isAuthenticated()">
     <div class="card-body">
       <div class="review-create__intro">
         <div>
@@ -87,7 +87,10 @@
         </div>
         <div class="review-create__intro-actions">
           <span class="review-create__badge">위치 인증 필수</span>
-          <a th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn btn-outline-success btn-sm">위치 인증</a>
+          <a th:href="@{|/cafes/${cafe.id}/reviews/location|}" class="btn review-create__certify-btn">
+            <span class="review-create__certify-icon" aria-hidden="true">📍</span>
+            <span class="review-create__certify-label">위치 인증하기</span>
+          </a>
         </div>
       </div>
       <form id="reviewCreateForm"
