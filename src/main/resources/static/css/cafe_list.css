@@ -9,6 +9,7 @@
    =============================== */
 .filter-panel {
   border-radius: 30px; /* 컨테이너 모서리를 둥글게 */
+    background: linear-gradient(135deg, #F4ECE5, #FFF);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
   padding: 1.5rem; /* 내부 여백 */
 }
@@ -170,6 +171,8 @@
   border-radius: 30px; /* 컨테이너 모서리를 둥글게 */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
   padding: 1.5rem;
+  margin-top:15px;
+
 }
 
 /* 총 건수 */
