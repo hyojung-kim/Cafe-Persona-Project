@@ -282,18 +282,29 @@ public class MypageController {
     }
 
     @PostMapping("/mypage/account/update")
+    @Transactional
     public String updateAccount(@RequestParam String nickname,
                                 @RequestParam String email,
                                 HttpServletRequest request) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
-        if (!requireReauthConsume(request)) return redirectToVerifyWithContinue(request);
 
+
+        // 1) SiteUser 저장
         user.setNickname(nickname);
         user.setEmail(email);
         userService.save(user);
+
+        // 2) BusinessUser 동기화
+        businessUserRepository.findByUserId(user.getId()).ifPresent(biz -> {
+            biz.setRepresentativeName(nickname);
+            biz.setRepresentativeEmail(email);
+            businessUserRepository.save(biz);
+        });
+
         return "redirect:/mypage";
     }
+
 
     @PostMapping("/mypage/account/update-password")
     @ResponseBody
@@ -301,7 +312,7 @@ public class MypageController {
                                  @RequestParam String newPassword) throws ServletException {
         SiteUser user = currentUserOrNull();
         if (user == null) return "fail";
-        if (!requireReauthConsume(request)) return "fail";
+
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userService.save(user);
