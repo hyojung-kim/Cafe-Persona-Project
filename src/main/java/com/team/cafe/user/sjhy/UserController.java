@@ -2,6 +2,10 @@ package com.team.cafe.user.sjhy;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +27,16 @@ public class UserController {
     public String kakaoLogin(Model model) {
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         model.addAttribute("redirectUri", redirectUri);
+        model.addAttribute("loginType", "USER");
         return "/login/login_form_user"; // login.html
     }
+
+    @GetMapping("/business/login")
+    public String businessLoginForm(Model model) {
+        model.addAttribute("loginType", "BUSINESS");
+        return "/login/login_form_business";
+    }
+
 
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
@@ -32,8 +44,4 @@ public class UserController {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
-    @GetMapping("/business/login")
-    public String businessLoginForm() {
-        return "/login/login_form_business";
-    }
-}
+  }

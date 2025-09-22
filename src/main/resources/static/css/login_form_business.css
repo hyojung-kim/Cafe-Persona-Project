@@ -1,5 +1,4 @@
-
-           /* 전체 컨테이너 중앙 정렬 */
+         /* 전체 컨테이너 중앙 정렬 */
             .container.my-4{
                 max-width: 600px; /* 폼 너비 제한 */
                 margin: 0 auto;   /* 화면 중앙 정렬 */
@@ -111,15 +110,6 @@
 
             button.btn-primary:hover {
                 background-color: #55453C;
-            }
-
-            /* 카카오 로그인 버튼 */
-            .kakao-login-btn img {
-                width: 100%;
-                margin-top: 5px;
-                margin-left: -3px;
-                margin-bottom: 10px;
-                border-radius: 12px;
             }
 
             /* 아이디/비밀번호 찾기, 회원가입 버튼 */

@@ -4,7 +4,7 @@
     <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     </head>
-    <div class="login-header-text">Login</div>
+    <div class="login-header-text">User Login</div>
     <form th:action="@{/user/login}" method="post" id="loginForm" onsubmit="return validateLoginConfirm()">
         <div class="mb-3 input-with-clear">
             <input type="text" name="username" id="username" placeholder="ID" class="form-control-num text-box-id">
@@ -14,7 +14,10 @@
             <input type="password" name="password" id="password" placeholder="PASSWORD" class="form-control-num">
             <i class="bi bi-eye toggle-btn"></i>
         </div>
-        <small th:if="${param.error}" id="loginConfirmError" class="form-text text-danger d-block">
+<!--        <small th:if="${param.error}" id="loginConfirmError" class="form-text text-danger d-block">-->
+<!--            아이디 또는 비밀번호가 일치하지 않습니다.-->
+<!--        </small>-->
+        <small id="loginConfirmError" class="form-text text-danger" th:classappend="${param.error} ? 'd-block' : 'd-none'">
             아이디 또는 비밀번호가 일치하지 않습니다.
         </small>
 
