@@ -27,6 +27,7 @@ public class SecurityConfig {
                                 "/",                 // 홈
                                 "/cafe/**",          // 카페 목록/상세 등
                                 "/user/**",          // 로그인/회원가입 등
+                                "/business/**",      // 비지니스
                                 "/css/**",           // 정적 CSS
                                 "/js/**",            // 정적 JS
                                 "/images/**",        // 정적 이미지
@@ -54,7 +55,8 @@ public class SecurityConfig {
                                 "/signup/check-username",
                                 "/signup/check-email",
                                 "/signup/check-nickname",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**"
+                                "/css/**", "/js/**", "/images/**", "/webjars/**",
+                                "/user/**", "business/**"
                         )
                 )
 

@@ -43,7 +43,7 @@ toggleBtn.addEventListener("click", () => {
 		pwInput.type = "password";
 		toggleBtn.classList.replace("bi-eye-slash", "bi-eye");
 	}
-
+});
 
 // URL에서 쿼리 파라미터를 가져오는 함수
 function getParameterByName(name, url = window.location.href) {
