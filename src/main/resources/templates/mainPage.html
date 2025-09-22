@@ -8,7 +8,7 @@
     <section class="promo" aria-labelledby="promoTitle">
 
         <div class="promo__inner">
-
+            <p class="promo__subtitle">오늘의 인기</p>
             <h2 id="promoTitle" class="promo__title">
                 오늘은 어떤 <em>카페</em>가 끌리나요?
             </h2>
@@ -16,27 +16,16 @@
             <a href="/cafe/list" class="promo__cta">자세히보기</a>
 
             <!-- 캐러셀 (Thymeleaf 바인딩 예시: li에 th:each) -->
-            <ul class="promo__list" role="list" aria-label="추천 카페">
+            <ul class="promo__list" role="list" aria-label="추천 카페" >
                 <!-- 예시 아이템들. 실제 연결 시 li에 th:each="c : ${topCafes}" -->
-                <li class="promo__item">
-                    <a href="/cafe/1" class="promo__link" aria-label="카페 모카모카">
-                        <img class="promo__thumb" src="/images/sample/cafe-01.jpg" alt="카페 모카모카 썸네일" />
-                        <span class="promo__name">모카모카</span>
+                <li class="promo__item" th:each="c : ${todayCafe}">
+                    <a class="promo__link"  th:href="@{|/cafe/detail/${c.id}|}" th:aria-label="${c.cafeName}">
+                        <img class="promo__thumb" th:src="${#strings.isEmpty(c.primaryImageUrl)} ? '/images/DBimg.PNG' : ${c.primaryImageUrl}"
+                             th:alt="|${c.cafeName} 썸네일|" />
+                        <span class="promo__name" th:text="${c.cafeName}">모카모카</span>
                     </a>
                 </li>
-                <li class="promo__item">
-                    <a href="/cafe/2" class="promo__link" aria-label="카페 어라운드">
-                        <img class="promo__thumb" src="/images/sample/cafe-02.jpg" alt="카페 어라운드 썸네일" />
-                        <span class="promo__name">어라운드</span>
-                    </a>
-                </li>
-                <li class="promo__item">
-                    <a href="/cafe/3" class="promo__link" aria-label="카페 루프탑뷰">
-                        <img class="promo__thumb" src="/images/sample/cafe-03.jpg" alt="카페 루프탑뷰 썸네일" />
-                        <span class="promo__name">루프탑뷰</span>
-                    </a>
-                </li>
-                <!-- ...더 추가 / th:each로 대체 -->
+
             </ul>
         </div>
     </section>
@@ -160,7 +149,7 @@
 
 
 
-
+<!--    cafes/149/reviews-->
     <section class="section">
         <div class="container">
             <!-- 섹션 헤더 -->
@@ -169,42 +158,38 @@
             </div>
 
             <!-- 리뷰 Top4 카드 리스트 -->
-            <div class="review-top4">
-
+            <div class="review-top4" >
                 <!-- 리뷰 카드 -->
-                <article class="review-card">
+                <a class="review-card" th:each="c : ${topReviews}" th:href="@{|/cafes/${c.id}/reviews|}">
                     <!-- 대표 이미지 -->
                     <div class="review-card__img">
-                        <img src="#" alt="카페 대표 이미지">
+                        <img th:src="${#strings.isEmpty(c.primaryImageUrl)} ? '/images/DBimg.PNG' : ${c.primaryImageUrl}"
+                             th:alt="|${c.cafeName} 대표 이미지|">
                     </div>
 
                     <!-- 카드 본문 -->
                     <div class="review-card__body">
                         <!-- 카페명 -->
-                        <h3 class="review-card__title">카페명</h3>
+                        <h3 class="review-card__title" th:text="${c.cafeName}">카페명</h3>
 
                         <!-- 별점 평균 + 리뷰 개수 -->
                         <p class="review-card__rating">
                             <span class="stars">★</span>
-                            <span class="avg">평균 별점</span>
-                            <span class="count">(리뷰 개수)</span>
+                            <span class="avg" th:text="${c.avgRating}">평균 별점</span>
+                            <span class="count" th:text="|(${c.reviewsCount}개 리뷰)|">(리뷰 개수)</span>
                         </p>
 
-                        <!-- 최신 리뷰 -->
+                         최신 리뷰
                         <div class="review-card__snippet">
-                            <strong>작성자</strong>
-                            <span>리뷰 내용 미리보기</span>
+                            <strong th:text="${c.latestReviewsAuthor}">작성자</strong>
+                            <span th:text="${c.latestReviewsContent}">리뷰 내용 미리보기</span>
                         </div>
 
-                        <!-- 상세보기 버튼 -->
-                        <a href="#" class="btn btn--ghost">상세보기</a>
-                    </div>
-                </article>
 
-                <!-- 반복 x4 -->
-                <article class="review-card">…</article>
-                <article class="review-card">…</article>
-                <article class="review-card">…</article>
+                    </div>
+                </a>
+
+
 
             </div>
         </div>
