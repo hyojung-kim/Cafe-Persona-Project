@@ -1,5 +1,6 @@
 package com.team.cafe.businessuser.sj;
 
+import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -65,6 +66,10 @@ public class BusinessUser {
     protected void onUpdate() {
         this.updatedAt = java.time.LocalDateTime.now();
     }
+
+    @OneToOne(mappedBy = "businessUser")
+    private Cafe cafe;
+
 
 
 }

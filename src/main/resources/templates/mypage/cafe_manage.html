@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" th:href="@{/css/cafe-manage.css}">
 </head>
-<body>
 <div layout:fragment="content">
+<body>
+
 <div class="g-container" th:with="biz=${user != null and user.businessUser != null ? user.businessUser : null}">
     <!-- 헤더 -->
     <div class="header">
         <div>
             <h1 class="title">사업장 관리</h1>
-            <p class="subtitle">메뉴·운영시간·사진을 손쉽게 업데이트하세요.</p>
-            <span class="badge">사업자 회원 전용</span>
+            <p class="subtitle">메뉴·운영시간·사진을 <br> 손쉽게 업데이트하세요.</p>
         </div>
 
         <div style="display:flex; gap:10px; align-items:center">
@@ -165,4 +165,5 @@
 <!-- JS 연결 -->
 <script src="/js/cafe_manage.js?v=DEV1"></script>
 </body>
+</div>
 </html>

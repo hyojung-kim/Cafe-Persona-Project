@@ -10,6 +10,8 @@ import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * 리뷰 이미지 업로드 전용 스토리지 서비스.
@@ -59,7 +61,8 @@ public class ImageStorageService {
         String ext = getExtension(originalName);
 
         // MIME 기본 검증(선택) - 이미지인지 대략 체크
-        if (!file.getContentType( ).startsWith("image/")) {
+        String contentType = file.getContentType();
+        if (contentType != null && !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
         }
 
@@ -98,11 +101,8 @@ public class ImageStorageService {
             throw new IllegalStateException("파일 업로드에 실패했습니다.", e);
         }
 
-        // 공개 URL 생성: /uploads/2025-09-07/uuid.jpg
-        String url = joinUrl(publicUrlPrefix, dateFolder, filename);
-        // joinUrl의 결과가 슬래시로 시작하지 않는 경우 보정
-        url = ensureStartsWithSlash(url);
-        return url;
+        // 공개 URL 생성: prefix + /yyyy-MM-dd/uuid.jpg
+        return buildPublicUrl(dateFolder, filename);
     }
 
     /**
@@ -141,23 +141,6 @@ public class ImageStorageService {
         return ext.replaceAll("[^a-z0-9]", "");
     }
 
-    private String joinUrl(String... parts) {
-        StringBuilder sb = new StringBuilder();
-        for (String p : parts) {
-            if (p == null || p.isBlank()) continue;
-            String s = p;
-            if (sb.length() == 0) {
-                // 첫 조각: 항상 슬래시로 시작
-                if (!s.startsWith("/")) sb.append('/');
-                sb.append(trimSlashes(s));
-            } else {
-                sb.append('/').append(trimSlashes(s));
-            }
-        }
-        // 최소한 "/"는 보장
-        return sb.length() == 0 ? "/" : sb.toString();
-    }
-
     private String trimSlashes(String s) {
         String r = s;
         while (r.startsWith("/")) r = r.substring(1);
@@ -168,5 +151,52 @@ public class ImageStorageService {
     private String ensureStartsWithSlash(String s) {
         if (s == null || s.isBlank()) return "/";
         return s.startsWith("/") ? s : "/" + s;
+    }
+
+    private String removeTrailingSlash(String s) {
+        if (s == null || s.isEmpty()) return "";
+        String result = s;
+        while (result.endsWith("/")) {
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+
+    private boolean isAbsoluteUrl(String value) {
+        if (value == null) return false;
+        int colonIndex = value.indexOf(':');
+        if (colonIndex <= 0) return false;
+        for (int i = 0; i < colonIndex; i++) {
+            char c = value.charAt(i);
+            if (!(Character.isLetter(c) || c == '+' || c == '-' || c == '.')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String buildPublicUrl(String... pathSegments) {
+        String prefix = publicUrlPrefix != null ? publicUrlPrefix.trim() : "";
+        String path = Arrays.stream(pathSegments)
+                .filter(segment -> segment != null && !segment.isBlank())
+                .map(this::trimSlashes)
+                .filter(segment -> !segment.isBlank())
+                .collect(Collectors.joining("/"));
+
+        if (prefix.isEmpty()) {
+            return path.isEmpty() ? "/" : "/" + path;
+        }
+
+        boolean absolute = isAbsoluteUrl(prefix) || prefix.startsWith("//");
+        String normalizedPrefix = absolute
+                ? removeTrailingSlash(prefix)
+                : ensureStartsWithSlash(trimSlashes(prefix));
+
+        if (path.isEmpty()) {
+            return normalizedPrefix.isEmpty() ? "/" : normalizedPrefix;
+        }
+
+        String separator = normalizedPrefix.endsWith("/") ? "" : "/";
+        return normalizedPrefix + separator + path;
     }
 }

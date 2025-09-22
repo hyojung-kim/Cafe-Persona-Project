@@ -1,14 +1,16 @@
        /* 전체 컨테이너 중앙 정렬 */
           .container {
-              max-width: 500px; /* 폼 너비 제한 */
-              margin: 0 auto;   /* 화면 중앙 정렬 */
-              padding-top: 50px; /* 위쪽 여백 */
-              font-family: 'Noto Sans KR'
-          }
+                max-width: 600px; /* 폼 너비 제한 */
+                margin: 0 auto;   /* 화면 중앙 정렬 */
+                padding-top: 50px; /* 위쪽 여백 */
+                font-family: 'Noto Sans KR';
+                padding-left: 50px;
+                padding-right: 50px;
+            }
 
           .my-3 {
               border-radius: 20px;
-              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
           }
 
           .container.my-3 .show-id a {

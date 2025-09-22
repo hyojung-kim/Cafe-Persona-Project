@@ -123,7 +123,7 @@ public interface CafeListRepository extends JpaRepository<Cafe, Long> { // â¬…ï¸
     Cafe findTopByOrderByIdDesc();
 
 
-
+    boolean existsByGooglePlaceId(String googlePlaceId);
 
 
 }

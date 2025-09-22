@@ -17,6 +17,9 @@
         if (next) {
           box.replaceWith(next);
           box = next;
+          if (typeof window.refreshReviewSectionUI === 'function') {
+            window.refreshReviewSectionUI();
+          }
         }
       })
       .catch(function () {
