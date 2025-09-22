@@ -2,6 +2,52 @@
 <div layout:fragment="content">
     <link rel="stylesheet" th:href="@{/css/mainPage.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <!-- Cafe Promo Banner -->
+    <section class="promo" aria-labelledby="promoTitle">
+
+        <div class="promo__inner">
+
+            <h2 id="promoTitle" class="promo__title">
+                오늘은 어떤 <em>카페</em>가 끌리나요?
+            </h2>
+
+            <a href="/cafe/list" class="promo__cta">자세히보기</a>
+
+            <!-- 캐러셀 (Thymeleaf 바인딩 예시: li에 th:each) -->
+            <ul class="promo__list" role="list" aria-label="추천 카페">
+                <!-- 예시 아이템들. 실제 연결 시 li에 th:each="c : ${topCafes}" -->
+                <li class="promo__item">
+                    <a href="/cafe/1" class="promo__link" aria-label="카페 모카모카">
+                        <img class="promo__thumb" src="/images/sample/cafe-01.jpg" alt="카페 모카모카 썸네일" />
+                        <span class="promo__name">모카모카</span>
+                    </a>
+                </li>
+                <li class="promo__item">
+                    <a href="/cafe/2" class="promo__link" aria-label="카페 어라운드">
+                        <img class="promo__thumb" src="/images/sample/cafe-02.jpg" alt="카페 어라운드 썸네일" />
+                        <span class="promo__name">어라운드</span>
+                    </a>
+                </li>
+                <li class="promo__item">
+                    <a href="/cafe/3" class="promo__link" aria-label="카페 루프탑뷰">
+                        <img class="promo__thumb" src="/images/sample/cafe-03.jpg" alt="카페 루프탑뷰 썸네일" />
+                        <span class="promo__name">루프탑뷰</span>
+                    </a>
+                </li>
+                <!-- ...더 추가 / th:each로 대체 -->
+            </ul>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
     <!-- Hero Search Section -->
     <section class="hero full-width">
         <!-- 배경 이미지 -->
@@ -111,6 +157,60 @@
             </ul>
         </div>
     </section>
+
+
+
+
+    <section class="section">
+        <div class="container">
+            <!-- 섹션 헤더 -->
+            <div class="section__head">
+                <h2 class="section__title">Cafe Reviews</h2>
+            </div>
+
+            <!-- 리뷰 Top4 카드 리스트 -->
+            <div class="review-top4">
+
+                <!-- 리뷰 카드 -->
+                <article class="review-card">
+                    <!-- 대표 이미지 -->
+                    <div class="review-card__img">
+                        <img src="#" alt="카페 대표 이미지">
+                    </div>
+
+                    <!-- 카드 본문 -->
+                    <div class="review-card__body">
+                        <!-- 카페명 -->
+                        <h3 class="review-card__title">카페명</h3>
+
+                        <!-- 별점 평균 + 리뷰 개수 -->
+                        <p class="review-card__rating">
+                            <span class="stars">★</span>
+                            <span class="avg">평균 별점</span>
+                            <span class="count">(리뷰 개수)</span>
+                        </p>
+
+                        <!-- 최신 리뷰 -->
+                        <div class="review-card__snippet">
+                            <strong>작성자</strong>
+                            <span>리뷰 내용 미리보기</span>
+                        </div>
+
+                        <!-- 상세보기 버튼 -->
+                        <a href="#" class="btn btn--ghost">상세보기</a>
+                    </div>
+                </article>
+
+                <!-- 반복 x4 -->
+                <article class="review-card">…</article>
+                <article class="review-card">…</article>
+                <article class="review-card">…</article>
+
+            </div>
+        </div>
+    </section>
+
+
 </div>
 </html>
 

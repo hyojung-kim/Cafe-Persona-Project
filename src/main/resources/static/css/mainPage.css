@@ -1,3 +1,179 @@
+/* 배너영역 */
+:root{
+  --bg: #FDF6F0;        /* 베이스 */
+  --ink: #3E2723;       /* 본문 텍스트 */
+  --muted:#8D6E63;      /* 보조 텍스트 */
+  --brand:#C97B63;      /* 포인트 */
+  --brand-ink:#fff;     /* 포인트 위 텍스트 */
+  --line: rgba(0,0,0,.08);
+
+  --radius: 16px;
+  --shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+
+/* ===== Promo Banner ===== */
+.promo{
+  width: 100vw;           /* 뷰포트 전체 */
+  margin-left: calc(-50vw + 50%);  /* container 중앙 기준으로 좌우 확장 */
+
+  position: relative;
+  padding: clamp(40px, 7vw, 80px) 16px;
+  background: url("/images/banner5.png") center/cover no-repeat;
+  overflow: hidden;
+}
+/*--------------------------------*/
+.banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.banner .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.25); /* ✅ 어둡게 25% */
+}
+
+.banner-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  color: white;
+  text-align: center;
+}
+
+/*--------------------------------------*/
+
+
+/* 배경 패턴 (SVG data URL) */
+.promo::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 20px 20px, rgba(0,0,0,.06) 2px, transparent 2.5px),
+    radial-gradient(circle at 60px 60px, rgba(0,0,0,.06) 2px, transparent 2.5px);
+  background-size: 80px 80px;
+  opacity:.4;
+  pointer-events:none;
+
+    content:""; position:absolute; inset:0;
+    /* 이미지 위에 베이지-브라운 아주 옅은 그라데이션 오버레이 */
+    background: linear-gradient(180deg, rgba(248,243,239,.82) 0%, rgba(248,243,239,.55) 60%, rgba(248,243,239,.32) 100%);
+}
+
+.promo__inner{
+
+  margin: 0 auto;
+  position: relative; /* 패턴 위 텍스트 보이도록 */
+  text-align: center;
+  color: var(--ink);
+}
+
+.promo__subtitle{
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: clamp(14px, 2.4vw, 16px);
+}
+
+.promo__accent{
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.promo__title{
+  margin: 0 0 16px;
+  font-size: clamp(26px, 6vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.promo__title em{
+  font-style: normal;
+  color: var(--brand);
+}
+
+.promo__cta{
+  display: inline-block;
+  margin: 8px 0 24px;
+  padding: 12px 20px;
+  background: var(--brand);
+  color: var(--brand-ink);
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+/* ===== Carousel ===== */
+.promo__list{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(96px, 120px);
+  gap: 18px;
+  overflow-x: auto;
+  padding: 10px 4px 4px;
+  margin: 0;
+  list-style: none;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  width: fit-content;   /* ✅ 내용 크기만큼만 넓이 */
+  margin: 0 auto;       /* ✅ 항상 중앙 배치 */
+
+  overflow-x: auto;     /* ✅ 가로 스크롤 */
+}
+.promo__list::-webkit-scrollbar{ height: 10px; }
+.promo__list::-webkit-scrollbar-thumb{
+  background: var(--line);
+  border-radius: 999px;
+}
+
+.promo__item{
+  scroll-snap-align: center;
+  text-align: center;
+}
+
+.promo__link{
+  display: grid;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.promo__thumb{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  border: 6px solid rgba(255,255,255,.8);
+  box-shadow: var(--shadow);
+  object-fit: cover;
+  background: #EDE9E8; /* 이미지 없을 때 배경 */
+}
+
+/* 이름 라벨 (두 줄 말줄임 방지: 한 줄 말줄임 처리) */
+.promo__name{
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hover (데스크톱) */
+@media (hover:hover){
+  .promo__thumb{ transition: transform .18s ease; }
+  .promo__link:hover .promo__thumb{ transform: translateY(-2px) scale(1.02); }
+}
+
+
+
+
+
+
 /* ===============================
    배너 영역
    =============================== */
@@ -15,24 +191,23 @@
 /* ---- 섹션/배경 ---- */
 
 .hero {
-
   position: relative;
   min-height: 360px;
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #f8f3ef; /* 라이트 베이지 바닥 */
+  /*background: #f8f3ef;*/ /* 라이트 베이지 바닥 */
 }
 .hero__bg {
   position: absolute; inset: 0;
-  background: url("/images/hero-blur.jpg") center/cover no-repeat;
+/*  background: url("/images/banner_img.jpg") center/cover no-repeat;*/
   filter: blur(6px) brightness(0.95);
   transform: scale(1.05);
 }
 .hero__bg::after{
   content:""; position:absolute; inset:0;
   /* 이미지 위에 베이지-브라운 아주 옅은 그라데이션 오버레이 */
-  background: linear-gradient(180deg, rgba(248,243,239,.82) 0%, rgba(248,243,239,.55) 60%, rgba(248,243,239,.32) 100%);
+  /*background: linear-gradient(180deg, rgba(248,243,239,.82) 0%, rgba(248,243,239,.55) 60%, rgba(248,243,239,.32) 100%);*/
 }
 
 /* ---- 카드 ---- */
@@ -351,4 +526,90 @@
   outline: 3px solid rgba(143,107,83,0.55); /* mid outline */
   outline-offset: 2px;
   border-radius: 12px;
+}
+
+
+
+/* ===============================
+   카드섹션 2영역 (브라운/베이지 테마)
+   =============================== */
+
+.review-top4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.review-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-card__img img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.review-card__body {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.review-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.review-card__rating {
+  font-size: 15px;
+  color: #333;
+}
+
+.review-card__rating .stars {
+  color: #FFD700; /* 별 노란색 */
+  margin-right: 4px;
+}
+
+.review-card__rating .count {
+  margin-left: 6px;
+  color: var(--muted);
+}
+
+.review-card__snippet {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+  max-height: 3.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.review-card__snippet strong {
+  margin-right: 6px;
+  color: var(--brand);
+}
+
+.section{
+  padding: 48px 16px 56px;
+}
+
+.section__title{
+  margin: 0 0 6px 0;
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #4b3a31; /* deep */
+}
+.section__head{
+  text-align: center;
+  margin-bottom: 22px;
 }

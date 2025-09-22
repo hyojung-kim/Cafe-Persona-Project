@@ -14,7 +14,7 @@ public class MainService {
     private final MainRepository mainRepository;
 
     public List<Cafe> getTop16ByViews() {
-        return mainRepository.findTop8ByOrderByHitCountDesc();
+        return mainRepository.findTop4ByOrderByHitCountDesc();
     }
 
 }
