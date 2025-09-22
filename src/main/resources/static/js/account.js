@@ -18,7 +18,7 @@
   const csrfToken  = csrfMeta ? csrfMeta.content : "";
   const csrfHeader = csrfHeaderMeta ? csrfHeaderMeta.content : "X-CSRF-TOKEN";
 
-  // --- 공통 요소 ---
+  // --- 공통 요소 (휴대폰) ---
   const phoneModal    = document.getElementById("phoneModal");
   const openPhoneBtn  = document.getElementById("openPhoneModal");
   const closePhoneBtn = document.getElementById("closePhoneModal");
@@ -54,7 +54,7 @@
     updateGuideState();
   }
 
-  // --- 모달 열기/닫기 ---
+  // --- 모달 열기/닫기 (휴대폰) ---
   if (openPhoneBtn && phoneModal) {
     openPhoneBtn.addEventListener("click", () => {
       resetPhoneInputs();                 // 열 때 항상 비우기 → 유도문 보이도록
@@ -93,7 +93,7 @@
     log("phone inputs not ready → p1/p2/p3/hidden missing?");
   }
 
-  // --- 저장 클릭 → 서버 전송 ---
+  // --- 저장 클릭 → 서버 전송 (휴대폰) ---
   if (updatePhoneBtn && hiddenPhone) {
     updatePhoneBtn.addEventListener("click", async () => {
       const newPhone = (hiddenPhone.value || "").trim(); // 예: 010-1234-5678
@@ -159,10 +159,149 @@
     log("updatePhoneBtn or hiddenPhone missing → click handler not bound");
   }
 
-  // =====(선택) 비밀번호 모달 동일 패턴=====
-  const pwModal   = document.getElementById("passwordModal");
-  const openPwBtn = document.getElementById("openPasswordModal");
-  const closePwBtn= document.getElementById("closePasswordModal");
-  if (openPwBtn && pwModal) openPwBtn.addEventListener("click", () => pwModal.classList.add("show"));
-  if (closePwBtn && pwModal) closePwBtn.addEventListener("click", () => pwModal.classList.remove("show"));
+  // ================== 비밀번호 변경 (재인증 체크 없이 간단 버전) ==================
+
+  // 요소
+  const pwModal    = document.getElementById("passwordModal");
+  const openPwBtn  = document.getElementById("openPasswordModal");
+  const closePwBtn = document.getElementById("closePasswordModal");
+  const newPwInput  = document.getElementById("newPassword");
+  const newPw2Input = document.getElementById("newPasswordConfirm");
+  const updatePwBtn = document.getElementById("updatePasswordBtn");
+  const pwMsg  = document.getElementById("passwordMessage");
+  const pwForm = document.getElementById("passwordForm"); // form이 있으면 기본 제출 막음
+
+  // 유틸
+  function resetPasswordInputs() {
+    if (newPwInput) newPwInput.value = "";
+    if (newPw2Input) newPw2Input.value = "";
+    if (pwMsg) pwMsg.textContent = "";
+  }
+  function validatePasswordFormat(pw) {
+    // 예시 정책: 8~64자, 영문/숫자/특수문자 중 2종 이상
+    if (pw.length < 8 || pw.length > 64) return "비밀번호는 8~64자여야 합니다.";
+    const classes = [
+      /[a-zA-Z]/.test(pw),
+      /\d/.test(pw),
+      /[^a-zA-Z0-9]/.test(pw)
+    ].filter(Boolean).length;
+    if (classes < 2) return "영문, 숫자, 특수문자 중 두 가지 이상을 조합해주세요.";
+    return "";
+  }
+  function showPwMsg(msg, ok = false) {
+    if (!pwMsg) return;
+    pwMsg.textContent = msg;
+    pwMsg.classList.toggle("ok", ok);
+    pwMsg.classList.toggle("err", !ok && !!msg);
+  }
+
+  // 모달 열고 닫기
+  if (openPwBtn && pwModal) {
+    openPwBtn.addEventListener("click", () => {
+      resetPasswordInputs();
+      pwModal.classList.add("show");
+      setTimeout(() => newPwInput?.focus(), 0);
+      log("openPasswordModal clicked → modal.show");
+    });
+  }
+  if (closePwBtn && pwModal) {
+    closePwBtn.addEventListener("click", () => {
+      resetPasswordInputs();
+      pwModal.classList.remove("show");
+      log("closePasswordModal clicked → modal.hide");
+    });
+  }
+
+  // form 기본 submit 방지
+  if (pwForm) pwForm.addEventListener("submit", (e) => e.preventDefault());
+
+  // 실시간 검증 메시지
+  if (newPwInput) {
+    newPwInput.addEventListener("input", () => {
+      const v = newPwInput.value || "";
+      const msg = validatePasswordFormat(v);
+      if (v && !msg) showPwMsg("사용 가능한 형식입니다.", true);
+      else if (v) showPwMsg(msg, false);
+      else showPwMsg("", false);
+    });
+  }
+  if (newPw2Input) {
+    newPw2Input.addEventListener("input", () => {
+      if (!newPwInput?.value) return;
+      const same = newPw2Input.value === newPwInput.value;
+      if (same) showPwMsg("새 비밀번호가 일치합니다.", true);
+      else showPwMsg("새 비밀번호 확인이 일치하지 않습니다.", false);
+    });
+  }
+
+  // 저장 클릭 → 서버 전송 (현재 비밀번호 없이)
+  if (updatePwBtn) {
+    updatePwBtn.addEventListener("click", async () => {
+      const newPw  = (newPwInput?.value  || "").trim();
+      const newPw2 = (newPw2Input?.value || "").trim();
+
+      const fmtMsg = validatePasswordFormat(newPw);
+      if (fmtMsg) { alert(fmtMsg); newPwInput?.focus(); return; }
+      if (newPw !== newPw2) { alert("새 비밀번호 확인이 일치하지 않습니다."); newPw2Input?.focus(); return; }
+
+      const url = `${CTX}/mypage/account/update-password`;
+      updatePwBtn.disabled = true;
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            [csrfHeader]: csrfToken
+          },
+          body: `newPassword=${encodeURIComponent(newPw)}&newPasswordConfirm=${encodeURIComponent(newPw2)}`
+        });
+
+        const text  = await res.text();
+        const ctype = (res.headers.get("content-type") || "").toLowerCase();
+        const bodyL = (text || "").trim().toLowerCase();
+
+        log("[update-password] status:", res.status,
+            "redirected:", res.redirected,
+            "finalURL:", res.url,
+            "contentType:", ctype,
+            "body(raw):", text);
+
+        if (res.ok && (bodyL === "success" || bodyL === "ok")) {
+          alert("비밀번호가 변경되었습니다. 다시 로그인해 주세요.");
+          resetPasswordInputs();
+          pwModal?.classList.remove("show");
+          // 보안상 재로그인 유도
+          location.href = `${CTX}/user/login?continue=` + encodeURIComponent(location.pathname + location.search);
+          return;
+        }
+
+        if (res.status === 401) {
+          alert("로그인이 필요합니다. 다시 로그인 후 시도해주세요.");
+          location.href = `${CTX}/user/login?continue=` + encodeURIComponent(location.pathname + location.search);
+          return;
+        }
+
+        if (res.status === 403 || res.redirected || ctype.includes("text/html")) {
+          // 서버에서 세션/재인증 만료로 판단 시
+          if (confirm("변경에 실패했습니다. 보안 인증을 다시 진행할까요?")) {
+            const cont = location.pathname + location.search;
+            location.href = `${CTX}/mypage/verify_password?continue=` + encodeURIComponent(cont);
+          }
+          return;
+        }
+
+        alert("변경에 실패했습니다: " + text);
+      } catch (e) {
+        err("fetch error (password):", e);
+        alert("서버 오류가 발생했습니다.");
+      } finally {
+        updatePwBtn.disabled = false;
+      }
+    });
+  } else {
+    log("updatePasswordBtn missing → password click handler not bound");
+  }
+
 })();

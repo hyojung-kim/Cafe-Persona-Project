@@ -76,19 +76,14 @@
     <!-- 비밀번호 변경 모달 -->
     <div id="passwordModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5>비밀번호 변경</h5>
-                <span id="closePasswordModal" class="close-btn">&times;</span>
-            </div>
-            <div class="modal-body">
-                <label>새 비밀번호:</label>
-                <input type="password" id="newPassword" placeholder="새 비밀번호 입력">
-                <label>비밀번호 확인:</label>
-                <input type="password" id="confirmPassword" placeholder="비밀번호 확인">
-            </div>
-            <div class="modal-footer">
-                <button id="updatePasswordBtn" type="button">수정</button>
-            </div>
+            <h2>비밀번호 변경</h2>
+            <form id="passwordForm">
+                <input type="password" id="newPassword" placeholder="새 비밀번호" required>
+                <input type="password" id="newPasswordConfirm" placeholder="새 비밀번호 확인" required>
+                <div id="passwordMessage"></div>
+                <button type="button" id="updatePasswordBtn">저장</button>
+                <button type="button" id="closePasswordModal">닫기</button>
+            </form>
         </div>
     </div>
 
