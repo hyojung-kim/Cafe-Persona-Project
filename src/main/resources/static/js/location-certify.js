@@ -5,8 +5,8 @@ let watchId;
 let stayTimer = null;
 let certified = false;
 
-const DISTANCE_THRESHOLD = 100; // meters
-const STAY_DURATION = 5000; // milliseconds
+const DISTANCE_THRESHOLD = 5000; // meters
+const STAY_DURATION = 1000; // milliseconds
 
 function initMap() {
     const mapContainer = document.getElementById('map');
