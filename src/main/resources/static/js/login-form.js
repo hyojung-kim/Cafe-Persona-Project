@@ -57,14 +57,40 @@ function getParameterByName(name, url = window.location.href) {
 
 document.addEventListener("DOMContentLoaded", function() {
     // URL에 'error' 파라미터가 있는지 확인
-    const errorParam = getParameterByName('error');
-    if (errorParam !== null) {
-        // 'message' 파라미터가 있는지 확인하고 메시지 설정
-        const errorMessage = getParameterByName('message');
-        const errorElement = document.getElementById('loginConfirmError');
-        if (errorMessage && errorElement) {
+//    const urlParams = new URLSearchParams(window.location.search);
+//    const errorParam = getParameterByName('error');
+//    if (errorParam !== null) {
+//        // 'message' 파라미터가 있는지 확인하고 메시지 설정
+//        const errorMessage = getParameterByName('message');
+//        const errorElement = document.getElementById('loginConfirmError');
+//        if (errorMessage && errorElement) {
+//            errorElement.textContent = errorMessage;
+//            errorElement.style.display = 'block'; // 메시지를 보이게 설정
+//        }
+//    }
+    ////사업자 유저 구분용 추후에 써보기
+// const urlParams = new URLSearchParams(window.location.search);
+//    const errorMessage = urlParams.get('message');
+//    const errorElement = document.getElementById('loginConfirmError');
+//
+//    // URL에 'error' 파라미터가 있고, 'message' 파라미터도 있다면 메시지 표시
+//    if (urlParams.has('error') && errorMessage) {
+//        errorElement.textContent = errorMessage;
+//        errorElement.style.display = 'block';
+//    } else {
+//        errorElement.style.display = 'none'; // 오류가 없을 경우 숨기기
+//    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorParam = urlParams.get('error');
+    const errorMessage = urlParams.get('message');
+    const errorElement = document.getElementById('loginConfirmError');
+
+    if (errorParam !== null && errorElement) {
+        if (errorMessage) {
             errorElement.textContent = errorMessage;
-            errorElement.style.display = 'block'; // 메시지를 보이게 설정
         }
+        errorElement.style.display = 'block';
+    } else if (errorElement) {
+        errorElement.style.display = 'none';
     }
 });
