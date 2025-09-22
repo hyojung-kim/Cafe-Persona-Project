@@ -242,10 +242,10 @@ body {
 }
 
 .review-magnifier {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  z-index: 5;
+  z-index: 1050;
   width: 160px;
   height: 160px;
   border-radius: 14px;
