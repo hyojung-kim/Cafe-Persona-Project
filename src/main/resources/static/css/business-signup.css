@@ -1,4 +1,9 @@
-
+.container {
+    width: 80rem;
+    padding: 0;
+    margin-top: 24px;
+    margin-bottom: 56px;
+}
         .form-row {
             display: flex;
             align-items: center;
