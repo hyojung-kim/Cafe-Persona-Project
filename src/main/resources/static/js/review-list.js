@@ -14,6 +14,9 @@
   const imageInput = document.getElementById('createImages');
   const imageList = document.getElementById('reviewImageList');
   const certificationNotice = document.getElementById('certifyRequiredMessage');
+  const certificationSuccessMessage = document.getElementById('certifySuccessMessage');
+  const reviewCreateSection = form.closest('.review-section.review-create');
+  const certifyButton = reviewCreateSection ? reviewCreateSection.querySelector('.review-create__certify-btn') : null;
   const selectedFiles = [];
   const supportsDataTransfer = typeof DataTransfer !== 'undefined';
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -24,21 +27,49 @@
     return localStorage.getItem('certifiedCafe_' + cafeId) === 'true';
   };
 
+  const setElementVisibility = (element, visible) => {
+    if (!element) return;
+    if (visible) {
+      element.classList.remove('d-none');
+      element.classList.add('d-block');
+    } else {
+      element.classList.remove('d-block');
+      element.classList.add('d-none');
+    }
+  };
+
   const showCertificationNotice = () => {
-    if (!certificationNotice) return;
-    certificationNotice.classList.remove('d-none');
-    certificationNotice.classList.add('d-block');
+    setElementVisibility(certificationNotice, true);
+    setElementVisibility(certificationSuccessMessage, false);
   };
 
   const hideCertificationNotice = () => {
-    if (!certificationNotice) return;
-    certificationNotice.classList.remove('d-block');
-    certificationNotice.classList.add('d-none');
+    setElementVisibility(certificationNotice, false);
+  };
+
+  const showCertificationSuccess = () => {
+    setElementVisibility(certificationSuccessMessage, true);
+  };
+
+  const hideCertificationSuccess = () => {
+    setElementVisibility(certificationSuccessMessage, false);
   };
 
   const syncCertificationNotice = () => {
-    if (isLocationCertified()) {
+    const certified = isLocationCertified();
+    if (certified) {
       hideCertificationNotice();
+      showCertificationSuccess();
+      if (reviewCreateSection) {
+        reviewCreateSection.classList.remove('review-create--locked');
+      }
+      form.removeAttribute('aria-disabled');
+    } else {
+      hideCertificationSuccess();
+      if (reviewCreateSection && !reviewCreateSection.classList.contains('review-create--locked')) {
+        reviewCreateSection.classList.add('review-create--locked');
+      }
+      form.setAttribute('aria-disabled', 'true');
     }
   };
 
@@ -48,6 +79,9 @@
     if (now - lastAlertAt < 1500) return;
     lastAlertAt = now;
     showCertificationNotice();
+    if (certifyButton) {
+      certifyButton.focus();
+    }
   };
 
   const shouldBlockInputTarget = (target) => {
@@ -380,6 +414,7 @@
       }
       if (cafeId) {
         localStorage.removeItem('certifiedCafe_' + cafeId);
+        syncCertificationNotice();
       }
     } catch (err) {
       console.error(err);

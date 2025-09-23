@@ -267,6 +267,77 @@ body {
   gap: 0.75rem;
 }
 
+.review-create__certify-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.6rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FF9F58, #FF6A3D);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  text-decoration: none;
+  box-shadow: 0 16px 32px rgba(213, 131, 95, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.review-create__certify-btn:hover,
+.review-create__certify-btn:focus {
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 20px 40px rgba(213, 131, 95, 0.45);
+  animation: none;
+}
+
+.review-create--locked .review-create__certify-btn {
+  animation: review-create-certify-pulse 2.4s ease-in-out infinite;
+}
+
+.review-create--locked .review-create__certify-btn:hover,
+.review-create--locked .review-create__certify-btn:focus {
+  animation: none;
+}
+
+@keyframes review-create-certify-pulse {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 16px 32px rgba(213, 131, 95, 0.35);
+  }
+  50% {
+    transform: translateY(-3px);
+    box-shadow: 0 24px 44px rgba(213, 131, 95, 0.45);
+  }
+}
+
+.review-create__certify-btn:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 3px;
+}
+
+.review-create__certify-icon {
+  font-size: 1.1rem;
+}
+
+.review-create__certify-label {
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 576px) {
+  .review-create__intro-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-create__certify-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .review-create__badge {
   display: inline-flex;
   align-items: center;
@@ -283,6 +354,30 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.8rem;
+  position: relative;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.review-create--locked .review-create__form {
+  filter: grayscale(0.7);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.review-create--locked .review-create__form::after {
+  content: "위치 인증 후 작성할 수 있어요";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  background: rgba(248, 245, 242, 0.75);
+  color: var(--ink-soft);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  pointer-events: none;
 }
 
 .review-create__rating {

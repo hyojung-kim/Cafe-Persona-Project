@@ -4,6 +4,8 @@ let cafeLat, cafeLng;
 let watchId;
 let stayTimer = null;
 let certified = false;
+let cafeMarkerImage;
+let userMarkerImage;
 
 const DISTANCE_THRESHOLD = 5000; // meters
 const STAY_DURATION = 1000; // milliseconds
@@ -13,6 +15,11 @@ function initMap() {
     const options = { center: new kakao.maps.LatLng(37.5665,126.9780), level:3 };
     map = new kakao.maps.Map(mapContainer, options);
 
+    const markerSize = new kakao.maps.Size(48, 48);
+    const markerOffset = new kakao.maps.Point(24, 48);
+    cafeMarkerImage = new kakao.maps.MarkerImage('/images/location_certify/cafe-marker.png', markerSize, {offset: markerOffset});
+    userMarkerImage = new kakao.maps.MarkerImage('/images/location_certify/user-marker.png', markerSize, {offset: markerOffset});
+
     const places = new kakao.maps.services.Places();
     if (cafeAddress) {
         places.keywordSearch(cafeAddress, function(result, status){
@@ -21,7 +28,7 @@ function initMap() {
                 cafeLat = parseFloat(first.y);
                 cafeLng = parseFloat(first.x);
                 const pos = new kakao.maps.LatLng(cafeLat, cafeLng);
-                new kakao.maps.Marker({map:map, position:pos});
+                new kakao.maps.Marker({map:map, position:pos, image: cafeMarkerImage});
                 map.setCenter(pos);
                 document.getElementById('cafeLocation').textContent = '카페 위치: ' + cafeAddress;
             }
@@ -42,7 +49,7 @@ function updateLocation(position) {
     if (currentMarker) {
         currentMarker.setMap(null);
     }
-    currentMarker = new kakao.maps.Marker({map:map, position:pos});
+    currentMarker = new kakao.maps.Marker({map:map, position:pos, image: userMarkerImage});
 
     document.getElementById('myLocation').textContent = '내 위치: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
 
