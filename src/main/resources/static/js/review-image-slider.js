@@ -42,9 +42,28 @@ function initReviewImageSlider() {
     var index = 0;
     var visible = parseInt(slider.dataset.visible || '3', 10);
     var slideWidth = 0;
+    var gap = 0;
+
+    function getGapSize() {
+      var trackStyles = window.getComputedStyle(track);
+      var gapValue = trackStyles.columnGap || trackStyles.gap || '0';
+      var parsed = parseFloat(gapValue);
+      if (Number.isNaN(parsed)) {
+        return 0;
+      }
+      return parsed;
+    }
 
     function applyWidths() {
-      slideWidth = slider.clientWidth / visible;
+      gap = getGapSize();
+      if (visible > 1) {
+        slideWidth = (slider.clientWidth - gap * (visible - 1)) / visible;
+      } else {
+        slideWidth = slider.clientWidth;
+      }
+      if (slideWidth < 0) {
+        slideWidth = 0;
+      }
       slides.forEach(function (s) { s.style.width = slideWidth + 'px'; });
     }
 
@@ -130,6 +149,7 @@ function initReviewImageMagnifier() {
       requestAnimationFrame(function () {
         lens.classList.add('is-visible');
       });
+      wrapper.classList.add('is-magnifying');
       moveLens(clientX, clientY);
     }
 
@@ -138,6 +158,7 @@ function initReviewImageMagnifier() {
         return;
       }
       lens.classList.remove('is-visible');
+      wrapper.classList.remove('is-magnifying');
       window.setTimeout(function () {
         if (lens.parentNode && !lens.classList.contains('is-visible')) {
           lens.parentNode.removeChild(lens);

@@ -225,6 +225,11 @@ body {
   background: var(--surface-alt);
 }
 
+.review-image-wrapper.is-magnifying,
+.review-image-wrapper.is-magnifying * {
+  cursor: none !important;
+}
+
 .review-image-wrapper::before {
   content: "";
   display: block;

@@ -56,7 +56,7 @@
     <div class="review-summary__preview"
          th:if="${topReviewImages != null and !#lists.isEmpty(topReviewImages)}"
          data-visible="4">
-      <h2 class="preview-title">요즘 가장 많이 담긴 사진</h2>
+      <h2 class="preview-title">최근 올라온 리뷰 사진</h2>
       <div class="review-image-slider">
         <div class="slider-track">
           <div class="slide" th:each="img : ${topReviewImages}">
