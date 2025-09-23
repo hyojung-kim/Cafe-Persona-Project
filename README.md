@@ -1,83 +1,53 @@
 ![](https://velog.velcdn.com/images/rlagywnd05/post/587b98a9-c7dd-483e-81dc-c9630d4a35b8/image.png)
 
 
+
+``` ## 패키지 요약본 
+=== JAVA (com.team.cafe) ===
+# 백엔드 비즈니스 로직과 엔티티, 서비스, 컨트롤러 등이 들어있는 패키지 구조
+cafe/
+├── DB/              # SQL 스크립트 및 더미 데이터
+├── Find/            # 계정 찾기(아이디/비밀번호) 관련 컨트롤러·서비스
+├── Menu/            # 카페 메뉴 도메인 및 CRUD
+├── Root/            # 메인 페이지 컨트롤러·서비스·뷰모델
+├── bookmark/        # 즐겨찾기/좋아요 파사드 및 도메인
+├── businessuser/    # 사업자 회원 도메인, 컨트롤러, 서비스
+├── cafeListImg/     # 카페 이미지 업로드/조회 도메인
+├── config_js/       # 글로벌 설정(WebMvc, WebClient, ExceptionHandler 등)
+├── google/          # 구글 Places API 클라이언트 및 수집 로직
+├── kakaosj/         # 카카오 API 연동(지도/검색 등)
+├── keyword/         # 키워드(페르소나 태그) 도메인·서비스
+├── like/            # 좋아요 도메인·서비스
+├── list/            # 카페 목록 검색/조회 컨트롤러·서비스
+├── review/          # 리뷰 도메인, 컨트롤러, 서비스, 외부 API 연동
+├── signup/          # 회원가입 컨트롤러·서비스
+├── test/            # 테스트 컨트롤러/레포
+└── user/            # 사용자(SiteUser) 도메인, 보안/인증 서비스
+
+
+=== RESOURCES/templates ===
+# Thymeleaf 템플릿 뷰 파일들 (페이지별 UI 구성)
+templates/
+├── cafe/        # 카페 상세·목록 페이지
+├── fragments/   # 공통 프래그먼트(알림창 등)
+├── login/       # 로그인·비밀번호 찾기 템플릿
+├── mypage/      # 마이페이지(계정, 카페관리, 북마크)
+├── review/      # 리뷰 CRUD 관련 페이지
+└── signup/      # 일반/사업자 회원가입 템플릿
+
+
+=== RESOURCES/static ===
+# 정적 리소스 (CSS/JS/이미지). 프론트엔드 스타일과 스크립트
+static/
+├── css/     # 각 페이지별 스타일
+├── js/      # 각 페이지별 동작 스크립트
+└── images/  # 배너/아이콘/업로드 이미지
 ```
-Cafe-Persona-Project/
-├── build.gradle / settings.gradle       # Gradle 설정
-├── src/
-│   ├── main/
-│   │   ├── java/com/team/cafe/
-│   │   │   ├── CafePersonaProjectApplication.java   # 메인 클래스
-│   │   │
-│   │   │   ├── cafe/        # 도메인: 카페
-│   │   │   │   ├── Cafe.java
-│   │   │   │   ├── CafeRepository.java
-│   │   │   │   ├── CafeService.java
-│   │   │   │   └── CafeController.java
-│   │   │   │
-│   │   │   ├── review/      # 도메인: 리뷰
-│   │   │   │   ├── Review.java
-│   │   │   │   ├── ReviewImage.java
-│   │   │   │   ├── ReviewReport.java
-│   │   │   │   ├── ReviewRepository.java
-│   │   │   │   ├── ReviewService.java
-│   │   │   │   └── ReviewController.java
-│   │   │   │
-│   │   │   ├── keyword/     # 도메인: 키워드/태그
-│   │   │   │   ├── Keyword.java
-│   │   │   │   ├── KeywordType.java
-│   │   │   │   ├── CafeKeyword.java
-│   │   │   │   └── KeywordRepository.java
-│   │   │   │
-│   │   │   ├── bookmark/
-│   │   │   │   ├── Bookmark.java
-│   │   │   │   ├── BookmarkRepository.java
-│   │   │   │   └── BookmarkService.java
-│   │   │   │
-│   │   │   ├── like/
-│   │   │   │   ├── ReviewLike.java
-│   │   │   │   ├── CafeLike.java
-│   │   │   │   └── LikeService.java
-│   │   │   │
-│   │   │   ├── user/        # 도메인: 사용자
-│   │   │   │   ├── SiteUser.java
-│   │   │   │   ├── UserRepository.java
-│   │   │   │   ├── UserService.java
-│   │   │   │   └── SecurityConfig.java
-│   │   │   │
-│   │   │   ├── common/      # 공용 기능
-│   │   │   │   ├── BaseTimeEntity.java
-│   │   │   │   └── exception/ (예외 처리)
-│   │   │   │
-│   │   │   └── config/
-│   │   │       ├── WebConfig.java       # 정적 리소스 매핑
-│   │   │       └── SecurityConfig.java  # Spring Security 설정
-│   │   │
-│   │   ├── resources/
-│   │   │   ├── application.properties / application.yml
-│   │   │   ├── templates/   # Thymeleaf 뷰
-│   │   │   │   ├── layout/
-│   │   │   │   │   ├── navbar.html
-│   │   │   │   │   └── base.html
-│   │   │   │   ├── cafe/
-│   │   │   │   │   ├── list.html
-│   │   │   │   │   ├── detail.html
-│   │   │   │   │   └── form.html
-│   │   │   │   ├── review/
-│   │   │   │   │   ├── form.html
-│   │   │   │   │   └── list.html
-│   │   │   │   └── user/
-│   │   │   │       ├── login.html
-│   │   │   │       └── signup.html
-│   │   │   └── static/      # CSS/JS/이미지
-│   │   │       ├── css/
-│   │   │       ├── js/
-│   │   │       └── images/
-│   │   └── webapp/ (필요시)
-│   │
-│   └── test/java/com/team/cafe/   # 단위 테스트
-└── README.md
-```
+
+
+
+
+
 
 
 
