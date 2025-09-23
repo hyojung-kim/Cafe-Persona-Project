@@ -42,9 +42,28 @@ function initReviewImageSlider() {
     var index = 0;
     var visible = parseInt(slider.dataset.visible || '3', 10);
     var slideWidth = 0;
+    var gap = 0;
+
+    function getGapSize() {
+      var trackStyles = window.getComputedStyle(track);
+      var gapValue = trackStyles.columnGap || trackStyles.gap || '0';
+      var parsed = parseFloat(gapValue);
+      if (Number.isNaN(parsed)) {
+        return 0;
+      }
+      return parsed;
+    }
 
     function applyWidths() {
-      slideWidth = slider.clientWidth / visible;
+      gap = getGapSize();
+      if (visible > 1) {
+        slideWidth = (slider.clientWidth - gap * (visible - 1)) / visible;
+      } else {
+        slideWidth = slider.clientWidth;
+      }
+      if (slideWidth < 0) {
+        slideWidth = 0;
+      }
       slides.forEach(function (s) { s.style.width = slideWidth + 'px'; });
     }
 
@@ -117,30 +136,32 @@ function initReviewImageMagnifier() {
       var offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
       var offsetY = Math.max(0, Math.min(clientY - rect.top, rect.height));
 
-      lens.style.left = offsetX + 'px';
-      lens.style.top = offsetY + 'px';
+      lens.style.left = (rect.left + offsetX) + 'px';
+      lens.style.top = (rect.top + offsetY) + 'px';
       lens.style.backgroundPosition = (offsetX / rect.width) * 100 + '% ' + (offsetY / rect.height) * 100 + '%';
     }
 
     function showLens(clientX, clientY) {
       updateLensBackground();
-      if (!wrapper.contains(lens)) {
-        wrapper.appendChild(lens);
-        requestAnimationFrame(function () {
-          lens.classList.add('is-visible');
-        });
+      if (!lens.isConnected) {
+        document.body.appendChild(lens);
       }
+      requestAnimationFrame(function () {
+        lens.classList.add('is-visible');
+      });
+      wrapper.classList.add('is-magnifying');
       moveLens(clientX, clientY);
     }
 
     function hideLens() {
-      if (!wrapper.contains(lens)) {
+      if (!lens.isConnected) {
         return;
       }
       lens.classList.remove('is-visible');
+      wrapper.classList.remove('is-magnifying');
       window.setTimeout(function () {
-        if (wrapper.contains(lens) && !lens.classList.contains('is-visible')) {
-          wrapper.removeChild(lens);
+        if (lens.parentNode && !lens.classList.contains('is-visible')) {
+          lens.parentNode.removeChild(lens);
         }
       }, 160);
     }
@@ -156,7 +177,7 @@ function initReviewImageMagnifier() {
       if (event.pointerType !== 'mouse') {
         return;
       }
-      if (!wrapper.contains(lens)) {
+      if (!lens.isConnected) {
         showLens(event.clientX, event.clientY);
       } else {
         moveLens(event.clientX, event.clientY);
