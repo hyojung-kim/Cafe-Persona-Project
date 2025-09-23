@@ -17,20 +17,13 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         String loginType = request.getParameter("loginType");
-        String errorMessage;
-
-        // 실제 발생한 예외에 따라 메시지 설정
-        if (exception != null && "Bad credentials".equals(exception.getMessage())) {
-            errorMessage = "아이디 또는 비밀번호가 일치하지 않습니다.";
-        } else {
-            errorMessage = "로그인에 실패하였습니다. 다시 시도해 주세요.";
-        }
+        String errorMessage = "아이디 또는 비밀번호가 일치하지 않습니다.";
 
         // URL 인코딩을 적용한 메시지 변수 사용
         String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8.toString());
 
         // 요청에 loginType이 BUSINESS로 명시된 경우 사업자 로그인 페이지로 리다이렉션
-        if ("BUSINESS".equals(loginType)) {
+        if ("ROLE_BUSINESS".equals(loginType)) {
             response.sendRedirect("/business/login?error&message=" + encodedMessage);
         } else {
             // 그 외의 경우 일반 사용자 로그인 페이지로 리다이렉션

@@ -1,6 +1,7 @@
 package com.team.cafe;
 
 import com.team.cafe.user.sjhy.CustomAuthenticationFailureHandler;
+//import com.team.cafe.user.sjhy.CustomAuthenticationProvider;
 import com.team.cafe.user.sjhy.CustomLoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,19 +10,30 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
+import java.util.stream.Collectors;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+//
+//    private final CustomAuthenticationProvider customAuthenticationProvider;
+//
+//    public SecurityConfig(CustomAuthenticationProvider customAuthenticationProvider) {
+//        this.customAuthenticationProvider = customAuthenticationProvider;
+//    }
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // 1) 정적 리소스 & 공개 경로 명시 허용
+//                .authenticationProvider(customAuthenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",                 // 홈
@@ -41,7 +53,7 @@ public class SecurityConfig {
                         // USER 전용 페이지
                         .requestMatchers("/user/**").hasRole("USER")
                         // BUSINESS 전용 페이지
-                        .requestMatchers("/business/**").hasRole("BUSINESS")
+                        .requestMatchers("/business/**").hasRole("BUSINESS_USER")
 
                         .anyRequest().permitAll()   // 현재는 전부 공개 (필요 시 authenticated()로 조정)
                 )
@@ -70,10 +82,8 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/user/login")          // GET: 로그인 페이지
                         .loginProcessingUrl("/user/login") // POST: 인증 처리
-//                        .defaultSuccessUrl("/", true)
-//                        .failureUrl("/user/login?error")
-                                .failureHandler(customAuthenticationFailureHandler())
-                                .successHandler(customLoginSuccessHandler())
+                        .failureHandler(customAuthenticationFailureHandler())
+                        .successHandler(customLoginSuccessHandler())
                 )
 
                 // 5) 로그아웃 설정 (POST 권장)
@@ -104,5 +114,20 @@ public class SecurityConfig {
     @Bean
     public CustomAuthenticationFailureHandler customAuthenticationFailureHandler() {
         return new CustomAuthenticationFailureHandler();
+    }
+
+    // business_user 로 저장되는 role_business를 사용하기 위함
+    @Bean
+    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
+        return authorities -> authorities.stream()
+                .map(authority -> {
+                    String role = authority.getAuthority();
+                    // 롤에 'ROLE_' 접두사가 없으면 붙여서 반환
+                    if (!role.startsWith("ROLE_")) {
+                        return new SimpleGrantedAuthority("ROLE_" + role);
+                    }
+                    return authority;
+                })
+                .collect(Collectors.toSet());
     }
 }
