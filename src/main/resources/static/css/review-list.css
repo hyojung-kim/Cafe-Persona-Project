@@ -608,6 +608,7 @@ body {
 }
 
 .review-search-btn {
+  width: 40px;
   border-radius: 999px;
 }
 

@@ -7,8 +7,8 @@ let certified = false;
 let cafeMarkerImage;
 let userMarkerImage;
 
-const DISTANCE_THRESHOLD = 100; // meters
-const STAY_DURATION = 5000; // milliseconds
+const DISTANCE_THRESHOLD = 50000; // meters
+const STAY_DURATION = 1000; // milliseconds
 
 function initMap() {
     const mapContainer = document.getElementById('map');
