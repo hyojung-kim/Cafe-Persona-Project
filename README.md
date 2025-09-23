@@ -1,4 +1,5 @@
-![](https://velog.velcdn.com/images/rlagywnd05/post/587b98a9-c7dd-483e-81dc-c9630d4a35b8/image.png)
+<img width="1239" height="795" alt="전체 ERD" src="https://github.com/user-attachments/assets/0c0b4557-b17d-4e00-8b45-2a2e651ff067" />
+
 
 
 
