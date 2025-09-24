@@ -85,12 +85,7 @@
         <a th:href="@{/cafes/{id}/reviews(id=${cafe.id})}">리뷰 목록 보기</a>
     </div>
 
-    <!-- mybookmark페이지에서 이동해 왔을 때 뒤로가기 버튼 생성 -->
-    <div th:if="${param.from != null and param.from[0] == 'bookmark'}" style="margin-top: 16px;">
-        <a th:href="@{/mypage/my/bookmark}" class="btn btn-secondary">
-            내 북마크로 돌아가기
-        </a>
-    </div>
+
     <div style="margin-top:8px;">
         <a class="btn" th:href="@{/cafe/map/{cafeId}(cafeId=${cafe.id})}">카페 위치 보기</a>
     </div>
