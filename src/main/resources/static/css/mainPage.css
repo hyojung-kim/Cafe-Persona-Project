@@ -610,6 +610,7 @@ a {
 
 .section{
   padding: 48px 16px 56px;
+  margin-bottom:56px;
 }
 
 .section__title{
