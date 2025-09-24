@@ -45,16 +45,16 @@ function attachCheck(inputId, errorId, successId, field) {
             if (error) error.classList.add("hidden");
             lastResult = true;
         } else if (available === false) {
-                      if (success) success.classList.add("hidden");
-                      if (error) {
-                          error.classList.remove("hidden");
-                          switch (inputId) {
-                              case "username":
-                                  error.innerText = "이미 사용중인 아이디입니다.";
-                                  break;
-                          }
-                      }
-                      lastResult = false;
+            if (success) success.classList.add("hidden");
+            if (error) {
+                error.classList.remove("hidden");
+                switch (inputId) {
+                    case "username":
+                        error.innerText = "이미 사용중인 아이디입니다.";
+                        break;
+                }
+            }
+            lastResult = false;
         } else {
             if (success) success.classList.add("hidden");
             if (error) error.classList.add("hidden");
@@ -84,7 +84,6 @@ function attachEmailCheck() {
     let lastResult = null;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     const allowedDomains = ["gmail.com", "naver.com", "daum.net", "kakao.com"];
 
     async function runCheck() {
@@ -105,14 +104,14 @@ function attachEmailCheck() {
             return;
         }
 
-                const domain = email.split("@")[1];
-                if (!allowedDomains.includes(domain)) {
-                    error.classList.remove("hidden");
-                    success.classList.add("hidden");
-                    error.innerText = "허용되지 않은 이메일 도메인입니다.";
-                    lastResult = false;
-                    return;
-                }
+        const domain = email.split("@")[1];
+        if (!allowedDomains.includes(domain)) {
+            error.classList.remove("hidden");
+            success.classList.add("hidden");
+            error.innerText = "허용되지 않은 이메일 도메인입니다.";
+            lastResult = false;
+            return;
+        }
 
         const available = await checkDuplicate("email", email);
 
@@ -175,38 +174,29 @@ function attachNicknameCheck() {
     input.addEventListener("blur", runCheck);
 }
 
-
-
 /* ================= 비밀번호 검증 ================= */
 function validatePassword() {
-  const pw = document.getElementById("password").value || "";
-  const msg = document.getElementById("passwordError");
-  const ok = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/.test(pw);
+    const pw = document.getElementById("password").value || "";
+    const msg = document.getElementById("passwordError");
+    const ok = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/.test(pw);
 
-      if (ok) {
-        // 조건 만족 시에만 성공 문구/초록색
+    if (ok) {
         msg.classList.remove("text-danger");
         msg.classList.add("text-success");
         msg.innerText = "사용 가능한 비밀번호입니다.";
         return true;
-      } else {
-        // 조건 미달일 땐 항상 기본 가이드만 붉은색으로 유지
+    } else {
         msg.classList.remove("text-success");
         msg.classList.add("text-danger");
         msg.innerText = "8자 이상, 특수문자 포함";
         return false;
-      }
-
-
+    }
 }
 
 function validatePasswordConfirm() {
     const pw = document.getElementById("password").value;
     const pw2 = document.getElementById("passwordConfirm").value;
     const msg = document.getElementById("passwordConfirmError");
-
-
-
 
     if (!pw2) {
         msg.classList.add("hidden");
@@ -230,36 +220,26 @@ function validatePasswordConfirm() {
 
 /* ================= 주소 검색 팝업 ================= */
 function openAddressPopup() {
-    // 기존 팝업 열기 방식 유지
     window.open('/jusoPopup', '주소검색', 'width=500,height=600,scrollbars=yes');
 }
-
-/* 팝업에서 선택 후 부모 창에 값 넣기 */
 function jusoCallBack(selectedAddress) {
     const addressInput = document.getElementById("address");
     const detailInput = document.getElementById("addressDetail");
 
     if (addressInput) {
         addressInput.value = selectedAddress.roadAddr || selectedAddress.jibunAddr || '';
-        detailInput.focus();
+        detailInput && detailInput.focus();
     }
 }
 
-
-
-// 알림팝업 띄우고 포커스 주기
+/* 알림팝업 띄우고 포커스 주기 */
 function alertAndFocus(msg, inputId) {
     showAlert(msg);
     const el = document.getElementById(inputId);
     if (el) {
-        // setTimeout으로 모달이 뜬 뒤 포커스가 덮어쓰이지 않게 살짝 지연
         setTimeout(() => { el.focus(); el.select && el.select(); }, 150);
     }
 }
-
-
-
-
 
 /* ================== 메인 실행 ================== */
 const checkUsername = attachUsernameCheck();
@@ -269,67 +249,25 @@ attachNicknameCheck();
 document.getElementById("password").addEventListener("input", validatePassword);
 document.getElementById("passwordConfirm").addEventListener("input", validatePasswordConfirm);
 
-/* ================= 폼 제출 검증 ================= */
-async function validateForm(e) {
-    if (!validatePassword() || !validatePasswordConfirm()) {
-        showAlert("비밀번호를 확인해주세요.");
-        e.preventDefault();
-        return false;
-    }
-
-    // ⬇️ 제출 직전에 최신 값으로 서버 중복 체크(반드시 await)
-        const username = document.getElementById("username")?.value?.trim() || "";
-        const email = document.getElementById("email")?.value?.trim() || "";
-
-        // 서버와 즉시 통신해서 true/false/null을 받는다
-        const [uAvail, eAvail, bAvail] = await Promise.all([
-            username ? checkDuplicate("username", username) : null,
-            email ? checkDuplicate("email", email) : null,
-        ]);
-
-        if (uAvail === false) {
-            e.preventDefault();
-            alertAndFocus("아이디가 이미 존재합니다.", "username");
-            return false;
-        }
-        if (eAvail === false) {
-            e.preventDefault();
-            alertAndFocus("이메일이 이미 존재합니다.", "email");
-            return false;
-        }
-
-        // 네트워크 에러 등으로 확인 실패했을 때는 기존 로직대로 제출(서버에서 한 번 더 검증)
-        return true;
-    }
-
 document.addEventListener("DOMContentLoaded", () => {
-    // 휴대폰 번호 입력 칸 3개
+    // 휴대폰 번호 입력 칸 3개 → hidden 병합
     const phone1 = document.getElementById("phone1");
     const phone2 = document.getElementById("phone2");
     const phone3 = document.getElementById("phone3");
-
-    // 실제 서버에 보낼 hidden input
     const phoneHidden = document.getElementById("phone");
 
     if (phone1 && phone2 && phone3 && phoneHidden) {
         const phoneInputs = [phone1, phone2, phone3];
 
         phoneInputs.forEach((input, idx) => {
-            // 입력 시 이벤트
             input.addEventListener("input", () => {
-                // 숫자만 허용
                 input.value = input.value.replace(/\D/g, "");
-
-                // 자동 포커스 이동
                 if (idx < 2 && input.value.length === parseInt(input.maxLength)) {
                     phoneInputs[idx + 1].focus();
                 }
-
-                // hidden input에 합치기
                 phoneHidden.value = `${phone1.value}-${phone2.value}-${phone3.value}`;
             });
 
-            // 백스페이스로 이전 칸 이동
             input.addEventListener("keydown", (e) => {
                 if (e.key === "Backspace" && input.value.length === 0 && idx > 0) {
                     phoneInputs[idx - 1].focus();
@@ -339,7 +277,117 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+/* ===================================================================== */
+/* =======================  사업자등록번호 (추가)  ======================= */
+/* ===================================================================== */
 
+/** 서비스키: 실제 발급키로 교체하세요 */
+const ODCLOUD_SERVICE_KEY = "9b24c8e7cbbe2db17820a115f7df22ea01dbd7a8fdd21ecd6da344c17eab3673";
 
+/** 숫자만 추출 */
+function normalizeBizNo(v) {
+    return (v || "").replace(/\D/g, "");
+}
 
+/** odcloud API 호출 */
+async function checkBusinessNumber(bizNoDigits) {
+    if (!bizNoDigits || bizNoDigits.length < 10) {
+        updateBizNumberUI({ ok: false, msg: "사업자등록번호를 입력하세요." });
+        return false;
+    }
 
+    try {
+        const res = await fetch(
+            `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${encodeURIComponent(ODCLOUD_SERVICE_KEY)}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=UTF-8",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({ b_no: [bizNoDigits] }),
+            }
+        );
+
+        if (!res.ok) {
+            console.error("odcloud status:", res.status, await res.text());
+            updateBizNumberUI({ ok: false, msg: "사업자 상태 조회 중 오류가 발생했습니다." });
+            return false;
+        }
+
+        const result = await res.json();
+        const matchCnt = typeof result.match_cnt === "string" ? parseInt(result.match_cnt, 10) : result.match_cnt;
+
+        if (matchCnt === 1) {
+            updateBizNumberUI({ ok: true, msg: "확인 완료" });
+            return true;
+        } else {
+            const msg = result?.data?.[0]?.tax_type || "유효하지 않은 사업자번호입니다.";
+            updateBizNumberUI({ ok: false, msg });
+            return false;
+        }
+    } catch (e) {
+        console.error("odcloud 예외:", e);
+        updateBizNumberUI({ ok: false, msg: "네트워크 오류로 사업자번호 확인에 실패했습니다." });
+        return false;
+    }
+}
+
+/** 성공/실패 메시지 토글 */
+function updateBizNumberUI({ ok, msg }) {
+    const okEl = document.getElementById("businessNumberSuccess");
+    const errEl = document.getElementById("businessNumberError");
+
+    if (ok) {
+        if (errEl) errEl.classList.add("hidden");
+        if (okEl) {
+            okEl.classList.remove("hidden");
+            okEl.innerText = msg || "확인 완료";
+        }
+    } else {
+        if (okEl) okEl.classList.add("hidden");
+        if (errEl) {
+            errEl.classList.remove("hidden");
+            errEl.innerText = msg || "잘못된 번호 형식";
+        }
+        showAlert(msg || "사업자등록번호를 확인해주세요.");
+    }
+}
+
+/** HTML의 버튼 onclick="corp_chk()" 용 – 입력창 #corp_reg 확인 */
+async function corp_chk() {
+    const el = document.getElementById("corp_reg");
+    if (!el) {
+        showAlert("사업자등록번호 입력창을 찾을 수 없습니다.");
+        return false;
+    }
+    const regNum = normalizeBizNo(el.value);
+    const ok = await checkBusinessNumber(regNum);
+    return ok;
+}
+
+/** 폼 onsubmit과 호환되게 기존 validateForm을 래핑해서 사업자번호 체크 추가 */
+(function wrapValidateFormForBiz() {
+    const original = window.validateForm;
+    if (typeof original !== "function") return;
+
+    window.validateForm = async function (e) {
+        // 1) 기존 검증 먼저 (아이디/이메일/비번 등) – 기존 로직 건드리지 않음
+        const base = await original(e);
+        if (base === false) return false; // 기존 로직이 막았으면 종료
+
+        // 2) 사업자등록번호 입력값 확인 (id="businessNumber")
+        const bnInput = document.getElementById("businessNumber");
+        const digits = normalizeBizNo(bnInput ? bnInput.value : "");
+
+        // 3) odcloud 검사 – 실패 시 제출 막기
+        const ok = await checkBusinessNumber(digits);
+        if (!ok) {
+            e && e.preventDefault();
+            return false;
+        }
+        return true;
+    };
+})();
+
+/* ===================================================================== */
