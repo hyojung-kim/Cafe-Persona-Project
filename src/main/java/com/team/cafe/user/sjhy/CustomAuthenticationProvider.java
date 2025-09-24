@@ -89,8 +89,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("일반 계정은 사업자 로그인 불가");
         }
 
-        // 성공 시 Authentication 리턴
-        return new UsernamePasswordAuthenticationToken(user, rawPassword, user.getAuthorities());
+        // 성공 시 Authentication 리턴 (principal은 SiteUser로 유지하고 비밀번호는 컨텍스트에 저장하지 않음)
+        UsernamePasswordAuthenticationToken authenticated =
+                new UsernamePasswordAuthenticationToken(siteUser, null, user.getAuthorities());
+        authenticated.setDetails(authentication.getDetails());
+        return authenticated;
     }
 
     @Override

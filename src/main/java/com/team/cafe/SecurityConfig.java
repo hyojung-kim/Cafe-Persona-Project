@@ -3,6 +3,7 @@ package com.team.cafe;
 import com.team.cafe.user.sjhy.CustomAuthenticationFailureHandler;
 import com.team.cafe.user.sjhy.CustomAuthenticationProvider;
 import com.team.cafe.user.sjhy.CustomLoginSuccessHandler;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,10 +13,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 import java.util.stream.Collectors;
 
@@ -89,7 +96,7 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                 )
                 // 6) 사용자, 사업자 로그인 엔드포인트를 동시에 처리하기 위한 커스텀 필터 등록
-                .addFilterAt(multiEndpointAuthenticationFilter(authenticationManager),
+                .addFilterAt(multiEndpointAuthenticationFilter(authenticationManager, http),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -117,11 +124,37 @@ public class SecurityConfig {
 
     @Bean
     public org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter multiEndpointAuthenticationFilter(
-            AuthenticationManager authenticationManager) {
+            AuthenticationManager authenticationManager,
+            HttpSecurity http) throws Exception {
         var filter = new com.team.cafe.user.sjhy.MultiEndpointAuthenticationFilter();
         filter.setAuthenticationManager(authenticationManager);
         filter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
         filter.setAuthenticationFailureHandler(customAuthenticationFailureHandler());
+        SecurityContextHolderStrategy holderStrategy = http.getSharedObject(SecurityContextHolderStrategy.class);
+        SecurityContextRepository contextRepository = http.getSharedObject(SecurityContextRepository.class);
+        SessionAuthenticationStrategy sessionStrategy = http.getSharedObject(SessionAuthenticationStrategy.class);
+        RememberMeServices rememberMeServices = http.getSharedObject(RememberMeServices.class);
+        ApplicationEventPublisher eventPublisher = http.getSharedObject(ApplicationEventPublisher.class);
+
+        if (holderStrategy != null) {
+            filter.setSecurityContextHolderStrategy(holderStrategy);
+        } else {
+            filter.setSecurityContextHolderStrategy(SecurityContextHolder.getContextHolderStrategy());
+        }
+        if (contextRepository != null) {
+            filter.setSecurityContextRepository(contextRepository);
+        } else {
+            filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
+        }
+        if (sessionStrategy != null) {
+            filter.setSessionAuthenticationStrategy(sessionStrategy);
+        }
+        if (rememberMeServices != null) {
+            filter.setRememberMeServices(rememberMeServices);
+        }
+        if (eventPublisher != null) {
+            filter.setApplicationEventPublisher(eventPublisher);
+        }
         return filter;
     }
 
