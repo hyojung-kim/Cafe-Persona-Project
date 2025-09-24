@@ -45,7 +45,7 @@ public class SignupService {
         user.setNickname(nickname);
         user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
-        user.setRole("USER");
+        user.setRole("ROLE_USER");
         user.setCreateDate(LocalDateTime.now());
         userRepository.save(user);
 

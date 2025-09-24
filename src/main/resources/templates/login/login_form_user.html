@@ -6,6 +6,7 @@
     </head>
     <div class="login-header-text">User Login</div>
     <form th:action="@{/user/login}" method="post" id="loginForm" onsubmit="return validateLoginConfirm()">
+        <input type="hidden" name="userRole" value="USER">
         <div class="mb-3 input-with-clear">
             <input type="text" name="username" id="username" placeholder="ID" class="form-control-num text-box-id">
             <span class="clear-btn">&times;</span>
@@ -20,13 +21,6 @@
         <small id="loginConfirmError" class="form-text text-danger" th:classappend="${param.error} ? 'd-block' : 'd-none'">
             아이디 또는 비밀번호가 일치하지 않습니다.
         </small>
-        <small th:if="${param.mismatch}" class="form-text text-danger d-block">
-    <span th:if="${param.mismatch[0] == 'business'}">
-        ⚠️ 사업자 계정은 일반 로그인 페이지에서 로그인할 수 없습니다.<br>
-        <a th:href="@{/business/login}">👉 사업자 로그인 페이지로 이동</a>
-    </span>
-        </small>
-
         <div class="login-btn">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <button type="submit" class="btn btn-primary">Login</button>

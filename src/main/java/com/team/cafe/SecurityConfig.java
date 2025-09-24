@@ -53,7 +53,7 @@ public class SecurityConfig {
                         // USER 전용 페이지
                         .requestMatchers("/user/**").hasRole("USER")
                         // BUSINESS 전용 페이지
-                        .requestMatchers("/business/**").hasRole("BUSINESS_USER")
+                        .requestMatchers("/business/**").hasRole("BUSINESS")
 
                         .anyRequest().permitAll()   // 현재는 전부 공개 (필요 시 authenticated()로 조정)
                 )
@@ -78,7 +78,7 @@ public class SecurityConfig {
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 )
 
-                // 4) 로그인 설정 일반 유저 전용
+                // 4) 로그인 설정
                 .formLogin(form -> form
                         .loginPage("/user/login")          // GET: 로그인 페이지
                         .loginProcessingUrl("/user/login") // POST: 인증 처리

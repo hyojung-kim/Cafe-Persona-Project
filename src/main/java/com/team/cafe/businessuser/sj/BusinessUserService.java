@@ -28,7 +28,7 @@ public class BusinessUserService {
         user.setNickname(dto.getNickname());
         user.setCreateDate(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setRole("BUSINESS_USER");
+        user.setRole("BUSINESS");
 
         // SiteUser 저장
         siteUserRepository.save(user);
