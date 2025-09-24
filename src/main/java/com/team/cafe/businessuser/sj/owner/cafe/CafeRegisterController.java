@@ -6,15 +6,11 @@ import com.team.cafe.cafeListImg.hj.CafeImage;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
+import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -23,11 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.security.Principal;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Controller
@@ -40,7 +33,12 @@ public class CafeRegisterController {
     private final UserService userService;
     private final BusinessUserRepository businessUserRepository;
 
-
+    /** 모든 뷰에서 ${user} 사용할 수 있도록 주입 */
+    @ModelAttribute("user")
+    public SiteUser injectUser(Principal principal) {
+        if (principal == null) return null;
+        return userService.getUser(principal.getName());
+    }
 
     /* ========== 등록 폼 ========== */
     @GetMapping("/register")
@@ -49,8 +47,16 @@ public class CafeRegisterController {
                                    Model model) {
         if (principal == null) return "redirect:/user/login";
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+
+        // 현재 로그인 사용자 및 사업자 정보 주입 (폼 프리필용)
+        SiteUser siteUser = userService.getUser(principal.getName());
+        if (siteUser == null) return "redirect:/user/login";
+        BusinessUser biz = businessUserRepository.findByUserId(siteUser.getId()).orElse(null);
+
         model.addAttribute("mode", "create");
         model.addAttribute("form", new CafeRegisterRequest());
+        model.addAttribute("biz", biz); // 템플릿에서 ${biz.*} 로 사용
+
         return "mypage/cafe-register";
     }
 
@@ -65,8 +71,8 @@ public class CafeRegisterController {
 
         try {
             // 1) 현재 사업자 조회
-            var user = userService.getUser(principal.getName());
-            var business = businessUserRepository.findByUserId(user.getId())
+            SiteUser user = userService.getUser(principal.getName());
+            BusinessUser business = businessUserRepository.findByUserId(user.getId())
                     .orElseThrow(() -> new IllegalStateException("사업자 회원이 아닙니다."));
 
             // 2) 이미 보유시 재등록 방지(1:1 정책)
@@ -76,7 +82,6 @@ public class CafeRegisterController {
             }
 
             Cafe cafe = new Cafe();
-            cafe.setGooglePlaceId(null);
             cafe.setName(req.getName());
             cafe.setPhoneNum(req.getPhoneNum());
             cafe.setSiteUrl(req.getSiteUrl());
@@ -114,24 +119,6 @@ public class CafeRegisterController {
         }
     }
 
-    private static Cafe getCafe(CafeRegisterRequest req) {
-        Cafe cafe = new Cafe();
-        cafe.setGooglePlaceId(null);
-        cafe.setName(req.getName());
-        cafe.setPhoneNum(req.getPhoneNum());
-        cafe.setSiteUrl(req.getSiteUrl());
-        cafe.setAddress1(req.getAddress1());
-        cafe.setAddress2(req.getAddress2());
-        cafe.setDistrict(req.getDistrict());
-        cafe.setCity(req.getCity());
-        cafe.setOpenTime(req.getOpenTime());
-        cafe.setCloseTime(req.getCloseTime());
-        cafe.setParkingYn(req.isParkingYn());
-        cafe.setHitCount(0);
-        cafe.setIntro(req.getIntro()); // ✅ 소개 저장
-        return cafe;
-    }
-
     /* ========== 수정 폼(프리필) ========== */
     @GetMapping("/edit/{cafeId}")
     public String showEdit(@PathVariable Long cafeId,
@@ -143,6 +130,11 @@ public class CafeRegisterController {
 
         Cafe cafe = cafeListRepository.findById(cafeId)
                 .orElseThrow(() -> new IllegalArgumentException("카페 없음: " + cafeId));
+
+        // 현재 로그인 사용자 및 사업자 정보 주입 (프리필용)
+        SiteUser siteUser = userService.getUser(principal.getName());
+        if (siteUser == null) return "redirect:/user/login";
+        BusinessUser biz = businessUserRepository.findByUserId(siteUser.getId()).orElse(null);
 
         // 폼 바인딩 값 미리 채우기
         CafeRegisterRequest form = new CafeRegisterRequest();
@@ -165,6 +157,8 @@ public class CafeRegisterController {
         model.addAttribute("form", form);
         model.addAttribute("photos", photos);
         model.addAttribute("photoCount", photos.size());
+        model.addAttribute("biz", biz); // ✅ 템플릿에서 ${biz.*} 로 사용
+
         return "mypage/cafe-register"; // 같은 템플릿 재사용
     }
 
@@ -190,7 +184,6 @@ public class CafeRegisterController {
             cafe.setAddress2(req.getAddress2());
             cafe.setDistrict(req.getDistrict());
             cafe.setCity(req.getCity());
-
             cafe.setOpenTime(req.getOpenTime());
             cafe.setCloseTime(req.getCloseTime());
             cafe.setParkingYn(req.isParkingYn());
@@ -216,9 +209,4 @@ public class CafeRegisterController {
             return "redirect:/mypage/cafe/edit/" + cafeId;
         }
     }
-
-
-
-
-
 }

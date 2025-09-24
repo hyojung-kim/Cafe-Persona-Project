@@ -1,15 +1,23 @@
 package com.team.cafe.businessuser.sj;
 
-import com.team.cafe.businessuser.sj.BusinessUserRepository;
+import com.team.cafe.Menu.Menu;
+import com.team.cafe.Menu.MenuService;
+import com.team.cafe.bookmark.BookmarkRepository;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
+import com.team.cafe.list.hj.CafeListService;
+import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +32,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @RequiredArgsConstructor
 @Controller
@@ -40,6 +49,10 @@ public class MypageController {
     private final BusinessUserRepository businessUserRepository;
     private final CafeImageService cafeImageService;
     private final CafeListRepository cafeListRepository;
+    private final CafeListService cafeListService;
+    private final ReviewService reviewService;
+    private final BookmarkRepository bookmarkRepository;
+    private final MenuService menuService;
 
     /* =========================
        Reauth Token
@@ -245,6 +258,7 @@ public class MypageController {
 
     @GetMapping("/mypage/verify_password")
     public String verifyPasswordPage(@RequestParam(value = "continue", required = false) String cont,
+                                     @RequestParam(value = "error", required = false) String error,
                                      HttpServletRequest request,
                                      HttpServletResponse response,
                                      Model model) {
@@ -255,6 +269,11 @@ public class MypageController {
 
         setNoCache(response);
         model.addAttribute("continueUrl", cont);
+
+        if (error != null) {
+            model.addAttribute("error", "비밀번호가 올바르지 않습니다.");
+        }
+
         return "mypage/verify_password";
     }
 
@@ -398,6 +417,42 @@ public class MypageController {
             model.addAttribute("photos", List.of());
             model.addAttribute("photoCount", 0);
             model.addAttribute("isRegistered", false);
+        }
+
+        if (cafeId != null) {
+            double avgRating = cafeListService.getActiveAverageRating(cafeId);
+            long reviewCount = cafeListService.getActiveReviewCount(cafeId);
+
+            var pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+            var recentPage = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable, null);
+            var recentReviews = recentPage.getContent();
+
+            model.addAttribute("avgRating", avgRating);
+            model.addAttribute("reviewCount", reviewCount);
+            model.addAttribute("recentReviews", recentReviews);
+        } else {
+            model.addAttribute("avgRating", null);
+            model.addAttribute("reviewCount", 0);
+            model.addAttribute("recentReviews", java.util.List.of());
+        }
+
+        if (cafeId != null) {
+
+            long bookmarkCount = bookmarkRepository.countByCafe_Id(cafeId);
+            model.addAttribute("bookmarkCount", bookmarkCount);
+
+        } else {
+            model.addAttribute("bookmarkCount", 0L);
+        }
+
+        try {
+            List<Menu> allMenus = menuService.findForDetail(cafeId);  // 정렬: sortOrder→name
+            List<Menu> menusLimited = (allMenus != null && allMenus.size() > 5)
+                    ? allMenus.subList(0, 5)
+                    : allMenus;
+            model.addAttribute("menusLimited", menusLimited);
+        } catch (Exception e) {
+            model.addAttribute("menusLimited", java.util.List.of());
         }
 
         return "mypage/cafe_manage";

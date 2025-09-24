@@ -24,7 +24,12 @@ body{
   color: var(--cm-text);
   -webkit-font-smoothing: antialiased;
 }
-
+.container {
+    margin-top: 24px;
+    margin-bottom: 56px;
+    width: 80rem;
+    padding: 0;
+}
 .g-container {
     width: 80rem;
 }
@@ -200,3 +205,22 @@ a.btn:focus, button.btn:focus{ outline: 2px solid #c7d2fe; outline-offset: 2px; 
 .mt-8{ margin-top: 8px; }
 .mt-12{ margin-top: 12px; }
 .mt-16{ margin-top: 16px; }
+
+
+.lists-area {
+    margin-top: 16px;
+}
+
+
+.modal { position: fixed; inset: 0; z-index: 1000; }
+.modal__backdrop { position:absolute; inset:0; background:rgba(0,0,0,.4); }
+.modal__panel { position: relative; width: min(900px, 92vw); max-height: 86vh; overflow: auto;
+    background: #fff; margin: 6vh auto 0; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.25); padding: 16px; }
+.modal__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.modal__close { border:0; background:transparent; font-size:24px; line-height:1; cursor:pointer; }
+.menu-list .row { display:grid; grid-template-columns: 1fr 120px 1fr 80px; gap: 8px; align-items:center; padding:6px 0; border-bottom:1px solid #eee; }
+.menu-list .row .name { font-weight:700; }
+.menu-list .empty { padding: 12px 0; color:#777; }
+.menu-form label { display:block; font-size:12px; color:#666; margin-bottom:4px; }
+.btn.danger { background:#e23; color:#fff; }
+
