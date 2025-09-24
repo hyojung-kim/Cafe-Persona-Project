@@ -30,21 +30,29 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         String loginType = request.getParameter("loginType");
+        String requestPath = request.getServletPath();
+
+        // loginType 파라미터가 전달되지 않은 경우 기본적으로 일반 로그인 시도로 간주
+        // (일반 로그인 페이지에서 loginType 히든 필드가 누락되거나 조작된 상황 대비)
+        boolean isBusinessLoginRequest = "BUSINESS".equals(loginType)
+                || (loginType == null && requestPath != null && requestPath.startsWith("/business"));
 
         // 인증된 사용자의 실제 역할(roles) 가져오기
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        boolean isUser = authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"));
-        boolean isBusiness = authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_BUSINESS"));
+        boolean isUser = authorities.stream()
+                .anyMatch(a -> "ROLE_USER".equalsIgnoreCase(a.getAuthority()));
+        boolean isBusiness = authorities.stream()
+                .anyMatch(a -> "ROLE_BUSINESS".equalsIgnoreCase(a.getAuthority()));
 
         // 1. 일반 로그인 페이지에서 사업자 계정으로 로그인 (loginType=null, 실제 롤: ROLE_BUSINESS)
-        if ("USER".equals(loginType) && isBusiness) {
+        if (isBusiness && !isBusinessLoginRequest) {
             request.getSession().invalidate(); // 세션 무효화
             response.sendRedirect("/user/login?mismatch=business");
             return;
         }
 
         // 2. 사업자 로그인 페이지에서 일반 계정으로 로그인 (loginType=BUSINESS, 실제 롤: ROLE_USER)
-        if ("BUSINESS".equals(loginType) && isUser) {
+        if (isBusinessLoginRequest && isUser) {
             request.getSession().invalidate();
             response.sendRedirect("/business/login?mismatch=user");
             return;

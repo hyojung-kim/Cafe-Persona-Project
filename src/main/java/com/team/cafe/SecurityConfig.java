@@ -1,7 +1,7 @@
 package com.team.cafe;
 
 import com.team.cafe.user.sjhy.CustomAuthenticationFailureHandler;
-//import com.team.cafe.user.sjhy.CustomAuthenticationProvider;
+import com.team.cafe.user.sjhy.CustomAuthenticationProvider;
 import com.team.cafe.user.sjhy.CustomLoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,18 +22,14 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-//
-//    private final CustomAuthenticationProvider customAuthenticationProvider;
-//
-//    public SecurityConfig(CustomAuthenticationProvider customAuthenticationProvider) {
-//        this.customAuthenticationProvider = customAuthenticationProvider;
-//    }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http,
+                                    AuthenticationManager authenticationManager,
+                                    CustomAuthenticationProvider customAuthenticationProvider) throws Exception {
         http
                 // 1) 정적 리소스 & 공개 경로 명시 허용
-//                .authenticationProvider(customAuthenticationProvider)
+                .authenticationProvider(customAuthenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",                 // 홈
@@ -91,7 +87,10 @@ public class SecurityConfig {
                         .logoutUrl("/user/logout")
                         .logoutSuccessUrl("/cafe/list")
                         .invalidateHttpSession(true)
-                );
+                )
+                // 6) 사용자, 사업자 로그인 엔드포인트를 동시에 처리하기 위한 커스텀 필터 등록
+                .addFilterAt(multiEndpointAuthenticationFilter(authenticationManager),
+                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -114,6 +113,16 @@ public class SecurityConfig {
     @Bean
     public CustomAuthenticationFailureHandler customAuthenticationFailureHandler() {
         return new CustomAuthenticationFailureHandler();
+    }
+
+    @Bean
+    public org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter multiEndpointAuthenticationFilter(
+            AuthenticationManager authenticationManager) {
+        var filter = new com.team.cafe.user.sjhy.MultiEndpointAuthenticationFilter();
+        filter.setAuthenticationManager(authenticationManager);
+        filter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
+        filter.setAuthenticationFailureHandler(customAuthenticationFailureHandler());
+        return filter;
     }
 
     // business_user 로 저장되는 role_business를 사용하기 위함

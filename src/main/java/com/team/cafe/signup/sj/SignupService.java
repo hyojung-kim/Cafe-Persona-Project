@@ -2,6 +2,7 @@ package com.team.cafe.signup.sj;
 
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserRepository;
+import com.team.cafe.user.sjhy.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class SignupService {
         user.setNickname(nickname);
         user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
-        user.setRole("ROLE_USER");
+        user.setRole(UserRole.USER.name());
         user.setCreateDate(LocalDateTime.now());
         userRepository.save(user);
 
