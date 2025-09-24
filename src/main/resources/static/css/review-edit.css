@@ -9,6 +9,10 @@
   --edit-shadow-soft: 0 18px 48px rgba(47, 31, 27, 0.16);
 }
 
+.review-page {
+  padding-bottom: 56px;
+}
+
 .floating-back-btn {
   position: fixed;
   right: 24px;
