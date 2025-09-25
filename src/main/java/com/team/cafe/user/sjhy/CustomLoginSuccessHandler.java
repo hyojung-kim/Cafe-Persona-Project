@@ -48,19 +48,19 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         boolean isBusiness = authorities.stream()
                 .anyMatch(a -> "ROLE_BUSINESS".equalsIgnoreCase(a.getAuthority()));
 
-        // 1. 일반 로그인 페이지에서 사업자 계정으로 로그인 (loginType=null, 실제 롤: ROLE_BUSINESS)
-        if (isBusiness && !isBusinessLoginRequest) {
-            request.getSession().invalidate(); // 세션 무효화
-            response.sendRedirect("/user/login?mismatch=business");
-            return;
-        }
-
-        // 2. 사업자 로그인 페이지에서 일반 계정으로 로그인 (loginType=BUSINESS, 실제 롤: ROLE_USER)
-        if (isBusinessLoginRequest && isUser) {
-            request.getSession().invalidate();
-            response.sendRedirect("/business/login?mismatch=user");
-            return;
-        }
+//        // 1. 일반 로그인 페이지에서 사업자 계정으로 로그인 (loginType=null, 실제 롤: ROLE_BUSINESS)
+//        if (isBusiness && !isBusinessLoginRequest) {
+//            request.getSession().invalidate(); // 세션 무효화
+//            response.sendRedirect("/user/login?mismatch=business");
+//            return;
+//        }
+//
+//        // 2. 사업자 로그인 페이지에서 일반 계정으로 로그인 (loginType=BUSINESS, 실제 롤: ROLE_USER)
+//        if (isBusinessLoginRequest && isUser) {
+//            request.getSession().invalidate();
+//            response.sendRedirect("/business/login?mismatch=user");
+//            return;
+//        }
 
         // 로그인 유형을 세션에 저장해 이후 화면에서 구분할 수 있게 한다.
         request.getSession().setAttribute("LOGIN_TYPE",
