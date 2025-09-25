@@ -65,6 +65,8 @@ dependencies {
 
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'com.h2database:h2'
+	testImplementation 'org.springframework.security:spring-security-test'
 
 	// 외부 API 연동하려고 넣음 외부 API 호출을 비동기/논블로킹 방식으로 처리 가능하게 함
 	// WebFlux의 네트워크 통신엔진인데 API 쓰려고 넣음
@@ -75,11 +77,11 @@ dependencies {
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
-    // JavaMailSender
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+	// JavaMailSender
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-    // layout dialect
-    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0'
+	// layout dialect
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0'
 
 }
 

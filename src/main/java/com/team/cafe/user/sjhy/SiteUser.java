@@ -110,8 +110,21 @@ public class SiteUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         //  사용자의 권한 목록을 반환
         //  여기서는 ROLE_USER 권한 하나만 부여 (추후 수정 예정)
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+//        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        // 사업자와 일반 모두
+        String roleValue = this.role;
+        if (roleValue == null || roleValue.isBlank()) {
+            roleValue = UserRole.USER.name();
+        }
+
+        String normalizedRole = roleValue.toUpperCase();
+        if (!normalizedRole.startsWith("ROLE_")) {
+            normalizedRole = "ROLE_" + normalizedRole;
+        }
+
+        return List.of(new SimpleGrantedAuthority(normalizedRole));
     }
+
 
 
     //  계정 만료 여부 확인 override
@@ -124,7 +137,5 @@ public class SiteUser implements UserDetails {
     // 일반 회원과 비즈니스 회원 1:1 연결
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private BusinessUser businessUser;
-
-
 }
 
