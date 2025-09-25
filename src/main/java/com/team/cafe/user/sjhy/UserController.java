@@ -27,9 +27,19 @@ public class UserController {
     public String kakaoLogin(Model model) {
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         model.addAttribute("redirectUri", redirectUri);
+        model.addAttribute("googleClientId", googleClientId);
+        model.addAttribute("googleRedirectUri", googleRedirectUri);
         model.addAttribute("loginType", "USER");
         return "/login/login_form_user"; // login.html
     }
+
+//    @GetMapping("/user/login/google")
+//    public String googleLogin(Model model) {
+//        model.addAttribute("googleClientId", googleClientId);
+//        model.addAttribute("googleRedirectUri", googleRedirectUri);
+//        model.addAttribute("loginType", "USER");
+//        return "/login/login_form_user";
+//    }
 
     @GetMapping("/business/login")
     public String businessLoginForm(Model model) {
@@ -44,4 +54,13 @@ public class UserController {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
-  }
+
+    @Value("${google.client-id}")
+    private String googleClientId;
+
+    @Value("${google.client-secret}")
+    private String googleClientSecret;
+
+    @Value("${google.redirect-uri}")
+    private String googleRedirectUri;
+}
