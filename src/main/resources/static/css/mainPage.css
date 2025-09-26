@@ -6,7 +6,6 @@
   --brand:#C97B63;      /* 포인트 */
   --brand-ink:#fff;     /* 포인트 위 텍스트 */
   --line: rgba(0,0,0,.08);
-
   --radius: 16px;
   --shadow: 0 8px 20px rgba(0,0,0,.08);
 }
@@ -26,7 +25,7 @@ a {
   padding: clamp(40px, 7vw, 80px) 16px;
 
   background: url("/images/banner5.png") center bottom/cover no-repeat;
-  background-color: rgba(255, 255, 255, 0.1); /* 흰색 반투명 덧씌우기 */
+  background-color: rgba(0,0,0,0.3))/* 흰색 반투명 덧씌우기 */
   background-blend-mode: lighten; /* 화면을 더 연하게 */
 
   border-bottom: 2px solid rgba(255, 255, 255, 0.6);
@@ -73,10 +72,11 @@ a {
 .promo__subtitle {
   font-size: 14px;         /* 작게 */
   font-weight: 600;        /* 살짝 두껍게 */
-  color: var(--muted);     /* 보조 색상 */
+  color:#8C7B75;     /* 보조 색상 */
   margin: 0 0 8px 0;       /* 타이틀과 간격 */
   text-transform: uppercase; /* (선택) 대문자 변환 */
   letter-spacing: 0.5px;   /* 자간 살짝 */
+  opacity:80%;
 }
 .promo__accent{
   color: var(--brand);
@@ -92,7 +92,7 @@ a {
 .promo__title em{
   font-style: normal;
   /*color: var(--brand);*/
-  color: #A64B2A;  /* 기존보다 채도+명도 낮춘 진한 톤 */
+  color: #A64C4C;  /* 기존보다 채도+명도 낮춘 진한 톤 */
   text-shadow: 0 1px 3px rgba(0,0,0,0.15);
 
 }
@@ -102,7 +102,8 @@ a {
   margin: 8px 0 24px;
   padding: 12px 20px;
   background: var(--brand);
-  color: var(--brand-ink);
+  color: #FFFFFF;
+  font-size:16px;
   border-radius: 999px;
   font-weight: 700;
   box-shadow: var(--shadow);
