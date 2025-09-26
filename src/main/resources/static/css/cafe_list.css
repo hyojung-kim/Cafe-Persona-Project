@@ -9,7 +9,7 @@
    =============================== */
 .filter-panel {
   border-radius: 30px; /* 컨테이너 모서리를 둥글게 */
-    background: linear-gradient(135deg, #F4ECE5, #FFF);
+  background: linear-gradient(135deg, #F4ECE5, #FFF);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
   padding: 1.5rem; /* 내부 여백 */
 }
@@ -166,7 +166,7 @@
   /*padding: 8px 12px;
      border: 1px solid #e5e5e5; border-radius: 6px;
      background: #fff; font-size: 14px; color: #333;*/
-
+  background:#fff;
   font-size: 14px;
   border-radius: 30px; /* 컨테이너 모서리를 둥글게 */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
@@ -277,12 +277,31 @@
 }
 
 .cafe-title-2{
-    font-size: 2rem; /* 제목 크기 */
-    padding: 2rem 0rem;
+  font-size: 26px;
+  font-weight: 600;
+  color: #2c2c2c;
+  letter-spacing: 0.5px;
+  margin: 24px 0 12px;
+}
+
+.cafe-title-2 {
+  position: relative;
+  padding-left: 10px;
+}
+.cafe-title-2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.2em;
+  background: #a64c4c; /* 포인트 색 */
+  border-radius: 2px;
 }
 
 .card {
-  background: #fff;
+  background: linear-gradient(135deg, #F4ECE5, #FFF);
   border-radius: 20px;
   overflow: hidden;
 
@@ -291,6 +310,12 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
   padding: 1rem; /* 내부 여백 */
 }
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(75,58,49,0.18);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 
 .card img {
   width: 100%;

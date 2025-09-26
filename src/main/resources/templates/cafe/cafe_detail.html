@@ -138,17 +138,24 @@
                     </ul>
                 </section>
 
-                <aside class="menu-section">
-                    <h3 class="title-2">메뉴 목록</h3>
+                <aside class="menu-section" role="region" aria-labelledby="menuTitle">
+                    <h3 id="menuTitle" class="menu-title">메뉴 목록</h3>
+
                     <ul class="menu-list">
                         <li class="menu-item" th:each="m : ${menus}">
                             <span class="menu-name" th:text="${m.name}">메뉴명</span>
+
+                            <!-- 가격 있으면 -->
                             <span class="menu-price"
-                                  th:text="${#numbers.formatInteger(m.price,0,'COMMA')} + ' 원'">0 원</span>
-                            <span th:unless="${m.price}" class="muted">메뉴 없음</span>
+                                  th:if="${m.price != null}"
+                                  th:text="${#numbers.formatInteger(m.price, 0, 'COMMA')} + ' 원'">5,800 원</span>
+
+                            <!-- 가격 없으면 -->
+                            <span class="menu-price is-empty" th:unless="${m.price != null}">메뉴 없음</span>
                         </li>
                     </ul>
                 </aside>
+
             </div>
 
         </section>
