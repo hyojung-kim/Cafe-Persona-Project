@@ -402,3 +402,63 @@ a:hover {
     background: #9A887B; /* 포인트 색 */
     border-radius: 2px;
 }
+
+
+
+/* 북마크 css 영역 */
+#likeBox{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  color:#444;
+  user-select:none;
+}
+
+/* 버튼(아이콘) – 네비/배너 톤과 어울리는 미니멀 스타일 */
+#likeBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px; height:34px;
+  background:transparent;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  color:#4b3a31;                 /* 기본 아이콘 색(비활성) */
+  transition:color .2s, background .2s, transform .08s;
+}
+#likeBtn:hover{
+  background:rgba(166,76,76,0.08); /* 아주 옅은 브릭톤 하이라이트 */
+  color:#a64c4c;
+}
+#likeBtn:active{ transform:scale(0.96); }
+#likeBtn:focus-visible{
+  outline:2px solid #a64c4c;
+  outline-offset:2px;
+}
+
+/* 아이콘 크기/색 */
+#activeBookmark, .label-liked i{
+  font-size:20px;
+  color:#4b3a31;             /* 북마크 ON 색 */
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.08));
+}
+#disableBookmarkIcon, .label-unliked i{
+  font-size:20px;
+  color:#777;                 /* 북마크 OFF 색 */
+}
+
+/* 텍스트/숫자 */
+#likeBox > span{ color:#555; }
+#likeCount{
+  font-weight:700;
+  color:#4b3a31;             /* 숫자 포인트 */
+  font-variant-numeric:tabular-nums; /* 자릿수 고정 */
+  margin-left:2px;
+}
+
+/* (옵션) 더 컴팩트하게 쓰고 싶을 때 */
+#likeBox.is-compact #likeBtn{ width:28px; height:28px; }
+#likeBox.is-compact #activeBookmark,
+#likeBox.is-compact #disableBookmarkIcon{ font-size:18px; }
