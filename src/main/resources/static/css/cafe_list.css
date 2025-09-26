@@ -282,12 +282,10 @@
   color: #2c2c2c;
   letter-spacing: 0.5px;
   margin: 24px 0 12px;
-}
-
-.cafe-title-2 {
   position: relative;
   padding-left: 10px;
 }
+
 .cafe-title-2::before {
   content: '';
   position: absolute;

@@ -380,3 +380,25 @@ a:hover {
   color: #a64c4c;
 }
 
+.map-title{
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2c2c2c;
+  letter-spacing: 0.5px;
+  margin: 24px 0 12px;
+  position: relative;
+  padding-left: 10px;
+}
+
+
+.map-title::after{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 1.2em;
+    background: #9A887B; /* 포인트 색 */
+    border-radius: 2px;
+}

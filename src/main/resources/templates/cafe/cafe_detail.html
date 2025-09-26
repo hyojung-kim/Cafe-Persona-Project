@@ -167,8 +167,8 @@
     <script src="/js/cafe-like.js"></script>
 
 
-    <div style="margin-top:8px;">
-        <h2 th:text="|${cafe.name} 위치|">카페 위치</h2>
+    <div style="margin-top:8px; " >
+        <h2 th:text="|${cafe.name} 위치|" style="" class="map-title">카페 위치</h2>
         <div style="margin-bottom:10px; display:flex; gap:8px">
             <input id="address-input" type="text" th:value="${cafe.address1}"
                    style="flex:1; padding:8px; border:1px solid var(--line); border-radius:4px"
