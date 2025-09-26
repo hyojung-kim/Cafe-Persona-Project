@@ -310,6 +310,12 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 은은한 그림자 */
   padding: 1rem; /* 내부 여백 */
 }
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(75,58,49,0.18);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 
 .card img {
   width: 100%;
