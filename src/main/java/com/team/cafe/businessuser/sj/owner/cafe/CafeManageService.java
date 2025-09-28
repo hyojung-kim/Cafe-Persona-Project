@@ -53,7 +53,6 @@ public class CafeManageService {
         if (representativeName != null)    bu.setRepresentativeName(representativeName);
         if (representativeEmail != null)   bu.setRepresentativeEmail(representativeEmail);
         if (representativePhone != null)   bu.setRepresentativePhone(representativePhone);
-        if (address != null)               bu.setAddress(address);
         if (description != null)           bu.setDescription(description); // 엔티티에 description 필드 있어야 함
 
         return businessUserRepository.save(bu);
@@ -89,7 +88,6 @@ public class CafeManageService {
         }
 
         if (companyName != null)         bu.setCompanyName(companyName);
-        if (address != null)             bu.setAddress(address);
         if (description != null)         bu.setDescription(description);
         if (representativeName != null)  bu.setRepresentativeName(representativeName);
         if (representativeEmail != null) bu.setRepresentativeEmail(representativeEmail);

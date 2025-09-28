@@ -15,8 +15,9 @@ public class CafeMatchDto {
     private String name;
     private String phoneNum;
     private String siteUrl;
-    private String address1;
-    private String address2;
+    private String zipCode;
+    private String streetAdr;
+    private String detailAdr;
     private String district;
     private String city;
     private BigDecimal lat;
@@ -25,6 +26,7 @@ public class CafeMatchDto {
     private LocalTime closeTime;
     private boolean parkingYn;
     private int hitCount;
+    private String address1;
 
     // === BaseEntity(감사 필드) - 프로젝트에 맞게 이름 맞춰서 사용 ===
     private LocalDateTime createdAt;   // BaseEntity에 존재하면 세팅
@@ -52,8 +54,9 @@ public class CafeMatchDto {
         this.name = c.getName();
         this.phoneNum = c.getPhoneNum();
         this.siteUrl = c.getSiteUrl();
-        this.address1 = c.getAddress1();
-        this.address2 = c.getAddress2();
+        this.zipCode = c.getZipCode();
+        this.streetAdr = c.getStreetAdr();
+        this.detailAdr = c.getDetailAdr();
         this.district = c.getDistrict();
         this.city = c.getCity();
         this.lat = c.getLat();
@@ -64,6 +67,7 @@ public class CafeMatchDto {
         this.hitCount = c.getHitCount();
         this.createdAt = c.getCreatedAt();   // BaseEntity에 맞게 이름 다르면 수정
         this.updatedAt = c.getUpdatedAt();
+        this.address1 = c.getAddress1();
         this.computeOpenNow(viewNow);
         // 엔티티에서 좋아요 수 가져오기
     }

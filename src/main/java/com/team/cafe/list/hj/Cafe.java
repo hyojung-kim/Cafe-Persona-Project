@@ -50,13 +50,21 @@ public class Cafe extends BaseEntity {
     @Comment("웹/블로그 URL")
     private String siteUrl;
 
-    @Column(name = "address1", length = 120)
-    @Comment("도로명 주소")
+    @Column(name = "address1", length = 255)
+    @Comment("기존 주소 (호환용)")
     private String address1;
 
-    @Column(name = "address2", length = 120)
+    @Column(name = "zip_code", length = 20)
+    @Comment("우편번호")
+    private String zipCode;
+
+    @Column(name = "street_adr", length = 255)
+    @Comment("도로명 주소")
+    private String streetAdr;
+
+    @Column(name = "detail_adr", length = 255)
     @Comment("상세 주소")
-    private String address2;
+    private String detailAdr;
 
     @Column(name = "district", length = 60)
     @Comment("구/군")

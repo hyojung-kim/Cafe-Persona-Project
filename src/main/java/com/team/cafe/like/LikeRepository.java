@@ -21,4 +21,6 @@ public interface LikeRepository  extends JpaRepository<Cafe, Long> {
         group by c.id
     """)
     List<CafeLikeCount> findLikeCountsByCafeIds(List<Long> ids);
+
+//    boolean existsByCafeIdAndUserId(Long cafeId, Long userId);
 }

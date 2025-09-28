@@ -7,6 +7,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
@@ -39,5 +41,16 @@ public class BookmarkController {
 
         model.addAttribute("bookmark", bookmark);
         return "mypage/my_bookmark";
+    }
+
+    // hy추가
+    @PostMapping("/mypage/my/bookmark/remove")
+    public String removeBookmark(@RequestParam Long cafeId, Principal principal) {
+        SiteUser user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+        bookmarkService.remove(cafeId, user.getId());
+
+        // 삭제 후 다시 북마크 목록 페이지로 리다이렉트
+        return "redirect:/mypage/my/bookmark";
     }
 }

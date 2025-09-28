@@ -1,29 +1,40 @@
 package com.team.cafe.businessuser.sj;
 
-import com.team.cafe.businessuser.sj.BusinessUserRepository;
+import com.team.cafe.Menu.Menu;
+import com.team.cafe.Menu.MenuService;
+import com.team.cafe.bookmark.BookmarkRepository;
 import com.team.cafe.cafeListImg.hj.CafeImageService;
 import com.team.cafe.list.hj.Cafe;
 import com.team.cafe.list.hj.CafeListRepository;
+import com.team.cafe.list.hj.CafeListService;
+import com.team.cafe.review.service.ReviewService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserService;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @RequiredArgsConstructor
 @Controller
@@ -40,6 +51,10 @@ public class MypageController {
     private final BusinessUserRepository businessUserRepository;
     private final CafeImageService cafeImageService;
     private final CafeListRepository cafeListRepository;
+    private final CafeListService cafeListService;
+    private final ReviewService reviewService;
+    private final BookmarkRepository bookmarkRepository;
+    private final MenuService menuService;
 
     /* =========================
        Reauth Token
@@ -243,31 +258,51 @@ public class MypageController {
         return "mypage/account";
     }
 
+
+
     @GetMapping("/mypage/verify_password")
     public String verifyPasswordPage(@RequestParam(value = "continue", required = false) String cont,
+                                     @RequestParam(value = "error", required = false) String errorParam,
                                      HttpServletRequest request,
                                      HttpServletResponse response,
                                      Model model) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
+
+        // 1) 이 페이지에서만큼은 전/타 흐름의 잔여 인증 예외 및 범용 error 키 무시
         HttpSession session = request.getSession(false);
-        if (session != null) session.removeAttribute(REAUTH_TOKEN_KEY);
+        if (session != null) {
+            session.removeAttribute(REAUTH_TOKEN_KEY);
+            session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION); // SPRING_SECURITY_LAST_EXCEPTION 제거
+        }
+        // (레이아웃/인터셉터 등이 model에 얹어놓은 범용 error 키 무력화)
+        model.addAttribute("error", null);
 
         setNoCache(response);
         model.addAttribute("continueUrl", cont);
+
+        // 2) 비번 검증 실패 상황에서만 전용 키로 메시지 세팅
+        if (errorParam != null) {
+            model.addAttribute("verifyPwError", "비밀번호가 올바르지 않습니다.");
+        }
+
         return "mypage/verify_password";
     }
+
 
     @PostMapping("/mypage/verify_password")
     public String verifyPassword(@RequestParam String password,
                                  @RequestParam(value = "continue", required = false) String cont,
-                                 HttpServletRequest request) {
+                                 HttpServletRequest request,
+                                 RedirectAttributes ra) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            String encoded = cont != null ? URLEncoder.encode(cont, StandardCharsets.UTF_8) : "";
-            return "redirect:/mypage/verify_password?error=1" + (encoded.isEmpty() ? "" : "&continue=" + encoded);
+            // 전용 키만 사용
+            ra.addFlashAttribute("verifyPwError", "비밀번호가 올바르지 않습니다.");
+            if (cont != null) ra.addFlashAttribute("continueUrl", cont);
+            return "redirect:/mypage/verify_password";
         }
 
         String base = (cont != null && isSafeInternalPath(cont)) ? cont : "/mypage/account";
@@ -281,19 +316,31 @@ public class MypageController {
         return "redirect:" + baseNoReauth + sep + "reauth=" + URLEncoder.encode(nonce, StandardCharsets.UTF_8);
     }
 
+
     @PostMapping("/mypage/account/update")
+    @Transactional
     public String updateAccount(@RequestParam String nickname,
                                 @RequestParam String email,
                                 HttpServletRequest request) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
-        if (!requireReauthConsume(request)) return redirectToVerifyWithContinue(request);
 
+
+        // 1) SiteUser 저장
         user.setNickname(nickname);
         user.setEmail(email);
         userService.save(user);
+
+        // 2) BusinessUser 동기화
+        businessUserRepository.findByUserId(user.getId()).ifPresent(biz -> {
+            biz.setRepresentativeName(nickname);
+            biz.setRepresentativeEmail(email);
+            businessUserRepository.save(biz);
+        });
+
         return "redirect:/mypage";
     }
+
 
     @PostMapping("/mypage/account/update-password")
     @ResponseBody
@@ -301,7 +348,7 @@ public class MypageController {
                                  @RequestParam String newPassword) throws ServletException {
         SiteUser user = currentUserOrNull();
         if (user == null) return "fail";
-        if (!requireReauthConsume(request)) return "fail";
+
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userService.save(user);
@@ -387,6 +434,42 @@ public class MypageController {
             model.addAttribute("photos", List.of());
             model.addAttribute("photoCount", 0);
             model.addAttribute("isRegistered", false);
+        }
+
+        if (cafeId != null) {
+            double avgRating = cafeListService.getActiveAverageRating(cafeId);
+            long reviewCount = cafeListService.getActiveReviewCount(cafeId);
+
+            var pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+            var recentPage = reviewService.getActiveReviewsByCafeWithUserImages(cafeId, pageable, null);
+            var recentReviews = recentPage.getContent();
+
+            model.addAttribute("avgRating", avgRating);
+            model.addAttribute("reviewCount", reviewCount);
+            model.addAttribute("recentReviews", recentReviews);
+        } else {
+            model.addAttribute("avgRating", null);
+            model.addAttribute("reviewCount", 0);
+            model.addAttribute("recentReviews", java.util.List.of());
+        }
+
+        if (cafeId != null) {
+
+            long bookmarkCount = bookmarkRepository.countByCafe_Id(cafeId);
+            model.addAttribute("bookmarkCount", bookmarkCount);
+
+        } else {
+            model.addAttribute("bookmarkCount", 0L);
+        }
+
+        try {
+            List<Menu> allMenus = menuService.findForDetail(cafeId);  // 정렬: sortOrder→name
+            List<Menu> menusLimited = (allMenus != null && allMenus.size() > 5)
+                    ? allMenus.subList(0, 5)
+                    : allMenus;
+            model.addAttribute("menusLimited", menusLimited);
+        } catch (Exception e) {
+            model.addAttribute("menusLimited", java.util.List.of());
         }
 
         return "mypage/cafe_manage";

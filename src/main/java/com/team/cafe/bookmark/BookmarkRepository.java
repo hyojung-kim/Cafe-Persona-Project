@@ -30,4 +30,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 //    List<Long> findBookmarkedCafeIds(@Param("userId") Long userId,
 //                                     @Param("cafeIds") List<Long> cafeIds);
 
+    long countByCafe_Id(Long cafeId);
+
 }

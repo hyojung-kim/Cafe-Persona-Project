@@ -7,7 +7,7 @@
 
     <div sec:authorize="isAuthenticated()">
         <!--        안녕하세요, <b sec:authentication="principal.nickname">사용자</b> 님!-->
-        안녕하세요, <b th:text="${@securityService.getNickname()}">사용자</b> 님!
+<!--        안녕하세요, <b th:text="${@securityService.getNickname()}">사용자</b> 님!-->
     </div>
 
 <!--    <div sec:authorize="isAnonymous()">-->
@@ -103,7 +103,7 @@
     </div>
 
     <input type="hidden" name="size" th:value="${size}" form="filterForm">
-    <h2 class="cafe-title-2">카페리스트</h2>
+    <h2 class="cafe-title-2">이런 카페 어떠세요?</h2>
 
     <section class="cafe-list">
 
@@ -116,13 +116,15 @@
             <div class="card-body">
                 <div class="card-header">
                     <a class="cafe-title" th:href="@{|/cafe/detail/${cafeList.id}|}" th:text="${cafeList.name}">카페 이름</a>
-                    <span th:text="${cafeList.id}"></span>
+
                     <span class="status"
                           th:text="${cafeList.openNow == null ? '정보없음' : (cafeList.openNow ? '영업중' : '영업 마감')}"
                           th:classappend="${cafeList.openNow == null ? ' unknown' : (cafeList.openNow ? ' open' : ' closed')}">상태 알 수 없음
                     </span>
                 </div>
-                <p class="address" th:text="${cafeList.address1}"></p>
+                <p class="address"
+                   th:text="${cafeList.address1 != null ? cafeList.address1 : cafeList.streetAdr}">
+                </p>
                 <p class="time" th:if="${cafeList.openTime != null and cafeList.closeTime != null}"
                    th:text="|${#temporals.format(cafeList.openTime,'HH시:mm분')} ~ ${#temporals.format(cafeList.closeTime,'HH시:mm분')}|"></p>
                 <div class="card-meta">

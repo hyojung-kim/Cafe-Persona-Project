@@ -5,7 +5,6 @@ import com.team.cafe.user.sjhy.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Comment;
 
 import java.time.LocalDateTime;
 
@@ -39,10 +38,20 @@ public class BusinessUser {
     @Column(name = "representative_email")
     private String representativeEmail;
 
-    @Column(name = "address")
-    private String address;
 
-    // ✅ 설명 필드 추가
+
+    // 새로 추가된 주소 컬럼들
+    @Column(name = "zip_code", length = 10)
+    private String zipCode;
+
+    @Column(name = "street_adr", length = 255)
+    private String streetAdr;
+
+    @Column(name = "detail_adr", length = 255)
+    private String detailAdr;
+
+
+    // 설명 필드 추가
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 

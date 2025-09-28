@@ -35,11 +35,25 @@ public class UserSecurityService implements UserDetailsService {
         SiteUser siteUser = _siteUser.get();
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if ("business".equals(username)) {
-            authorities.add(new SimpleGrantedAuthority(UserRole.BUSINESS.getValue()));
-        } else {
-            authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
+
+        String role = siteUser.getRole();
+
+        if (role == null || role.isBlank()) {
+            role = UserRole.USER.name();
         }
+
+        String normalizedRole = role.toUpperCase();
+        if (!normalizedRole.startsWith("ROLE_")) {
+            normalizedRole = "ROLE_" + normalizedRole;
+        }
+
+        // UserRole enum에 정의된 값만 허용, 나머지는 기본 USER 권한 부여
+        if (!normalizedRole.equals(UserRole.BUSINESS.getValue()) &&
+                !normalizedRole.equals(UserRole.USER.getValue())) {
+            normalizedRole = UserRole.USER.getValue();
+        }
+
+        authorities.add(new SimpleGrantedAuthority(normalizedRole));
         // principal을 SiteUser로 사용
 
         // 카카오 로그인 위한 임시 데이터

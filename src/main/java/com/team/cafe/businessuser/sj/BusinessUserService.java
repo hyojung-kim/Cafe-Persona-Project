@@ -2,6 +2,7 @@ package com.team.cafe.businessuser.sj;
 
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserRepository;
+import com.team.cafe.user.sjhy.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class BusinessUserService {
         user.setNickname(dto.getNickname());
         user.setCreateDate(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setRole("BUSINESS_USER");
+        user.setRole(UserRole.BUSINESS.name());
 
         // SiteUser 저장
         siteUserRepository.save(user);
@@ -41,7 +42,9 @@ public class BusinessUserService {
         businessUser.setRepresentativeName(dto.getRepresentativeName());
         businessUser.setRepresentativePhone(dto.getRepresentativePhone());
         businessUser.setRepresentativeEmail(dto.getRepresentativeEmail());
-        businessUser.setAddress(dto.getAddress());
+        businessUser.setZipCode(dto.getZipCode());
+        businessUser.setStreetAdr(dto.getStreetAdr());
+        businessUser.setDetailAdr(dto.getDetailAdr());
         businessUser.setStatus("pending");
 
         return businessUserRepository.save(businessUser);

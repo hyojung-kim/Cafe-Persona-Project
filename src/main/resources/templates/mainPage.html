@@ -2,6 +2,39 @@
 <div layout:fragment="content">
     <link rel="stylesheet" th:href="@{/css/mainPage.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <!-- Cafe Promo Banner -->
+    <section class="promo" >
+        <div class="promo__inner">
+            <p class="promo__subtitle">오늘의 인기</p>
+            <h2 id="promoTitle" class="promo__title">
+                오늘은 어떤 <em>카페</em>가 끌리나요?
+            </h2>
+
+            <a href="/cafe/list" class="promo__cta">자세히보기</a>
+
+            <!-- 캐러셀 (Thymeleaf 바인딩 예시: li에 th:each) -->
+            <ul class="promo__list" role="list" aria-label="추천 카페" >
+                <!-- 예시 아이템들. 실제 연결 시 li에 th:each="c : ${topCafes}" -->
+                <li class="promo__item" th:each="c : ${todayCafe}">
+                    <a class="promo__link"  th:href="@{|/cafe/detail/${c.id}|}" th:aria-label="${c.cafeName}">
+                        <img class="promo__thumb" th:src="${#strings.isEmpty(c.primaryImageUrl)} ? '/images/DBimg.PNG' : ${c.primaryImageUrl}"
+                             th:alt="|${c.cafeName} 썸네일|" />
+                        <span class="promo__name" th:text="${c.cafeName}">모카모카</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
     <!-- Hero Search Section -->
     <section class="hero full-width">
         <!-- 배경 이미지 -->
@@ -42,8 +75,6 @@
                         </form>
 
                     </nav>
-
-
                 </div>
             </div>
         </div>
@@ -111,6 +142,56 @@
             </ul>
         </div>
     </section>
+
+
+
+<!--    cafes/149/reviews-->
+    <section class="section">
+        <div class="container">
+            <!-- 섹션 헤더 -->
+            <div class="section__head">
+                <h2 class="section__title">Cafe Reviews</h2>
+            </div>
+
+            <!-- 리뷰 Top4 카드 리스트 -->
+            <div class="review-top4" >
+                <!-- 리뷰 카드 -->
+                <a class="review-card" th:each="c : ${topReviews}" th:href="@{|/cafes/${c.id}/reviews|}">
+                    <!-- 대표 이미지 -->
+                    <div class="review-card__img">
+                        <img th:src="${#strings.isEmpty(c.primaryImageUrl)} ? '/images/DBimg.PNG' : ${c.primaryImageUrl}"
+                             th:alt="|${c.cafeName} 대표 이미지|">
+                    </div>
+
+                    <!-- 카드 본문 -->
+                    <div class="review-card__body">
+                        <!-- 카페명 -->
+                        <h3 class="review-card__title" th:text="${c.cafeName}">카페명</h3>
+
+                        <!-- 별점 평균 + 리뷰 개수 -->
+                        <p class="review-card__rating">
+                            <span class="stars">★</span>
+                            <span class="avg" th:text="${c.avgRating}">평균 별점</span>
+                            <span class="count" th:text="|(${c.reviewsCount}개 리뷰)|">(리뷰 개수)</span>
+                        </p>
+
+                         최신 리뷰
+                        <div class="review-card__snippet">
+                            <strong th:text="${c.latestReviewsAuthor}">작성자</strong>
+                            <span th:text="${c.latestReviewsContent}">리뷰 내용 미리보기</span>
+                        </div>
+
+
+                    </div>
+                </a>
+
+
+
+            </div>
+        </div>
+    </section>
+
+
 </div>
 </html>
 

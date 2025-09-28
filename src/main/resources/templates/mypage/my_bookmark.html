@@ -3,7 +3,7 @@
     <link rel="stylesheet" th:href="@{/css/menubar.css}">
     <link rel="stylesheet" th:href="@{/css/my_bookmark.css}">
 
-    <form th:action="@{/mypage/my/bookmark}" method="post">
+<!--    <form th:action="@{/mypage/my/bookmark}" method="post">-->
 
 
         <div class="main_con">
@@ -22,10 +22,17 @@
                         <!--                <a th:href="@{|/cafe/detail/${bm.cafe.id}|}"-->
                         <a th:href="@{|/cafe/detail/${bm.cafe.id}?from=bookmark|}"
                            th:text="${bm.cafe.name}">카페명</a>
+                        <form th:action="@{/mypage/my/bookmark/remove}" method="post" style="display:inline;">
+                            <input type="hidden" name="cafeId" th:value="${bm.cafe.id}"/>
+                            <button type="submit" class="btn-remove-bookmark">
+                                <i class="fa-solid fa-trash"></i>삭제
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </div>
-    </form>
+<!--    </form>-->
+    <script src="/js/my-bookmark.js" defer></script>
 </div>
 </html>

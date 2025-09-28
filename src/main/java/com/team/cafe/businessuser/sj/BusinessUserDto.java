@@ -19,5 +19,7 @@ public class BusinessUserDto {
     private String representativeName;
     private String representativePhone;
     private String representativeEmail;
-    private String address;
+    private String zipCode;
+    private String streetAdr;
+    private String detailAdr;
 }

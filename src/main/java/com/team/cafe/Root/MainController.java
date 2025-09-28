@@ -29,8 +29,13 @@ public class MainController {
 
     @GetMapping("/main")
     public String mainPage(Model model) {
-        List<Cafe> topCafes = mainService.getTop16ByViews();
 
+        //오늘의 인기순 카페의 랜덤 List
+        List<CafeBannerRow> todayCafe = mainService.getTodayRecommended(50, 5);
+        //인기순 카페 List
+        List<Cafe> topCafes = mainService.getTop16ByViews();
+        //리뷰많은카페 List
+        List<CafeReviewSummary> topReviews = mainService.getTop4ByReviews(4);
         // 이번 페이지의 카페 ID들만 모아서
         List<Long> ids = topCafes.stream()
                 .map(Cafe::getId)
@@ -50,7 +55,8 @@ public class MainController {
         model.addAttribute("topCafes", topCafes);
         model.addAttribute("imageMap", imageMap);
         model.addAttribute("ratingAvgMap", ratingAvgMap);
-
+        model.addAttribute("todayCafe", todayCafe);
+        model.addAttribute("topReviews", topReviews);
         return "mainPage";
     }
 

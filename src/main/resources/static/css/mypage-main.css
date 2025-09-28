@@ -1,10 +1,15 @@
 
 
 
-
+.container {
+    width: 80rem !important;
+    padding: 0 !important;
+}
 .main_con {
 display: flex;
     gap: 20px;
+    margin-bottom: 56px;
+    margin-top: 24px;
 }
 
 
@@ -19,3 +24,4 @@ width: 65%;
   font-size: 24px;
 
 }
+

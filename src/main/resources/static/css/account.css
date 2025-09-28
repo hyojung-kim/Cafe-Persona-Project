@@ -13,6 +13,12 @@
 .info-row span { font-weight: bold; }
 .info-row button { margin-left: 10px; }
 
+.container {
+    width: 80rem !important;
+    margin-top: 24px !important;
+    margin-bottom: 56px !important;
+    padding: 0 !important;
+}
 
 .main_con {
 display: flex;
@@ -116,3 +122,24 @@ display: flex;
   background: #fff; padding: 16px; border-radius: 8px;
 }
 
+.modal button {
+    all: unset;
+    width: 60px;
+    border-radius: 10px;
+    background: var( --cream);
+    border:1px solid rgb(228, 228, 228);
+    text-align: center;
+    margin-right: 16px;
+}
+
+.modal button:hover {
+    border:1px solid rgb(210, 210, 210);
+}
+
+.modal .modal-content h2 {
+    margin-bottom: 16px;
+}
+
+.modal input {
+    margin-bottom: 12px;
+}
