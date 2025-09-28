@@ -263,4 +263,29 @@ public class CafeListController {
                 "bookmarked", likedNow   // 정책상 보장됨(OFF도 유지 정책이면 exists 쿼리로 반환)
         ));
     }
+//    @GetMapping(value = "/like/status/{cafeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    public ResponseEntity<?> checkStatus(@PathVariable Long cafeId, Principal principal) {
+//        if (principal == null) {
+//            // 비로그인 → 기본값: false
+//            return ResponseEntity.ok(Map.of(
+//                    "count", likeService.getLikeCount(cafeId),
+//                    "liked", false,
+//                    "bookmarked", false
+//            ));
+//        }
+//
+//        SiteUser user = userService.getUser(principal.getName());
+//
+//        // 현재 로그인 유저가 북마크했는지 확인
+//        boolean likedNow = likeService.isLikedByUser(cafeId, user.getId());
+//
+//        long count = likeService.getLikeCount(cafeId);
+//
+//        return ResponseEntity.ok(Map.of(
+//                "count", count,
+//                "liked", likedNow,
+//                "bookmarked", likedNow
+//        ));
+//    }
 }

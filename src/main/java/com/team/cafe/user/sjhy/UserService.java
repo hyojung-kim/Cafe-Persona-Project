@@ -45,4 +45,15 @@ public class UserService {
     }
 
 
+    public SiteUser registerOrGetGoogleUser(String googleId, String email, String nickname) {
+        return userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    SiteUser user = new SiteUser();
+                    user.setUsername(googleId);
+                    user.setEmail(email);
+                    user.setNickname(nickname);
+                    user.setPassword(passwordEncoder.encode("GOOGLE_PASSWORD"));
+                    return userRepository.save(user);
+                });
+    }
 }

@@ -49,4 +49,18 @@ $(function () {
       btn.prop('disabled', false);
     });
   });
+
+    // 🔽 북마크 삭제 성공 시 상세페이지 UI를 끄는 함수 추가
+//    window.setBookmarkOff = function () {
+//      countEl.text(String(Number(countEl.text()) - 1)); // 카운트 -1
+//      setLikedUI(false);                               // 버튼 OFF
+//      badgeEl.toggleClass('hidden', true);             // 뱃지 숨김
+//    };
+$(function () {
+  const box = $('#likeBox');
+  if (!box.length) return;
+
+  const liked = box.data('liked') === true || box.data('liked') === 'true';
+  setLikedUI(liked); // ✅ 페이지 로딩할 때 초기화
+});
 });

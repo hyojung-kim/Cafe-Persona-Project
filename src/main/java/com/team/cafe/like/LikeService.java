@@ -55,4 +55,8 @@ public class LikeService {
         if (cafeIds == null || cafeIds.isEmpty()) return List.of();
         return likeRepository.findLikeCountsByCafeIds(cafeIds);
     }
+
+//    public boolean isLikedByUser(Long cafeId, Long userId) {
+//        return likeRepository.existsByCafeIdAndUserId(cafeId, userId);
+//    }
 }

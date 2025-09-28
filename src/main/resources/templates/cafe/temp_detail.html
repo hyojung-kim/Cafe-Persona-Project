@@ -52,6 +52,7 @@
     <div id="likeBox"
          th:data-cafe-id="${cafe.id}"
          th:data-liked="${liked}">
+        <span id="likeCount" th:text="${likeCount}"></span>
         <button id="likeBtn" type="button" aria-label="좋아요 토글">
             <span class="label-liked" th:if="${liked}"><i class="fa-solid fa-bookmark" id="activeBookmark"></i></span>
             <span class="label-unliked" th:if="${!liked}"><i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i></span>
