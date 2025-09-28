@@ -6,9 +6,14 @@ let stayTimer = null;
 let certified = false;
 let cafeMarkerImage;
 let userMarkerImage;
-let loadingOverlay;
+let lastKnownCoords = null;
 
-const DISTANCE_THRESHOLD = 5000; // meters
+const loadingOverlay = document.getElementById('loadingOverlay');
+const cafeLocationElement = document.getElementById('cafeLocation');
+const myLocationElement = document.getElementById('myLocation');
+const distanceInfoElement = document.getElementById('distanceInfo');
+
+const DISTANCE_THRESHOLD = 100; // meters
 const STAY_DURATION = 5000; // milliseconds
 
 function showLoadingOverlay() {
@@ -47,7 +52,10 @@ function initMap() {
                 const pos = new kakao.maps.LatLng(cafeLat, cafeLng);
                 new kakao.maps.Marker({map:map, position:pos, image: cafeMarkerImage});
                 map.setCenter(pos);
-                document.getElementById('cafeLocation').textContent = '카페 위치: ' + cafeAddress;
+                if (cafeLocationElement) {
+                    cafeLocationElement.textContent = '카페 위치: ' + cafeAddress;
+                }
+                evaluateDistanceAndCertification();
             }
         });
     }
@@ -68,35 +76,52 @@ function updateLocation(position) {
     }
     currentMarker = new kakao.maps.Marker({map:map, position:pos, image: userMarkerImage});
 
-    document.getElementById('myLocation').textContent = '내 위치: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
-
-    if (cafeLat && cafeLng) {
-        const dist = calculateDistance(lat, lng, cafeLat, cafeLng);
-        document.getElementById('distanceInfo').textContent = '카페까지 거리: ' + Math.round(dist) + 'm';
-
-        if (!certified) {
-            if (dist <= DISTANCE_THRESHOLD) {
-                showLoadingOverlay();
-                if (!stayTimer) {
-                    stayTimer = setTimeout(() => {
-                        certified = true;
-                        onCertificationSuccess();
-                    }, STAY_DURATION);
-                }
-            } else {
-                hideLoadingOverlay();
-                if (stayTimer) {
-                    clearTimeout(stayTimer);
-                    stayTimer = null;
-                }
-            }
-        }
+    if (myLocationElement) {
+        myLocationElement.textContent = '내 위치: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
     }
+
+    lastKnownCoords = { lat, lng };
+    evaluateDistanceAndCertification();
 }
 
 function handleError(err) {
     console.error(err);
-    document.getElementById('myLocation').textContent = '위치를 가져올 수 없습니다.';
+    if (myLocationElement) {
+        myLocationElement.textContent = '위치를 가져올 수 없습니다.';
+    }
+}
+
+function evaluateDistanceAndCertification() {
+    if (!lastKnownCoords || typeof cafeLat !== 'number' || typeof cafeLng !== 'number') {
+        return;
+    }
+
+    const { lat, lng } = lastKnownCoords;
+    const dist = calculateDistance(lat, lng, cafeLat, cafeLng);
+
+    if (distanceInfoElement) {
+        distanceInfoElement.textContent = '카페까지 거리: ' + Math.round(dist) + 'm';
+    }
+
+    if (certified) {
+        return;
+    }
+
+    if (dist <= DISTANCE_THRESHOLD) {
+        showLoadingOverlay();
+        if (!stayTimer) {
+            stayTimer = setTimeout(() => {
+                certified = true;
+                onCertificationSuccess();
+            }, STAY_DURATION);
+        }
+    } else {
+        hideLoadingOverlay();
+        if (stayTimer) {
+            clearTimeout(stayTimer);
+            stayTimer = null;
+        }
+    }
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -130,7 +155,5 @@ function loadKakao() {
         setTimeout(loadKakao, 50);
     }
 }
-document.addEventListener('DOMContentLoaded', () => {
-    loadingOverlay = document.getElementById('loadingOverlay');
-    loadKakao();
-});
+
+loadKakao();
