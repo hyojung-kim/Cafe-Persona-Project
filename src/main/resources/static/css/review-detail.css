@@ -31,8 +31,52 @@ body {
   color: var(--ink);
 }
 
+.floating-back-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: #6b4a2b;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  z-index: 1040;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-back-btn:hover,
+.floating-back-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
+  outline: none;
+}
+
+.floating-back-btn__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .floating-back-btn {
+    right: 16px;
+    bottom: 16px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .floating-back-btn__icon {
+    font-size: 1.25rem;
+  }
+}
+
 .review-page {
-  padding-bottom: 3rem;
+  padding-bottom: 56px;
 }
 
 .summary-label {

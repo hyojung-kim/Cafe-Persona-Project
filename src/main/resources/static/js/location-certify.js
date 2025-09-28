@@ -6,9 +6,26 @@ let stayTimer = null;
 let certified = false;
 let cafeMarkerImage;
 let userMarkerImage;
+let loadingOverlay;
 
 const DISTANCE_THRESHOLD = 5000; // meters
-const STAY_DURATION = 1000; // milliseconds
+const STAY_DURATION = 5000; // milliseconds
+
+function showLoadingOverlay() {
+    if (!loadingOverlay || loadingOverlay.classList.contains('is-visible')) {
+        return;
+    }
+    loadingOverlay.classList.add('is-visible');
+    loadingOverlay.setAttribute('aria-hidden', 'false');
+}
+
+function hideLoadingOverlay() {
+    if (!loadingOverlay) {
+        return;
+    }
+    loadingOverlay.classList.remove('is-visible');
+    loadingOverlay.setAttribute('aria-hidden', 'true');
+}
 
 function initMap() {
     const mapContainer = document.getElementById('map');
@@ -59,6 +76,7 @@ function updateLocation(position) {
 
         if (!certified) {
             if (dist <= DISTANCE_THRESHOLD) {
+                showLoadingOverlay();
                 if (!stayTimer) {
                     stayTimer = setTimeout(() => {
                         certified = true;
@@ -66,6 +84,7 @@ function updateLocation(position) {
                     }, STAY_DURATION);
                 }
             } else {
+                hideLoadingOverlay();
                 if (stayTimer) {
                     clearTimeout(stayTimer);
                     stayTimer = null;
@@ -93,6 +112,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function onCertificationSuccess() {
+    hideLoadingOverlay();
     alert('위치 인증이 성공했습니다.');
     if (watchId) {
         navigator.geolocation.clearWatch(watchId);
@@ -110,5 +130,7 @@ function loadKakao() {
         setTimeout(loadKakao, 50);
     }
 }
-
-loadKakao();
+document.addEventListener('DOMContentLoaded', () => {
+    loadingOverlay = document.getElementById('loadingOverlay');
+    loadKakao();
+});

@@ -186,7 +186,7 @@
         <input type="hidden" name="sort" th:value="${sort}">
         <input type="text" name="keyword" class="form-control review-search-input" placeholder="키워드로 리뷰를 찾아보세요"
                th:value="${keyword}">
-        <button class="btn btn-outline-secondary btn-sm ms-1 review-search-btn" type="submit">검색</button>
+        <button class="btn btn-outline-secondary btn-sm ms-1 review-search-btn" type="submit">🔍</button>
       </form>
     </div>
   </section>
@@ -316,6 +316,13 @@
   <script th:src="@{/js/review-like.js}" defer></script>
   <script th:src="@{/js/review-list.js}" defer></script>
   <script th:src="@{/js/reviews-section.js}" defer></script>
+
+  <button type="button"
+          class="floating-back-btn"
+          onclick="window.history.back()">
+    <span class="visually-hidden">이전 페이지로 이동</span>
+    <span aria-hidden="true" class="floating-back-btn__icon">&#8592;</span>
+  </button>
 </div>
 
 </html>
