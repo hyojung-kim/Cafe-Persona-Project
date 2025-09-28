@@ -60,7 +60,7 @@ static/
 
 ## 1) 프로젝트 개요
 
-* **제품명(가칭)**: Bean spot Project
+* **제품명**: Bean spot Project
 * **핵심 가치**: 상황·취향 맞춤 카페 탐색(태그 AND 검색), 신뢰 가능한 리뷰·이미지, 북마크/좋아요 저장
 * **플랫폼**: Web(SSR: Thymeleaf)
 * **기술 스택**: Spring Boot, Spring Security, JPA(Hibernate), MariaDB/MySQL, Thymeleaf, jQuery(선택), Bootstrap/Tailwind(선택)
@@ -120,21 +120,21 @@ static/
 
 * 파라미터: `kw, page, size, sort, dir, parking(Boolean), openNow(Boolean), keyList(List<Long>)`
 * 정렬: 최신순(default), 이름순, 인기순
-  
+
 * **영업 중 판정 로직**
 
   * 일반 케이스: `openTime <= closeTime` → `open ≤ now ≤ close`
   * 야간영업(자정 넘김): `openTime > closeTime` → `now ≥ open` OR `now ≤ close`
 * 결과 카드에는: 대표 이미지, 카페명, 주소(도시/구/상세), 영업시간, 평점 평균, 좋아요/북마크 수
   
-* **배치 통계 API**로 카드에 필요한 값 일괄 조회(IDs)
+* **배치 통계 API**로 카드에 필요한 값 일괄 조회(IDs), 쿼리복잡도 줄이고 서버 효율 증가
 
 ### 4.3 카페 상세
 
 * 기본정보 + 소개글 + 위치 + 영업시간 + 태그(칩)
 * 카페 이미지 갤러리(대표/정렬), 좋아요/북마크 토글 상태, 평균 평점/리뷰 수
 * 리뷰 리스트(최근순/평점순), 메뉴 목록
-* 주소기반 위치표시
+* 주소데이터 기반 맵 위치 표시
   
 
 ### 4.4 좋아요 & 북마크
