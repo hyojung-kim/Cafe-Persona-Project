@@ -63,12 +63,12 @@ INSERT INTO keyword (id, name, type_id) VALUES
 
 
 
-
+street_adr
 
 
 테스트 데이터 추가
 
-INSERT INTO cafe (cafe_name, address1, city, district, phone_num, open_time, close_time, parking_yn, hit_count, intro, created_at, updated_at)
+INSERT INTO cafe (cafe_name, street_adr, city, district, phone_num, open_time, close_time, parking_yn, hit_count, intro, created_at, updated_at)
 VALUES
 ('루프탑 클럽 001', '인천 남동구 141길 8', '인천', '남동구', '032-101-1001', '08:00:00', '22:00:00', 0, 129, '밤늦게까지 머물 수 있는 심야 영업과 조용한 대화가 어울리는 공간을(를) 즐길 수 있는 카페', NOW(), NOW()),
 ('빈센트 하우스 002', '대구 수성구 120길 151', '대구', '수성구', '053-102-1002', '09:30:00', '21:30:00', 0, 469, '와이드 좌석과 쾌적한 작업 환경과 비건을 위한 대체 메뉴을(를) 즐길 수 있는 카페', NOW(), NOW()),
