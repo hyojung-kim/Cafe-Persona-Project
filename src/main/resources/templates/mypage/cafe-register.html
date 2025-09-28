@@ -91,16 +91,43 @@
 
                     <!-- 우 -->
                     <div class="col">
+                        <!-- 주소 (우편번호 / 도로명 / 상세) -->
                         <div class="form-group">
-                            <label for="address">사업장 주소 <span class="required">*</span></label>
-                            <input id="address" name="address1" type="text"
-                                   placeholder="예) 서울특별시 강남구 테헤란로..."
-                                   th:value="${form?.address1 != null ? form.address1 : (biz?.address)}"/>
+                            <label for="zipCode">사업장 주소 <span class="required">*</span></label>
 
-                            <input name="address2" type="text" placeholder="상세 주소"
-                                   th:value="${form?.address2}"/>
+                            <div style="display:grid; grid-template-columns:1fr auto; gap:8px;">
+                                <!-- 우편번호 -->
+                                <input id="zipCode"
+                                       name="zipCode"
+                                       type="text"
+                                       placeholder="우편번호"
+                                       readonly
+                                       th:value="${form?.zipCode != null ? form.zipCode : (biz != null ? biz.zipCode : (user?.businessUser != null ? user.businessUser.zipCode : ''))}" />
 
+                                <!-- 검색 버튼 (클릭 시 카카오/다음 주소검색) -->
+                                <button type="button" class="btn btn-outline" id="btn-postcode"
+                                        onclick="openDaumPostcode()">주소 검색</button>
+                            </div>
+
+                            <!-- 도로명 주소 -->
+                            <input id="streetAdr"
+                                   name="streetAdr"
+                                   type="text"
+                                   placeholder="도로명 주소"
+                                   readonly
+                                   style="margin-top:8px;"
+                                   th:value="${form?.streetAdr != null ? form.streetAdr : (biz != null ? biz.streetAdr : (user?.businessUser != null ? user.businessUser.streetAdr : ''))}" />
+
+                            <!-- 상세 주소 (직접 입력) -->
+                            <input id="detailAdr"
+                                   name="detailAdr"
+                                   type="text"
+                                   placeholder="상세 주소 (예: 건물/층/호)"
+                                   style="margin-top:8px;"
+                                   th:value="${form?.detailAdr != null ? form.detailAdr : (biz != null ? biz.detailAdr : (user?.businessUser != null ? user.businessUser.detailAdr : ''))}"
+                                   onclick="guardDetailAdr()" />
                         </div>
+
 
                         <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                             <div>
@@ -207,6 +234,33 @@
 
     <!-- JS -->
     <script th:src="@{/js/cafe-register.js}" defer></script>
+    <!-- 다음(카카오) 우편번호 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <script>
+        function openDaumPostcode() {
+          new daum.Postcode({
+            oncomplete: function(data) {
+              // 우편번호
+              document.getElementById('zipCode').value   = data.zonecode || '';
+              // 도로명 주소 (지번은 필요 시 data.jibunAddress 사용)
+              document.getElementById('streetAdr').value = data.roadAddress || data.address || '';
+              // 상세주소 포커스
+              document.getElementById('detailAdr').focus();
+            }
+          }).open();
+        }
+
+        function guardDetailAdr() {
+          const zip = document.getElementById('zipCode').value.trim();
+          const street = document.getElementById('streetAdr').value.trim();
+          if (!zip && !street) {
+            alert('먼저 "주소 검색" 버튼으로 주소를 선택해 주세요.');
+            document.getElementById('btn-postcode').focus();
+          }
+        }
+    </script>
+
 </div>
 </body>
 </html>

@@ -3,7 +3,6 @@ package com.team.cafe.businessuser.sj.owner.cafe;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalTime;
 
 
@@ -13,8 +12,9 @@ public class CafeRegisterRequest {
     private String name;
     private String phoneNum;
     private String siteUrl;
-    private String address1;
-    private String address2;
+    private String zipCode;
+    private String streetAdr;
+    private String detailAdr;
     private String district;
     private String city;
     private LocalTime openTime;

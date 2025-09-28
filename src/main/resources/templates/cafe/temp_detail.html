@@ -23,7 +23,7 @@
     <p>
         <strong>주소:</strong>
         <span th:text="${cafe.address1}">대전 서구 둔산동 101</span>
-        <span th:if="${cafe.address2}" th:text="| ${cafe.address2}|"></span>
+        <span th:text="|(${cafe.zipCode}) ${cafe.streetAdr} ${cafe.detailAdr}|"></span>
     </p>
 
     <p>

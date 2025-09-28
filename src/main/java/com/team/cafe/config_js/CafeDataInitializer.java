@@ -50,7 +50,7 @@ public class CafeDataInitializer implements CommandLineRunner {
         return Cafe.builder()
                 .googlePlaceId(p.getId())
                 .name(p.getDisplayName() != null ? p.getDisplayName().getText() : null)
-                .address1(p.getFormattedAddress())
+                .streetAdr(p.getFormattedAddress())
                 .build();
     }
 }

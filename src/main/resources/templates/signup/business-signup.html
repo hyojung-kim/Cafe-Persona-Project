@@ -63,14 +63,14 @@
     <!-- 사업자등록번호 -->
     <div class="form-row">
         <label for="businessNumber">사업자등록번호</label>
-        <input type="text" class="form-control" id="businessNumber" name="businessNumber" placeholder="예: 123-45-67890" required>
-        <span class="validation-message text-danger hidden" id="businessNumberError">잘못된 번호 형식</span>
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+            <input type="text" class="form-control" id="businessNumber" name="businessNumber"
+                   placeholder="예: 123-45-67890" required>
+            <input type="button" id="corp_button" value="확 인" onclick="corp_chk();">
+        </div>
+
         <span class="validation-message text-success hidden" id="businessNumberSuccess">확인 완료</span>
     </div>
-
-
-    <input type="text" name="corp_reg" id="corp_reg" value=""/>
-    <input type="button" name="corp_button" id="corp_button" value="확 인" onclick="corp_chk();">
 
     <!-- 대표자명 -->
     <div class="form-row">
@@ -92,18 +92,18 @@
     </div>
 
     <div class="form-row">
-        <label for="adress">우편 번호</label>
+        <label for="zipCode">우편 번호</label>
         <div class="col-sm-6 mb-3 mb-sm-0">
             <input type="text" class="form-control form-control-user"
                    id="zipCode" name="zipCode" placeholder="우편번호 검색" readonly onclick="sample4_execDaumPostcode()">
         </div>
     </div>
     <div class="form-row">
-        <label for="adressStreet">도로명 주소</label>
+        <label for="streetAdr">도로명 주소</label>
         <input type="text" class="form-control form-control-user" id="streetAdr" name="streetAdr" placeholder="도로명 주소" readonly>
     </div>
     <div class="form-row">
-        <label for="addressDetail">상세 주소</label>
+        <label for="detailAdr">상세 주소</label>
         <input type="text" class="form-control form-control-user" id="detailAdr" name="detailAdr" placeholder="예: 건물명, 층수 등" onclick="addrCheck()">
     </div>
 
@@ -130,14 +130,7 @@
     <button type="submit" class="btn btn-primary mt-3">회원가입</button>
 
 
-    <!-- 카카오 로그인 버튼 -->
-    <a class="kakao-login-btn" href="https://kauth.kakao.com/oauth/authorize"
-       th:href="@{https://kauth.kakao.com/oauth/authorize(
-               client_id=${kakaoApiKey},
-               redirect_uri=${redirectUri},
-               response_type='code')}">
-        <img th:src="@{/images/kakao_login_medium_wide.png}" alt="카카오 로그인 버튼">
-    </a>
+
 </form>
 
 <!-- 공통 알림 모달 -->

@@ -170,7 +170,7 @@ public class ReviewController {
         model.addAttribute("kakaoApiKey", kakaoApiKey);
         // location_certify.html expects the address under the name "address1"
         // so expose the cafe's primary address using that key
-        model.addAttribute("address1", cafe.getAddress1());
+        model.addAttribute("address1", cafe.getStreetAdr());
         return "review/location_certify";
     }
 

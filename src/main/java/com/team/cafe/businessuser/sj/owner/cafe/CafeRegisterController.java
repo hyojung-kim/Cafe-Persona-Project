@@ -85,8 +85,9 @@ public class CafeRegisterController {
             cafe.setName(req.getName());
             cafe.setPhoneNum(req.getPhoneNum());
             cafe.setSiteUrl(req.getSiteUrl());
-            cafe.setAddress1(req.getAddress1());
-            cafe.setAddress2(req.getAddress2());
+            cafe.setZipCode(req.getZipCode());
+            cafe.setStreetAdr(req.getStreetAdr());
+            cafe.setDetailAdr(req.getDetailAdr());
             cafe.setDistrict(req.getDistrict());
             cafe.setCity(req.getCity());
             cafe.setOpenTime(req.getOpenTime());
@@ -141,8 +142,9 @@ public class CafeRegisterController {
         form.setName(cafe.getName());
         form.setPhoneNum(cafe.getPhoneNum());
         form.setSiteUrl(cafe.getSiteUrl());
-        form.setAddress1(cafe.getAddress1());
-        form.setAddress2(cafe.getAddress2());
+        form.setZipCode(cafe.getZipCode());
+        form.setStreetAdr(cafe.getStreetAdr());
+        form.setDetailAdr(cafe.getDetailAdr());
         form.setDistrict(cafe.getDistrict());
         form.setCity(cafe.getCity());
         form.setOpenTime(cafe.getOpenTime());
@@ -180,8 +182,9 @@ public class CafeRegisterController {
             cafe.setName(req.getName());
             cafe.setPhoneNum(req.getPhoneNum());
             cafe.setSiteUrl(req.getSiteUrl());
-            cafe.setAddress1(req.getAddress1());
-            cafe.setAddress2(req.getAddress2());
+            cafe.setZipCode(req.getZipCode());
+            cafe.setStreetAdr(req.getStreetAdr());
+            cafe.setDetailAdr(req.getDetailAdr());
             cafe.setDistrict(req.getDistrict());
             cafe.setCity(req.getCity());
             cafe.setOpenTime(req.getOpenTime());
