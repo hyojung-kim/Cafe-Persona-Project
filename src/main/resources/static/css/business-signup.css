@@ -3,7 +3,15 @@
     padding: 0;
     margin-top: 24px;
     margin-bottom: 56px;
+    font-family: 'Noto Sans KR';
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
+h2 {
+    letter-spacing: 0.4em;
+}
+
         .form-row {
             display: flex;
             align-items: center;
@@ -24,3 +32,7 @@
         .text-danger { color: #dc3545; }
         .text-success { color: #28a745; }
         .hidden { display: none; }
+
+.phonenum .form-control {
+    width: 150px !important;
+}

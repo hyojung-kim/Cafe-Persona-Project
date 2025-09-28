@@ -42,7 +42,9 @@ public class BusinessUserService {
         businessUser.setRepresentativeName(dto.getRepresentativeName());
         businessUser.setRepresentativePhone(dto.getRepresentativePhone());
         businessUser.setRepresentativeEmail(dto.getRepresentativeEmail());
-        businessUser.setAddress(dto.getAddress());
+        businessUser.setZipCode(dto.getZipCode());
+        businessUser.setStreetAdr(dto.getStreetAdr());
+        businessUser.setDetailAdr(dto.getDetailAdr());
         businessUser.setStatus("pending");
 
         return businessUserRepository.save(businessUser);

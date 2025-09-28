@@ -124,8 +124,8 @@
 
 
             <td>
-                <span th:text="${cafeList.address1}">주소1</span>
-                <span th:if="${cafeList.address2 != null and !#strings.isEmpty(cafeList.address2)}"
+                <span th:text="${cafeList.streetAdr}">주소1</span>
+                <span th:if="${cafeList.zipCode != null and !#strings.isEmpty(cafeList.zipCode)}"
                       th:text="' ' + ${cafeList.address2}"></span>
             </td>
 

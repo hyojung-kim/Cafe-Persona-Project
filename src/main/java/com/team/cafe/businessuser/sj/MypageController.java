@@ -23,9 +23,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -256,37 +258,51 @@ public class MypageController {
         return "mypage/account";
     }
 
+
+
     @GetMapping("/mypage/verify_password")
     public String verifyPasswordPage(@RequestParam(value = "continue", required = false) String cont,
-                                     @RequestParam(value = "error", required = false) String error,
+                                     @RequestParam(value = "error", required = false) String errorParam,
                                      HttpServletRequest request,
                                      HttpServletResponse response,
                                      Model model) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
+
+        // 1) 이 페이지에서만큼은 전/타 흐름의 잔여 인증 예외 및 범용 error 키 무시
         HttpSession session = request.getSession(false);
-        if (session != null) session.removeAttribute(REAUTH_TOKEN_KEY);
+        if (session != null) {
+            session.removeAttribute(REAUTH_TOKEN_KEY);
+            session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION); // SPRING_SECURITY_LAST_EXCEPTION 제거
+        }
+        // (레이아웃/인터셉터 등이 model에 얹어놓은 범용 error 키 무력화)
+        model.addAttribute("error", null);
 
         setNoCache(response);
         model.addAttribute("continueUrl", cont);
 
-        if (error != null) {
-            model.addAttribute("error", "비밀번호가 올바르지 않습니다.");
+        // 2) 비번 검증 실패 상황에서만 전용 키로 메시지 세팅
+        if (errorParam != null) {
+            model.addAttribute("verifyPwError", "비밀번호가 올바르지 않습니다.");
         }
 
         return "mypage/verify_password";
     }
 
+
     @PostMapping("/mypage/verify_password")
     public String verifyPassword(@RequestParam String password,
                                  @RequestParam(value = "continue", required = false) String cont,
-                                 HttpServletRequest request) {
+                                 HttpServletRequest request,
+                                 RedirectAttributes ra) {
         SiteUser user = currentUserOrNull();
         if (user == null) return "redirect:/user/login";
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            String encoded = cont != null ? URLEncoder.encode(cont, StandardCharsets.UTF_8) : "";
-            return "redirect:/mypage/verify_password?error=1" + (encoded.isEmpty() ? "" : "&continue=" + encoded);
+            // 전용 키만 사용
+            ra.addFlashAttribute("verifyPwError", "비밀번호가 올바르지 않습니다.");
+            if (cont != null) ra.addFlashAttribute("continueUrl", cont);
+            return "redirect:/mypage/verify_password";
         }
 
         String base = (cont != null && isSafeInternalPath(cont)) ? cont : "/mypage/account";
@@ -299,6 +315,7 @@ public class MypageController {
         String sep = (baseNoReauth.contains("?")) ? "&" : "?";
         return "redirect:" + baseNoReauth + sep + "reauth=" + URLEncoder.encode(nonce, StandardCharsets.UTF_8);
     }
+
 
     @PostMapping("/mypage/account/update")
     @Transactional
