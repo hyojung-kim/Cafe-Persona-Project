@@ -65,7 +65,14 @@
                 <div class="info-grid__row">
                     <div class="title-2">주소</div>
                     <span class="info-grid__value">
-    <span class="link" th:text="|(${cafe.zipCode}) ${cafe.streetAdr} ${cafe.detailAdr}|"></span>
+                        <span class="link"
+                              th:if="${cafe.streetAdr != null}"
+                              th:text="|(${cafe.zipCode}) ${cafe.streetAdr} ${cafe.detailAdr}|"></span>
+
+                        <!-- 새 주소가 없으면 기존 address 출력 -->
+                        <span class="link"
+                              th:unless="${cafe.streetAdr != null}"
+                              th:text="${cafe.address1}"></span>
                     </span>
                 </div>
                 <div class="chips">
@@ -170,7 +177,8 @@
     <div style="margin-top:8px; " >
         <h2 th:text="|${cafe.name} 위치|" style="" class="map-title">카페 위치</h2>
         <div style="margin-bottom:10px; display:flex; gap:8px">
-            <input id="address-input" type="text" th:value="${cafe.streetAdr}"
+            <input id="address-input" type="text"
+                   th:value="${!#strings.isEmpty(cafe.address1) ? cafe.address1 : cafe.streetAdr}"
                    style="flex:1; padding:8px; border:1px solid var(--line); border-radius:4px"
                    placeholder="주소 검색" />
             <button id="search-btn" type="button" class="btn">검색</button>
