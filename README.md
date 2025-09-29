@@ -289,7 +289,8 @@ ex) 3개의 키워드 선택
 
 <img width="700" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270 (1)" src="https://github.com/user-attachments/assets/6d4b049e-50c3-474a-b829-93be580108eb" />
 
-<img width="700" height="auto" alt="localhost_8080_mypage_cafe_edit_270" src="https://github.com/user-attachments/assets/7b7067ad-2474-4924-82a8-13781c4207ec" />
+<img width="700" height="auto" alt="localhost_8080_mypage_cafe_edit_270 (1)" src="https://github.com/user-attachments/assets/2e5e25be-dbed-4f2a-be82-57fef6954543" />
+
 
 
 
