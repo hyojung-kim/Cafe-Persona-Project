@@ -250,7 +250,7 @@ ex) 3개의 키워드 선택
 
 ### 1.메인페이지
 
-<img width="1200" height="auto" alt="localhost_8080_main (8)" src="https://github.com/user-attachments/assets/29f06268-9d4e-48e6-be4e-18f59c6500b2" />
+<img width="700" height="auto" alt="localhost_8080_main (8)" src="https://github.com/user-attachments/assets/29f06268-9d4e-48e6-be4e-18f59c6500b2" />
 
 
 - 배너 : 오늘 날짜기준 인기순 카페 바로가기
@@ -260,7 +260,7 @@ ex) 3개의 키워드 선택
 <br><br>
 ### 2.목록페이지
 
-<img width="1200" height="auto" alt="localhost_8080_cafe_list_" src="https://github.com/user-attachments/assets/f9ae9574-8887-428c-94fd-3e8668fd04f7" />
+<img width="700" height="auto" alt="localhost_8080_cafe_list_" src="https://github.com/user-attachments/assets/f9ae9574-8887-428c-94fd-3e8668fd04f7" />
 
 - 상단 필터 목록 : 4가지 타입으로 분류된 테마별 키워드 태그
 - 하단 필터 : 주차여부, 영업여부, 인기순 , 등록순, 이름순 등의 필터
@@ -269,7 +269,7 @@ ex) 3개의 키워드 선택
 <br><br>
 ### 3. 상세페이지
 
-<img width="1200" height="auto" alt="localhost_8080_cafe_detail_149" src="https://github.com/user-attachments/assets/e71b2654-39dc-4bc4-bb50-baef38732c04" />
+<img width="700" height="auto" alt="localhost_8080_cafe_detail_149" src="https://github.com/user-attachments/assets/e71b2654-39dc-4bc4-bb50-baef38732c04" />
 
 - 상단 카페소개 : 카페명, 평균별점, 리뷰 갯수, 조회수, 주소, 카페 핵심키워드태그, 소개문구, 영업시간, 번호, 편의시설, 웹사이트, 메뉴목록
 - 카페 지도위치 : 등록된 주소 기준 지도 표시
@@ -280,16 +280,16 @@ ex) 3개의 키워드 선택
 
 ### 3. 로그인
 
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/e667354c-99dd-4051-86c8-cf054573b287" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/e667354c-99dd-4051-86c8-cf054573b287" />
 1유저로그인
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/87c6b2c1-a575-44af-b7dd-a2d668ea72c2" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/87c6b2c1-a575-44af-b7dd-a2d668ea72c2" />
 2사업자로그인
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/a63c8b54-d334-4371-baa8-3884371b0216" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/a63c8b54-d334-4371-baa8-3884371b0216" />
 3아이디찾기
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/244f1bfd-b9d1-4701-8dec-aa6f1125d441" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/244f1bfd-b9d1-4701-8dec-aa6f1125d441" />
 4비밀번호찾기
 <br><br>
 
@@ -298,41 +298,41 @@ ex) 3개의 키워드 선택
 
 
 
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/c3092b52-1f4c-4a1a-ae32-41990779aa76" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/c3092b52-1f4c-4a1a-ae32-41990779aa76" />
 5회원가입
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/26363d28-a553-45fa-b6e5-b415535bd18c" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/26363d28-a553-45fa-b6e5-b415535bd18c" />
 6사업자회원가입
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/416c606c-eb72-4432-9b07-990a5eafae15" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/416c606c-eb72-4432-9b07-990a5eafae15" />
 7내 북마크 목록
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/79fbb030-5fb0-49bb-865b-63df64dfb695" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/79fbb030-5fb0-49bb-865b-63df64dfb695" />
 8내정보수정
 <br><br>
-<img width="1200" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270 reauth=facbb740-a064-472b-bbe2-a8e6d067a2cd" src="https://github.com/user-attachments/assets/72d40c4d-ba9e-4f90-ac59-ade23896f40d" />
+<img width="700" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270 reauth=facbb740-a064-472b-bbe2-a8e6d067a2cd" src="https://github.com/user-attachments/assets/72d40c4d-ba9e-4f90-ac59-ade23896f40d" />
 9사업장관리
 <br><br>
-<img width="1200" height="auto" alt="사업장수정" src="https://github.com/user-attachments/assets/9b45c0d8-1f1f-43d0-b0cc-04cd5279cb26" />
+<img width="700" height="auto" alt="사업장수정" src="https://github.com/user-attachments/assets/9b45c0d8-1f1f-43d0-b0cc-04cd5279cb26" />
 10 사업장 수정
 <br><br>
 
 ---
 
 
-<img width="1200" height="auto" alt="리뷰" src="https://github.com/user-attachments/assets/0cb7582a-5712-4c99-bea4-d931d51c2e56" />
+<img width="700" height="auto" alt="리뷰" src="https://github.com/user-attachments/assets/0cb7582a-5712-4c99-bea4-d931d51c2e56" />
 11리뷰목록
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/f069418d-2d6e-4be6-942f-01a6b64b6614" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/f069418d-2d6e-4be6-942f-01a6b64b6614" />
 12위치인증
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/0ff143fb-4285-4d9d-aa2b-5dfca9c7cda4" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/0ff143fb-4285-4d9d-aa2b-5dfca9c7cda4" />
 13리뷰작성
 <br><br>
-<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/9f089593-2094-41c3-90c0-e26a42347450" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/9f089593-2094-41c3-90c0-e26a42347450" />
 14리뷰 상세
 <br><br>
-<img width="1200" height="auto" alt="localhost_8080_reviews_4003_edit" src="https://github.com/user-attachments/assets/6b76cfb2-9d6f-489b-803b-7352318241ed" />
+<img width="700" height="auto" alt="localhost_8080_reviews_4003_edit" src="https://github.com/user-attachments/assets/6b76cfb2-9d6f-489b-803b-7352318241ed" />
 15리뷰수정
 <br><br>
 
