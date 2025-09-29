@@ -34,48 +34,70 @@
     <!-- 아이디 -->
     <div class="form-row">
         <label for="username">아이디</label>
-        <input type="text" class="form-control" id="username" name="username" required>
-        <span class="validation-message text-danger hidden" id="usernameError">이미 사용 중</span>
-        <span class="validation-message text-success hidden" id="usernameSuccess">사용 가능</span>
+        <div class="field">
+            <input type="text" class="form-control" id="username" name="username" required>
+            <div class="msg-slot">
+                <span class="validation-message text-danger hidden" id="usernameError">이미 사용 중</span>
+                <span class="validation-message text-success hidden" id="usernameSuccess">사용 가능</span>
+            </div>
+        </div>
     </div>
 
     <!-- 이메일 -->
     <div class="form-row">
         <label for="email">이메일</label>
-        <input type="email" class="form-control" id="email" name="email" required>
-        <span class="validation-message text-danger hidden" id="emailError">이미 사용 중</span>
-        <span class="validation-message text-success hidden" id="emailSuccess">사용 가능</span>
+        <div class="field">
+            <input type="email" class="form-control" id="email" name="email" required>
+            <div class="msg-slot">
+                <span class="validation-message text-danger hidden" id="emailError">이미 사용 중</span>
+                <span class="validation-message text-success hidden" id="emailSuccess">사용 가능</span>
+            </div>
+        </div>
     </div>
+
 
     <!-- 닉네임 -->
     <div class="form-row">
         <label for="nickname">닉네임</label>
-        <input type="text" class="form-control" id="nickname" name="nickname" required>
-        <span class="validation-message text-danger" id="nicknameMessage">2~10자, 특수문자 제외</span>
+        <div class="field">
+            <input type="text" class="form-control" id="nickname" name="nickname" required>
+            <div class="msg-slot">
+                <span class="validation-message text-danger" id="nicknameMessage">2~10자, 특수문자 제외</span>
+            </div>
+        </div>
     </div>
 
-    <!-- 사업자명 -->
+    <!-- 상호명 -->
     <div class="form-row">
         <label for="companyName">상호명</label>
-        <input type="text" class="form-control" id="companyName" name="companyName" required>
+        <div class="field">
+            <input type="text" class="form-control" id="companyName" name="companyName" required>
+            <div class="msg-slot"></div>
+        </div>
     </div>
 
     <!-- 사업자등록번호 -->
     <div class="form-row">
         <label for="businessNumber">사업자등록번호</label>
-        <div style="display:flex; gap:8px; align-items:flex-start;">
-            <input type="text" class="form-control" id="businessNumber" name="businessNumber"
-                   placeholder="예: 123-45-67890" required>
-            <input type="button" id="corp_button" value="확 인" onclick="corp_chk();">
+        <div class="field">
+            <div class="bn-inline">
+                <input type="text" class="form-control" id="businessNumber" name="businessNumber"
+                       placeholder="예: 123-45-67890" required>
+                <input type="button" id="corp_button" value="확 인" onclick="corp_chk();">
+            </div>
+            <div class="msg-slot">
+                <span class="validation-message text-success hidden" id="businessNumberSuccess">확인 완료</span>
+            </div>
         </div>
-
-        <span class="validation-message text-success hidden" id="businessNumberSuccess">확인 완료</span>
     </div>
 
     <!-- 대표자명 -->
     <div class="form-row">
         <label for="representativeName">대표자명</label>
-        <input type="text" class="form-control" id="representativeName" name="representativeName" required>
+        <div class="field">
+            <input type="text" class="form-control" id="representativeName" name="representativeName" required>
+            <div class="msg-slot"></div>
+        </div>
     </div>
 
     <!-- 실제 서버에 전송할 hidden input -->
@@ -84,27 +106,46 @@
     <!-- 휴대폰 번호 -->
     <div class="form-row phonenum">
         <label for="phone1">휴대폰 번호</label>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="phone1" name="phone1" maxlength="3" pattern="\d{3}" required placeholder="010" class="form-control">
-            <input type="text" id="phone2" name="phone2" maxlength="4" pattern="\d{4}" required placeholder="1234" class="form-control">
-            <input type="text" id="phone3" name="phone3" maxlength="4" pattern="\d{4}" required placeholder="5678" class="form-control">
+        <div class="field">
+            <div class="phone-inline" style="display: flex; gap: 2.5px;">
+                <input type="text" id="phone1" name="phone1" maxlength="3" pattern="\d{3}" required placeholder="010" class="form-control">
+                <span class="sep"></span>
+                <input type="text" id="phone2" name="phone2" maxlength="4" pattern="\d{4}" required placeholder="1234" class="form-control">
+                <span class="sep"></span>
+                <input type="text" id="phone3" name="phone3" maxlength="4" pattern="\d{4}" required placeholder="5678" class="form-control">
+            </div>
+            <div class="msg-slot"></div> <!-- 메시지는 지금 없지만 자리 예약 -->
         </div>
     </div>
 
+
+    <!-- 우편 번호 -->
     <div class="form-row">
         <label for="zipCode">우편 번호</label>
-        <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="field">
             <input type="text" class="form-control form-control-user"
-                   id="zipCode" name="zipCode" placeholder="우편번호 검색" readonly onclick="sample4_execDaumPostcode()">
+                   id="zipCode" name="zipCode" placeholder="우편번호 검색"
+                   readonly onclick="sample4_execDaumPostcode()">
+            <div class="msg-slot"></div>
         </div>
     </div>
+
+    <!-- 도로명 주소 -->
     <div class="form-row">
         <label for="streetAdr">도로명 주소</label>
-        <input type="text" class="form-control form-control-user" id="streetAdr" name="streetAdr" placeholder="도로명 주소" readonly>
+        <div class="field">
+            <input type="text" class="form-control form-control-user" id="streetAdr" name="streetAdr" placeholder="도로명 주소" readonly>
+            <div class="msg-slot"></div>
+        </div>
     </div>
+
+    <!-- 상세 주소 -->
     <div class="form-row">
         <label for="detailAdr">상세 주소</label>
-        <input type="text" class="form-control form-control-user" id="detailAdr" name="detailAdr" placeholder="예: 건물명, 층수 등" onclick="addrCheck()">
+        <div class="field">
+            <input type="text" class="form-control form-control-user" id="detailAdr" name="detailAdr" placeholder="예: 건물명, 층수 등" onclick="addrCheck()">
+            <div class="msg-slot"></div>
+        </div>
     </div>
 
 
@@ -116,18 +157,29 @@
     <!-- 비밀번호 -->
     <div class="form-row">
         <label for="password">비밀번호</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-        <span class="validation-message text-danger" id="passwordError">8자 이상, 특수문자 포함</span>
+        <div class="field">
+            <input type="password" class="form-control" id="password" name="password" required>
+            <div class="msg-slot">
+                <span class="validation-message text-danger" id="passwordError">8자 이상, 특수문자 포함</span>
+            </div>
+        </div>
     </div>
 
     <!-- 비밀번호 확인 -->
     <div class="form-row">
         <label for="passwordConfirm">비밀번호 확인</label>
-        <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" required>
-        <span class="validation-message text-danger hidden" id="passwordConfirmError">비밀번호 불일치</span>
+        <div class="field">
+            <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" required>
+            <div class="msg-slot">
+                <span class="validation-message text-danger hidden" id="passwordConfirmError">비밀번호 불일치</span>
+            </div>
+        </div>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">회원가입</button>
+    <div class="form-row button-row">
+        <button type="submit" class="btn btn-primary mt-3">회원가입</button>
+    </div>
+
 
 
 
