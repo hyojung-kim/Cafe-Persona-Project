@@ -1,3 +1,5 @@
+# 카페 프로젝트 ERD
+
 <img width="1239" height="795" alt="전체 ERD" src="https://github.com/user-attachments/assets/0c0b4557-b17d-4e00-8b45-2a2e651ff067" />
 
 
@@ -243,3 +245,9 @@ ex) 3개의 키워드 선택
 * [ ] 대표 이미지를 변경하면 기존 대표는 자동 해제된다
 
 ---
+
+#페이지 소개
+
+### 메인페이지
+<img width="1075" height="2784" alt="localhost_8080_main" src="https://github.com/user-attachments/assets/1862d1e3-4a18-4e1d-92f7-52853bc7f6ee" />
+
