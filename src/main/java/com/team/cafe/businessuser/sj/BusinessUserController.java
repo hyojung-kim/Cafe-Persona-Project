@@ -53,7 +53,7 @@ public class BusinessUserController {
         try {
             businessUserService.register(form);
             ra.addAttribute("success", 1);
-            return "redirect:/user/login";
+            return "redirect:/business/login";
         } catch (DuplicateBusinessNumberException e) {
             ra.addAttribute("error", "businessNumberExists");
         } catch (DuplicateUsernameException e) {

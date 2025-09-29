@@ -1,0 +1,69 @@
+// /static/js/cafe-like.js
+
+console.log("✅ cafe-like-2.js 로드됨");
+
+$(function () {
+  const box = $('#likeBox');
+  if (!box.length) return;
+
+  const cafeId  = box.data('cafe-id');
+  const btn     = $('#likeBtn');
+  const countEl = $('#likeCount');
+  const badgeEl = $('#bookmark-badge'); // 있으면 토글, 없으면 무시
+
+  // CSRF (Thymeleaf 메타태그 사용 시)
+  const csrfToken  = $('meta[name="_csrf"]').attr('content');
+  const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+  function setLikedUI(liked) {
+    box.attr('data-liked', liked ? 'true' : 'false');
+    btn.html(
+      liked
+        ? '<i class="fa-solid fa-bookmark" id="activeBookmark"></i>'
+        : '<i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i>'
+    );
+  }
+
+  // ✅ 상세페이지에서 북마크 삭제를 반영할 수 있는 전역 함수
+  window.setBookmarkOff = function () {
+    const current = Number(countEl.text());
+    if (current > 0) {
+      countEl.text(String(current - 1)); // 카운트 -1
+    }
+    setLikedUI(false);                   // 버튼 OFF
+    badgeEl.toggleClass('hidden', true); // 뱃지 숨김
+  };
+
+  btn.on('click', function () {
+    btn.prop('disabled', true);
+
+    $.ajax({
+      url: "/cafe/like/" + cafeId,
+      type: "POST",          // 상태 변경 → POST
+      dataType: "json",      // 응답을 JSON으로 받음 {count, liked}
+      headers: csrfToken && csrfHeader ? { [csrfHeader]: csrfToken } : {},
+      cache: false
+    })
+    .done(function (res) {
+      console.log("JSON 응답", res);
+      countEl.text(String(res.count));
+      setLikedUI(!!res.liked);
+      badgeEl.toggleClass('hidden', !res.bookmarked);
+    })
+    .fail(function (xhr) {
+      if (xhr.status === 401 || xhr.status === 403) {
+        window.location.href = '/user/login';
+      } else {
+        console.error('좋아요 오류:', xhr.status, xhr.responseText);
+        alert('좋아요 처리 중 오류가 발생했어요.');
+      }
+    })
+    .always(function () {
+      btn.prop('disabled', false);
+    });
+  });
+
+  // ✅ 페이지 로딩할 때 초기화
+  const liked = box.data('liked') === true || box.data('liked') === 'true';
+  setLikedUI(liked);
+});

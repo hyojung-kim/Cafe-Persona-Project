@@ -56,7 +56,6 @@
         <button id="likeBtn" type="button" aria-label="좋아요 토글">
             <span class="label-liked" th:if="${liked}"><i class="fa-solid fa-bookmark" id="activeBookmark"></i></span>
             <span class="label-unliked" th:if="${!liked}"><i class="fa-regular fa-bookmark" id="disableBookmarkIcon"></i></span>
-
         </button>
         <span style="margin-left:8px;">
             북마크 저장 : <b id="likeCount" th:text="${likeCount}">0</b>
