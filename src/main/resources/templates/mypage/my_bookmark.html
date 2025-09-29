@@ -12,22 +12,29 @@
 
             <div class="bookmark_card">
                 <h3 class="bookmark_h3">내 북마크</h3>
-                <div th:if="${#lists.isEmpty(bookmark)}" >
-                    아직 북마크한 카페가 없습니다.
+<!--                <div th:if="${#lists.isEmpty(bookmark)}" id="empty-bookmark-message" >-->
+<!--                    아직 북마크한 카페가 없습니다.-->
+<!--                </div>-->
+                <div id="empty-bookmark-message"
+                     th:classappend="${!#lists.isEmpty(bookmark) ? 'd-none' : ''}"> 아직 북마크한 카페가 없습니다.
                 </div>
 
-                <ul th:if="${!#lists.isEmpty(bookmark)}">
-                    <li th:each="bm : ${bookmark}">
+                <ul th:if="${!#lists.isEmpty(bookmark)}" id="bookmark-list">
+                    <li th:each="bm : ${bookmark}" >
                         <!--                   ?from=bookmark-->
                         <!--                <a th:href="@{|/cafe/detail/${bm.cafe.id}|}"-->
                         <a th:href="@{|/cafe/detail/${bm.cafe.id}?from=bookmark|}"
                            th:text="${bm.cafe.name}">카페명</a>
-                        <form th:action="@{/mypage/my/bookmark/remove}" method="post" style="display:inline;">
-                            <input type="hidden" name="cafeId" th:value="${bm.cafe.id}"/>
-                            <button type="submit" class="btn-remove-bookmark">
-                                <i class="fa-solid fa-trash"></i>삭제
-                            </button>
-                        </form>
+<!--                        <form th:action="@{/mypage/my/bookmark/remove}" method="post" style="display:inline;">-->
+<!--                            <input type="hidden" name="cafeId" th:value="${bm.cafe.id}"/>-->
+<!--                            <button type="submit" class="btn-remove-bookmark">-->
+<!--                                <i class="fa-solid fa-trash"></i>삭제-->
+<!--                            </button>-->
+<!--                        </form>-->
+                        <button type="button" class="btn-remove-bookmark"
+                                th:data-cafe-id="${bm.cafe.id}">
+                            <i class="fa-solid fa-trash"></i>삭제
+                        </button>
                     </li>
                 </ul>
             </div>

@@ -1,17 +1,22 @@
 package com.team.cafe.bookmark;
 
+import com.team.cafe.like.LikeService;
 import com.team.cafe.user.sjhy.SiteUser;
 import com.team.cafe.user.sjhy.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -20,6 +25,7 @@ public class BookmarkController {
 
     private final BookmarkService bookmarkService;
     private final UserRepository userRepository;
+    private final LikeService likeService;
 
     @GetMapping("/mypage/my/bookmark")
     public String showMyBookmark(Model model, Principal principal) {
@@ -44,13 +50,33 @@ public class BookmarkController {
     }
 
     // hy추가
+//    @PostMapping("/mypage/my/bookmark/remove")
+//    public String removeBookmark(@RequestParam Long cafeId, Principal principal) {
+//        SiteUser user = userRepository.findByUsername(principal.getName())
+//                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+//        bookmarkService.remove(cafeId, user.getId());
+//
+//        // 삭제 후 다시 북마크 목록 페이지로 리다이렉트
+//        return "redirect:/mypage/my/bookmark";
+//    }
     @PostMapping("/mypage/my/bookmark/remove")
-    public String removeBookmark(@RequestParam Long cafeId, Principal principal) {
+    @ResponseBody // JSON 응답을 위해 추가
+    public ResponseEntity<?> removeBookmark(@RequestParam Long cafeId, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         SiteUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+
         bookmarkService.remove(cafeId, user.getId());
 
-        // 삭제 후 다시 북마크 목록 페이지로 리다이렉트
-        return "redirect:/mypage/my/bookmark";
+        long newLikeCount = likeService.getLikeCount(cafeId);
+
+        // 삭제 후 성공 응답 (JSON)
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "cafeId", cafeId,
+                "count", newLikeCount));
     }
 }
