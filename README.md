@@ -272,4 +272,22 @@ ex) 3개의 키워드 선택
 - 카페 지도위치 : 등록된 주소 기준 지도 표시
 - 하단 리뷰 목록 : 리뷰 목록 4개 , 최신순 인기순 정렬 선택, 리뷰페이지로 이동
 
+### 3. 로그인
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/d3b064df-fd21-4b61-ac6b-cfe46eba2822" />
+
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/8be6bfb4-c83d-4e82-956e-a7eb26a942f2" />
+
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/a7a790e8-cd3d-4a38-b225-e16d4e471cd1" />
+
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/812d9a8d-9bdd-48e5-bcaa-9dc7a5138893" />
+
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/4b1ebe0b-05aa-4da8-9fa0-72c3b8b695f2" />
+
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/ed25bc88-c81c-452f-b7d1-8738e74fc437" />
+
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/05f741c6-1918-4e73-8131-c8837e728df5" />
+
+<img width="1330" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270" src="https://github.com/user-attachments/assets/8a6b2c00-f681-47e8-8815-6aa336d1306b" />
+
+
 ---
