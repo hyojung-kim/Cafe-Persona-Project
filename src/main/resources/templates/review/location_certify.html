@@ -235,6 +235,15 @@
             animation: barMove 3.6s ease-in-out infinite;
         }
 
+        .loading-overlay[data-state="error"] {
+            --accent: #d45d4c;
+            --accent-2: #e28743;
+        }
+
+        .loading-overlay[data-state="error"] .progress {
+            display: none;
+        }
+
         @keyframes barMove {
             0% {
                 width: 0%;
@@ -259,7 +268,7 @@
     </style>
 </th:block>
 
-<div layout:fragment="content" class="container mt-4">
+<div layout:fragment="content" class="container mt-4" id="locationContent">
     <h2 class="h5 mb-3" th:text="|${cafe.name} 위치 인증|">위치 인증</h2>
     <div id="map" style="width:100%;height:70vh;"></div>
     <div class="mt-2 text-muted small">
@@ -276,6 +285,7 @@
     </button>
 </div>
 
+<!--로딩화면-->
 <div id="loadingOverlay" class="loading-overlay" role="status" aria-live="polite" aria-hidden="true">
     <div class="card">
         <div class="svg-wrap" aria-hidden="true">
@@ -321,8 +331,8 @@
             </svg>
         </div>
 
-        <h1>핸드드립 중…</h1>
-        <p>따끈한 화면을 내리는 중이에요 ☕️</p>
+        <h1 id="loadingOverlayTitle">핸드드립 중…</h1>
+        <p id="loadingOverlayMessage">따끈한 화면을 내리는 중이에요 ☕️</p>
 
         <div class="progress" aria-hidden="true"><div class="bar"></div></div>
     </div>
