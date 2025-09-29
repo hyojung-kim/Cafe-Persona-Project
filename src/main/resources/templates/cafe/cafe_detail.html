@@ -64,15 +64,10 @@
                 </div>
                 <div class="info-grid__row">
                     <div class="title-2">주소</div>
-                    <span class="info-grid__value">
-                        <span class="link"
-                              th:if="${cafe.streetAdr != null}"
-                              th:text="|(${cafe.zipCode}) ${cafe.streetAdr} ${cafe.detailAdr}|"></span>
-
-                        <!-- 새 주소가 없으면 기존 address 출력 -->
-                        <span class="link"
-                              th:unless="${cafe.streetAdr != null}"
-                              th:text="${cafe.address1}"></span>
+                    <span class="link"
+                          th:text="${#strings.isEmpty(cafe.zipCode)
+                            ? ( (cafe.streetAdr?:'') + ' ' + (cafe.detailAdr?:'') )
+                            : '(' + cafe.zipCode + ') ' + (cafe.streetAdr?:'') + ' ' + (cafe.detailAdr?:'') }">
                     </span>
                 </div>
                 <div class="chips">

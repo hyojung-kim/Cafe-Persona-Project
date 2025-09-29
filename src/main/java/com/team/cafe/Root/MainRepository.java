@@ -37,14 +37,21 @@ public interface MainRepository extends JpaRepository<Cafe, Long> {
           GROUP BY r.cafe_id
         ),
         latest_reviews AS (
-          SELECT cafe_id, created_by, content
-          FROM (
-            SELECT r.*,
-                   ROW_NUMBER() OVER (PARTITION BY r.cafe_id ORDER BY r.created_at DESC) AS rn
-            FROM reviews r
-            WHERE r.is_active = 1
-          ) x
-          WHERE x.rn = 1
+          SELECT      r.cafe_id,
+                      u.nickname,
+                      r.content
+              FROM (
+                  SELECT  id, cafe_id, user_id, content, created_at,
+                          ROW_NUMBER() OVER (
+                              PARTITION BY cafe_id
+                              ORDER BY created_at DESC, id DESC
+                          ) AS rn
+                  FROM reviews
+                  WHERE is_active = 1
+              ) AS r
+              JOIN site_user AS u
+                ON u.user_id = r.user_id
+              WHERE r.rn = 1
         ),
         primary_img AS (
           SELECT cafe_id, img_url
@@ -61,7 +68,7 @@ public interface MainRepository extends JpaRepository<Cafe, Long> {
           COALESCE(rs.avg_rating, 0.0) AS avgRating,
           COALESCE(rs.reviews_count, 0) AS reviewsCount,
           pi.img_url                   AS primaryImageUrl,
-          lr.created_by                AS latestReviewsAuthor,
+          lr.nickname                AS latestReviewsAuthor,
           lr.content                   AS latestReviewsContent
         FROM cafe c
         LEFT JOIN r_stats       rs ON rs.cafe_id = c.cafe_id
