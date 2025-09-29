@@ -5,7 +5,29 @@
 
 <!--    <form th:action="@{/mypage/my/bookmark}" method="post">-->
 
+    <style>
 
+        ul>li button {
+            color: #bfbfbf;
+            font-size: 12px;
+            display: inline-block;
+            text-align: right;
+            border: none;
+            background-color: fff;
+            padding-top: -1px;
+            margin-right: auto;
+            border-radius: 4px;
+        }
+        ul>li i {
+            background-color: fff;
+        }
+                ul>li button:hover {
+  background: #f2f6ff;     /* 마우스 올리면 배경 */
+  color: #3366cc;          /* 글자색 변경 */
+  transform: translateX(4px); /* 살짝 오른쪽으로 이동 */
+    transition: all 0.2s ease-in-out;
+}
+    </style>
         <div class="main_con">
             <div th:replace="~{mypage/mypage-menubar :: menubar}"></div>
 
@@ -33,7 +55,7 @@
 <!--                        </form>-->
                         <button type="button" class="btn-remove-bookmark"
                                 th:data-cafe-id="${bm.cafe.id}">
-                            <i class="fa-solid fa-trash"></i>삭제
+                            <i class="fa-solid fa-x"></i>
                         </button>
                     </li>
                 </ul>
