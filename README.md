@@ -280,29 +280,31 @@ ex) 3개의 키워드 선택
 
 ### 3. 로그인
 
-<img width="1313" height="795" alt="image" src="https://github.com/user-attachments/assets/e667354c-99dd-4051-86c8-cf054573b287" />
-<img width="1464" height="792" alt="image" src="https://github.com/user-attachments/assets/87c6b2c1-a575-44af-b7dd-a2d668ea72c2" />
-<img width="1304" height="479" alt="image" src="https://github.com/user-attachments/assets/a63c8b54-d334-4371-baa8-3884371b0216" />
-<img width="1305" height="507" alt="image" src="https://github.com/user-attachments/assets/244f1bfd-b9d1-4701-8dec-aa6f1125d441" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/e667354c-99dd-4051-86c8-cf054573b287" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/87c6b2c1-a575-44af-b7dd-a2d668ea72c2" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/a63c8b54-d334-4371-baa8-3884371b0216" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/244f1bfd-b9d1-4701-8dec-aa6f1125d441" />
+
 ---
 
 
 
 
-<img width="1316" height="835" alt="image" src="https://github.com/user-attachments/assets/c3092b52-1f4c-4a1a-ae32-41990779aa76" />
-<img width="1126" height="951" alt="image" src="https://github.com/user-attachments/assets/26363d28-a553-45fa-b6e5-b415535bd18c" />
-<img width="1090" height="864" alt="image" src="https://github.com/user-attachments/assets/416c606c-eb72-4432-9b07-990a5eafae15" />
-<img width="677" height="449" alt="image" src="https://github.com/user-attachments/assets/79fbb030-5fb0-49bb-865b-63df64dfb695" />
-<img width="1596" height="1790" alt="localhost_8080_mypage_cafe_manage_cafeId=270 reauth=facbb740-a064-472b-bbe2-a8e6d067a2cd" src="https://github.com/user-attachments/assets/72d40c4d-ba9e-4f90-ac59-ade23896f40d" />
-<img width="1596" height="1790" alt="localhost_8080_mypage_cafe_manage_cafeId=270 reauth=facbb740-a064-472b-bbe2-a8e6d067a2cd" src="https://github.com/user-attachments/assets/a2474f7c-928c-4f9f-9222-eeb35a397208" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/c3092b52-1f4c-4a1a-ae32-41990779aa76" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/26363d28-a553-45fa-b6e5-b415535bd18c" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/416c606c-eb72-4432-9b07-990a5eafae15" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/79fbb030-5fb0-49bb-865b-63df64dfb695" />
+<img width="1200" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270 reauth=facbb740-a064-472b-bbe2-a8e6d067a2cd" src="https://github.com/user-attachments/assets/72d40c4d-ba9e-4f90-ac59-ade23896f40d" />
+<img width="1200" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270 reauth=facbb740-a064-472b-bbe2-a8e6d067a2cd" src="https://github.com/user-attachments/assets/a2474f7c-928c-4f9f-9222-eeb35a397208" />
+
 ---
 
 
-<img width="1593" height="1631" alt="리뷰" src="https://github.com/user-attachments/assets/0cb7582a-5712-4c99-bea4-d931d51c2e56" />
-<img width="1403" height="936" alt="image" src="https://github.com/user-attachments/assets/f069418d-2d6e-4be6-942f-01a6b64b6614" />
-<img width="1335" height="752" alt="image" src="https://github.com/user-attachments/assets/0ff143fb-4285-4d9d-aa2b-5dfca9c7cda4" />
-<img width="1318" height="747" alt="image" src="https://github.com/user-attachments/assets/9f089593-2094-41c3-90c0-e26a42347450" />
-<img width="1596" height="1863" alt="localhost_8080_reviews_4003_edit" src="https://github.com/user-attachments/assets/6b76cfb2-9d6f-489b-803b-7352318241ed" />
+<img width="1200" height="auto" alt="리뷰" src="https://github.com/user-attachments/assets/0cb7582a-5712-4c99-bea4-d931d51c2e56" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/f069418d-2d6e-4be6-942f-01a6b64b6614" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/0ff143fb-4285-4d9d-aa2b-5dfca9c7cda4" />
+<img width="1200" height="auto" alt="image" src="https://github.com/user-attachments/assets/9f089593-2094-41c3-90c0-e26a42347450" />
+<img width="1200" height="auto" alt="localhost_8080_reviews_4003_edit" src="https://github.com/user-attachments/assets/6b76cfb2-9d6f-489b-803b-7352318241ed" />
 
 ---
 
