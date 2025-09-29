@@ -250,7 +250,8 @@ ex) 3개의 키워드 선택
 
 ### 1.메인페이지
 
-<img width="700" height="auto" alt="localhost_8080_main (5)" src="https://github.com/user-attachments/assets/83917f22-8e87-4de1-8bda-fcebadc5a8ad"/>
+<img width="1200" height="auto" alt="localhost_8080_main (8)" src="https://github.com/user-attachments/assets/29f06268-9d4e-48e6-be4e-18f59c6500b2" />
+
 
 - 배너 : 오늘 날짜기준 인기순 카페 바로가기
 - 검색영역 : 카페이름으로 검색하여 이동 혹은 목록으로 바로가기
@@ -258,7 +259,8 @@ ex) 3개의 키워드 선택
 
 
 ### 2.목록페이지
-<img width="700" height="auto" alt="localhost_8080_cafe_list_" src="https://github.com/user-attachments/assets/e25296bc-dfc9-4fcc-b1b5-5147e0fb1020"/>
+
+<img width="1200" height="auto" alt="localhost_8080_cafe_list_" src="https://github.com/user-attachments/assets/f9ae9574-8887-428c-94fd-3e8668fd04f7" />
 
 - 상단 필터 목록 : 4가지 타입으로 분류된 테마별 키워드 태그
 - 하단 필터 : 주차여부, 영업여부, 인기순 , 등록순, 이름순 등의 필터
@@ -266,31 +268,14 @@ ex) 3개의 키워드 선택
 - 하단 페이징 기능
 
 ### 3. 상세페이지
-<img width="700" height="auto" alt="localhost_8080_cafe_detail_71" src="https://github.com/user-attachments/assets/414c3bc4-2e51-4d81-b5c4-fbc0f35dda14"/>
+
+<img width="1200" height="auto" alt="localhost_8080_cafe_detail_149" src="https://github.com/user-attachments/assets/e71b2654-39dc-4bc4-bb50-baef38732c04" />
 
 - 상단 카페소개 : 카페명, 평균별점, 리뷰 갯수, 조회수, 주소, 카페 핵심키워드태그, 소개문구, 영업시간, 번호, 편의시설, 웹사이트, 메뉴목록
 - 카페 지도위치 : 등록된 주소 기준 지도 표시
 - 하단 리뷰 목록 : 리뷰 목록 4개 , 최신순 인기순 정렬 선택, 리뷰페이지로 이동
 
 ### 3. 로그인
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/d3b064df-fd21-4b61-ac6b-cfe46eba2822" />
-
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/8be6bfb4-c83d-4e82-956e-a7eb26a942f2" />
-
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/a7a790e8-cd3d-4a38-b225-e16d4e471cd1" />
-
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/812d9a8d-9bdd-48e5-bcaa-9dc7a5138893" />
-
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/4b1ebe0b-05aa-4da8-9fa0-72c3b8b695f2" />
-
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/ed25bc88-c81c-452f-b7d1-8738e74fc437" />
-
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/05f741c6-1918-4e73-8131-c8837e728df5" />
-
-<img width="700" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270 (1)" src="https://github.com/user-attachments/assets/6d4b049e-50c3-474a-b829-93be580108eb" />
-
-<img width="700" height="auto" alt="localhost_8080_mypage_cafe_edit_270 (1)" src="https://github.com/user-attachments/assets/2e5e25be-dbed-4f2a-be82-57fef6954543" />
-
 
 
 
