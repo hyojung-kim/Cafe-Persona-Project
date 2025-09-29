@@ -257,7 +257,7 @@ ex) 3개의 키워드 선택
 - 검색영역 : 카페이름으로 검색하여 이동 혹은 목록으로 바로가기
 - 카페 추천 섹션 : 인기순 정렬된 카페 선택 바로가기, 카페 리뷰순 정렬 후 최신 리뷰1건씩 표시
 
-
+<br><br>
 ### 2.목록페이지
 
 <img width="1200" height="auto" alt="localhost_8080_cafe_list_" src="https://github.com/user-attachments/assets/f9ae9574-8887-428c-94fd-3e8668fd04f7" />
@@ -266,7 +266,7 @@ ex) 3개의 키워드 선택
 - 하단 필터 : 주차여부, 영업여부, 인기순 , 등록순, 이름순 등의 필터
 - 목록 카드섹션 : 카페명, 영업표시, 목록별 평균 별점, 좋아요(북마크) 카운트, 조회수
 - 하단 페이징 기능
-
+<br><br>
 ### 3. 상세페이지
 
 <img width="1200" height="auto" alt="localhost_8080_cafe_detail_149" src="https://github.com/user-attachments/assets/e71b2654-39dc-4bc4-bb50-baef38732c04" />
@@ -274,9 +274,21 @@ ex) 3개의 키워드 선택
 - 상단 카페소개 : 카페명, 평균별점, 리뷰 갯수, 조회수, 주소, 카페 핵심키워드태그, 소개문구, 영업시간, 번호, 편의시설, 웹사이트, 메뉴목록
 - 카페 지도위치 : 등록된 주소 기준 지도 표시
 - 하단 리뷰 목록 : 리뷰 목록 4개 , 최신순 인기순 정렬 선택, 리뷰페이지로 이동
-
+<br><br>
 ### 3. 로그인
 
+<img width="1313" height="795" alt="image" src="https://github.com/user-attachments/assets/e667354c-99dd-4051-86c8-cf054573b287" />
+<img width="1464" height="792" alt="image" src="https://github.com/user-attachments/assets/87c6b2c1-a575-44af-b7dd-a2d668ea72c2" />
+<img width="1304" height="479" alt="image" src="https://github.com/user-attachments/assets/a63c8b54-d334-4371-baa8-3884371b0216" />
+<img width="1305" height="507" alt="image" src="https://github.com/user-attachments/assets/244f1bfd-b9d1-4701-8dec-aa6f1125d441" />
+
+
+
+
+
+<img width="1316" height="835" alt="image" src="https://github.com/user-attachments/assets/c3092b52-1f4c-4a1a-ae32-41990779aa76" />
+<img width="1126" height="951" alt="image" src="https://github.com/user-attachments/assets/26363d28-a553-45fa-b6e5-b415535bd18c" />
+<img width="1090" height="864" alt="image" src="https://github.com/user-attachments/assets/416c606c-eb72-4432-9b07-990a5eafae15" />
 
 
 
