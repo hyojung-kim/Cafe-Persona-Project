@@ -248,7 +248,11 @@ ex) 3개의 키워드 선택
 
 #페이지 소개
 
-### 메인페이지
-![Uploading localhost_8080_main (5).png…]()
+### 1.메인페이지
 
+<img width="1266" height="1079" alt="localhost_8080_main (5)" src="https://github.com/user-attachments/assets/83917f22-8e87-4de1-8bda-fcebadc5a8ad" />
+
+- 배너 : 오늘 날짜기준 인기순 카페 바로가기
+- 검색영역 : 카페이름으로 검색하여 이동 혹은 목록으로 바로가기
+- 카페 추천 섹션 : 인기순 정렬된 카페 선택 바로가기, 카페 리뷰순 정렬 후 최신 리뷰1건씩 표시
 
