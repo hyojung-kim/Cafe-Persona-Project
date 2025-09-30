@@ -3,33 +3,25 @@
 <table border="1" style="border-collapse: collapse; text-align: center;">
   <thead>
     <tr>
-      <th>김효중👑</th>
-      <th>조현영</th>
-      <th>채상진</th>
-      <th>황정성</th>
+      <th width="200">김효중👑</th>
+      <th width="200">조현영</th>
+      <th width="200">채상진</th>
+      <th width="200">황정성</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/7c39b0a5-9df3-4034-ac5a-1ae781c3fdb3" /></td>
+      <td><img width="190" height="190" alt="image" src="https://github.com/user-attachments/assets/7c39b0a5-9df3-4034-ac5a-1ae781c3fdb3" /></td>
       <td>사진</td>
       <td>사진</td>
       <td style="text-align: center;">
-        <img 
-          src="https://github.com/user-attachments/assets/878654ea-a0cc-4dc4-95e2-afa0eb394472" 
-          style="display: block; margin: 0 auto;" 
-          width="100" 
-          height="100" 
-          alt="프로필 이미지" 
-        />
-      </td>
+        <img src="https://github.com/user-attachments/assets/878654ea-a0cc-4dc4-95e2-afa0eb394472" style="display: block; margin: 0 auto;" width="190" height="190" /></td>
     </tr>
-    <tr>
-      <td><a href="https://github.com/hyojung-kim" target="_blank">@hyojung-kim</a></td>
-      <td><a href="https://github.com/0n0ng" target="_blank">@0n0ng</a></td>
-      <td><a herf="https://github.com/Chae-sangjin" target="_blank">@Chae-SangJin</a> </td>
-      <td><a href="https://github.com/HwangJeongSeong" target="_blank">@HwangJeongSeong</a></td>
-		
+    <tr style="text-align: center;">
+      <td style="text-align: center;"><a href="https://github.com/hyojung-kim" target="_blank">@hyojung-kim</a></td>
+      <td style="text-align: center;"><a href="https://github.com/0n0ng" target="_blank">@0n0ng</a></td>
+      <td style="text-align: center;">깃 주소</td>
+      <td style="text-align: center;"><a href="https://github.com/HwangJeongSeong" target="_blank">@HwangJeongSeong</a></td>
     </tr>
   </tbody>
 </table>
