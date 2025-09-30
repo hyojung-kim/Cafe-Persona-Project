@@ -348,7 +348,7 @@ ex) 3개의 키워드 선택
 
 ---
 
-#페이지 소개
+# 페이지 소개
 
 ### 1.메인페이지
 
@@ -382,7 +382,7 @@ ex) 3개의 키워드 선택
 
 ### 3. 로그인
 
-<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/e667354c-99dd-4051-86c8-cf054573b287" />
+<img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/f2b00cb4-796f-4a5f-9986-30db031f779e" />
 <br>
 - 1유저로그인
 <br><br><br>
