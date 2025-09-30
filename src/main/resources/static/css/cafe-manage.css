@@ -212,15 +212,96 @@ a.btn:focus, button.btn:focus{ outline: 2px solid #c7d2fe; outline-offset: 2px; 
 }
 
 
-.modal { position: fixed; inset: 0; z-index: 1000; }
-.modal__backdrop { position:absolute; inset:0; background:rgba(0,0,0,.4); }
-.modal__panel { position: relative; width: min(900px, 92vw); max-height: 86vh; overflow: auto;
+.modal { position: fixed; inset: 0; z-index: 1000; display: none;}
+.modal__panel { position: fixed; transform: translate(-50%, -50%); top: 50%; left: 50%; margin: 0 !important; width: 60rem; z-index: 1; display:flex; flex-direction:column; height: 538px;
     background: #fff; margin: 6vh auto 0; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.25); padding: 16px; }
 .modal__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .modal__close { border:0; background:transparent; font-size:24px; line-height:1; cursor:pointer; }
-.menu-list .row { display:grid; grid-template-columns: 1fr 120px 1fr 80px; gap: 8px; align-items:center; padding:6px 0; border-bottom:1px solid #eee; }
 .menu-list .row .name { font-weight:700; }
 .menu-list .empty { padding: 12px 0; color:#777; }
-.menu-form label { display:block; font-size:12px; color:#666; margin-bottom:4px; }
+label {
+    display:block;
+    font-size:12px;
+    color:#666;
+    margin-bottom:4px;
+    }
 .btn.danger { background:#e23; color:#fff; }
 
+
+.menu-form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.menu-form .row  {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    width: 100%;
+}
+
+
+.menu-form .row > *{
+    width: auto;
+}
+
+.row input {
+    display: block;
+    width: 100%;
+}
+
+.modal__footer {
+    margin-top: auto;
+    display: flex;
+    align-items: flex-end;
+    position: sticky;
+    gap: 12px;
+    bottom: 0;
+    height: 52px;
+}
+
+.modal__body {
+    width: 100%;
+    flex: 1;
+    overflow: auto;
+}
+
+.modal__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:rgba(0,0,0,.4);
+}
+
+.modal__footer button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    padding: 0;
+    text-align: center;
+    height: 30px;
+}
+
+#menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 380px;
+  overflow-y: auto;
+}
+
+
+#menuList > .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--cm-border);
+}
+
+
+
+#menuList > .row > div {
+    width: 25%;
+}

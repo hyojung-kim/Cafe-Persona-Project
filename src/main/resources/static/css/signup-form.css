@@ -1,35 +1,65 @@
 .container {
-    width: 80rem;
+    width: 600px;
     padding: 0;
     margin-top: 24px;
     margin-bottom: 56px;
+    font-family: 'Noto Sans KR';
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 50px;
 }
 
-
+h2 {
+    letter-spacing: 0.4em;
+}
 
         .form-row {
             display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
+            align-items: start;
+            justify-content: space-between;
         }
 
-        /* 라벨: 왼쪽 끝 정렬, 고정 너비 */
         .form-row label {
-            width: 100px;
-            text-align: right;
-            margin-right: 100px;
+            width: 120px;
         }
 
         /* 입력폼: 고정 너비 200px */
         .form-row input {
-            width: 200px;
+            width: 280px;
         }
 
         /* 메시지: 입력폼 오른쪽 바깥 */
         .validation-message {
-            margin-left: 10px;
+            flex-basis: 100%;
+            margin: 0;
             font-size: 0.875rem;
         }
         .text-danger { color: #dc3545; }
         .text-success { color: #28a745; }
         .hidden { display: none; }
+
+        .mt-3 {
+            all: unset;
+            padding: 12px;
+            border-radius: 10px;
+            background-color: #9A887B;
+            color: white;
+        }
+        .mt-3:hover {
+            background-color: #55453C;
+            transition: 0.5s;
+
+        }
+        .phonenum .form-control {
+            width: 90px !important;
+        }
+
+
+.button-row {
+    justify-content: flex-end;
+}
+
+.msg-slot {
+  min-height: 2.0rem;   /* 필요시 1.5rem/2rem로 조정 */
+  line-height: 2.0rem;
+}

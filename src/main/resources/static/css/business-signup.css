@@ -1,11 +1,12 @@
 .container {
-    width: 80rem;
+    width: 600px;
     padding: 0;
     margin-top: 24px;
     margin-bottom: 56px;
     font-family: 'Noto Sans KR';
     border-radius: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 50px;
 }
 
 h2 {
@@ -14,16 +15,16 @@ h2 {
 
         .form-row {
             display: flex;
-            align-items: center;
+            align-items: start;
             margin-bottom: 1rem;
+            justify-content: space-between;
+            margin-bottom: 0;
         }
         .form-row label {
             width: 120px;
-            text-align: right;
-            margin-right: 80px;
         }
         .form-row input {
-            width: 250px;
+            width: 280px;
         }
         .validation-message {
             margin-left: 10px;
@@ -34,5 +35,68 @@ h2 {
         .hidden { display: none; }
 
 .phonenum .form-control {
-    width: 150px !important;
+    width: 90px !important;
 }
+
+#corp_button {
+    all: unset;
+    border: 1px solid rgb(228, 228, 228);
+    background: var(--cream);
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 6px 12px;
+}
+
+#corp_button:hover {
+    border: 1px solid rgb(210, 210, 210)
+}
+
+.btn {
+    all: unset;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: #9A887B;
+    color: white;
+}
+
+.btn:hover {
+    background-color: #55453C;
+    transition: 0.5s;
+
+}
+
+.button-row {
+    justify-content: flex-end;
+}
+
+
+
+
+
+.validation-message { display:block; font-size:0.875rem; }
+
+.validation-message { margin-left:0; }
+.validation-message.hidden { display:none; }
+
+
+.msg-slot { min-height:2rem; line-height:2rem; }
+
+
+.phone-inline { display:flex;}
+
+
+.bn-inline { display:flex; gap:8px; align-items:flex-start; }
+
+.bn-inline > input { width: 208px;}
+
+
+#corp_button {
+  all:unset; border:1px solid #e4e4e4; background:var(--cream); cursor:pointer;
+  border-radius:10px; padding:6px 12px;
+}
+#corp_button:hover { border-color:#d2d2d2; }
+.btn { all:unset; padding:12px; border-radius:10px; background-color:#9A887B; color:#fff; }
+.btn:hover { background:#55453C; transition:.5s; }
+
+
+.button-row { justify-content:flex-end; }

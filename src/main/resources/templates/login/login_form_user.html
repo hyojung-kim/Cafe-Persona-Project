@@ -4,6 +4,9 @@
     <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     </head>
+
+    <style>
+    </style>
     <div class="login-header-text">User Login</div>
     <form th:action="@{/user/login}" method="post" id="loginForm" onsubmit="return validateLoginConfirm()">
         <input type="hidden" name="loginType" value="USER">

@@ -60,6 +60,7 @@
     if (!m) return;
     m.style.display = 'block';
     ensureMenuFormBound();   // 모달 열릴 때도 안전하게 바인딩
+    setTimeout(() => qs('#menuName')?.focus(), 0);
     reloadMenus();
   }
   function closeMenuModalImpl() {
@@ -126,15 +127,17 @@
     const price  = qs('#menuPrice')?.value;
     const desc   = qs('#menuDesc')?.value?.trim() || '';
 
-    if (!cafeId) return alert('카페 정보가 없습니다.');
-    if (!name)   return alert('메뉴 이름을 입력하세요.');
-    if (!price)  return alert('가격을 입력하세요.');
+    // ✅ 유효성 먼저 (통과 후에만 in-flight on)
+    if (!cafeId) { alert('카페 정보가 없습니다.'); qs('#menuName')?.focus(); return; }
+    if (!name)   { alert('메뉴 이름을 입력하세요.'); qs('#menuName')?.focus(); return; }
+    if (!price)  { alert('가격을 입력하세요.'); qs('#menuPrice')?.focus(); return; }
+
+    __menuSubmitInFlight = true; // ← 여기서만 켜기
 
     const btn = qs('#menuSubmitBtn');
     const { header, token } = getCsrf();
 
     try {
-      __menuSubmitInFlight = true;
       btn && (btn.disabled = true);
 
       const res = await fetch('/api/mypage/cafe/menu', {
@@ -161,7 +164,6 @@
       btn && (btn.disabled = false);
     }
   }
-  // 전역 노출(HTML onclick 보호용)
   window.doSubmitMenu = doSubmitMenu;
 
   window.deleteMenu = async function (menuId) {
@@ -183,30 +185,39 @@
     }
   };
 
-  // ==================== 폼/버튼 바인딩 보장 ====================
-  function ensureMenuFormBound() {
-    const form = qs('#menuForm');
-    if (!form) return;
+function ensureMenuFormBound() {
+   const form = document.querySelector('#menuForm');
+   if (!form || form.dataset.bound) return;
 
-    // form submit (submit 타입 버튼을 쓰더라도 한 번만 처리)
-    if (!form.dataset.bound) {
-      form.addEventListener('submit', function(e){
-        e.preventDefault();
-        doSubmitMenu();
-      });
-      form.dataset.bound = '1';
-    }
+   // 🔴 브라우저 자동 유효성 검증으로 submit을 막지 않도록 비활성화
+   //    (reportValidity는 계속 사용 가능)
+   form.setAttribute('novalidate', '');
 
-    // 버튼 클릭 (type="button"이어도 동작)
-    const btn = qs('#menuSubmitBtn');
-    if (btn && !btn.dataset.bound) {
-      btn.addEventListener('click', function(e){
-        e.preventDefault();
-        doSubmitMenu();
-      });
-      btn.dataset.bound = '1';
-    }
-  }
+   // ✅ submit 한 경로만 사용
+   form.addEventListener('submit', function (e) {
+     e.preventDefault();
+
+     // Safari에서 포커스된 input 값이 즉시 반영되지 않는 경우가 있어 blur로 커밋 유도
+     if (document.activeElement && document.activeElement !== document.body) {
+       document.activeElement.blur();
+     }
+
+     // 네이티브 메시지 표시 + 포커스 이동 (검사 실패 시 여기서 종료)
+     if (!form.reportValidity()) return;
+
+     // 통과하면 JS 경로로만 전송
+     doSubmitMenu();
+   });
+
+   // 🔕 버튼 개별 클릭 리스너/inline onclick은 두 경로를 만들어서 2클릭 이슈 원인
+   //    → 절대 바인딩하지 않음(이미 붙어있다면 제거하세요)
+   const btn = document.querySelector('#menuSubmitBtn');
+   if (btn) btn.onclick = null;
+
+   form.dataset.bound = '1';
+ }
+
+
 
   // ==================== 요약 섹션 갱신 ====================
   async function reloadMenuSummary() {

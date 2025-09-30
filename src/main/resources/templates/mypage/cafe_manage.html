@@ -136,7 +136,7 @@
                 </div>
 
                 <div class="divider"></div>
-                <div style="display:flex; justify-content:flex-end">
+                <div style="display:flex; justify-content:flex-end;">
                     <button type="button" class="btn secondary" onclick="openMenuModal()">메뉴 등록 및 삭제</button>
                 </div>
             </div>
@@ -158,11 +158,11 @@
                         <div class="divider" style="margin:12px 0;"></div>
 
                         <!-- 등록 폼 -->
-                        <form id="menuForm" onsubmit="return false;" class="menu-form">
+                        <form id="menuForm" class="menu-form" novalidate>
                             <!-- cafeId는 서버에서 내려줌 -->
                             <input type="hidden" id="cafeId" th:value="${cafe != null ? cafe.id : 0}"/>
 
-                            <div class="row" style="display:grid; grid-template-columns:1fr 120px 1fr 100px; gap:8px;">
+                            <div class="row">
                                 <div>
                                     <label for="menuName">메뉴 이름</label>
                                     <input id="menuName" type="text" placeholder="예) 아메리카노" required>
@@ -175,17 +175,18 @@
                                     <label for="menuDesc">설명</label>
                                     <input id="menuDesc" type="text" placeholder="예) 깊은 바디감">
                                 </div>
-                                <div style="display:flex; align-items:flex-end;">
-                                    <button id="menuSubmitBtn" type="button" class="btn" onclick="doSubmitMenu()">등록</button>
 
-                                </div>
+                            </div>
+
+                            <div class="modal__footer">
+                                <button id="menuSubmitBtn" type="submit" class="btn">등록</button>
+
+                                <button type="button" class="btn secondary" onclick="closeMenuModal()">닫기</button>
                             </div>
                         </form>
                     </div>
 
-                    <div class="modal__footer" style="text-align:right;">
-                        <button type="button" class="btn secondary" onclick="closeMenuModal()">닫기</button>
-                    </div>
+
                 </div>
             </div>
 
