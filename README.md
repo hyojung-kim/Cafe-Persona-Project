@@ -546,16 +546,19 @@ ex) 3개의 키워드 선택
 
 ### 🚨김효중 <br>
 📍 **문제 상황** <br>
-- 기존 cafe테이블에서 pageable객체의 + JPQL 방식으로 orderby 정렬(등록,이름,조회 순), where 조건(주차여부, 영업여부 등) 필터 기능들만 적용한 것이 단순한 개발 초기버전 <br>
-keyword 타입별 AND매칭 구현할 떄 기존 로직에서 SQL을 어떻게 확장하는 것이 좋을지 고민을 많이하게됨 <br>
-	
-✅ **문제 해결**  <br>
-- 필터 조건들을 유지한 상태로 keyword목록 정렬을 추가해야 했었다. keyword테이블을 조인 할 경우 조건 갯수별 AND매칭 구현을 위해서  <br>
-groupby로 집계, having조건으로 매칭 갯수를 필터링 해야한다. <br><br>
-결과적으로 where + orderby + groupby + having 등의 커스텀을 위해 JPQL에서 Native Query방식으로 변경, 리팩토링 진행  <br>
-파라미터값이 다중선택값이 목록으로 전달이 됨, 기존 필터도 동작, 페이지 변경, 카페주소 검색을 해도 일관적으로 동작함 <br>
+- 초기 버전 Pageable + JPQL(@Query)로 등록일(createdAt), 이름(name), 조회수(viewCount) 정렬 <br>
+  요구사항 증가: keyword 타입별 AND 매칭(선택한 키워드 모두 포함) + 키워드 기반 정렬 필요 <br>
+  동시에 기존 WHERE 필터(주차/영업)와 ORDER BY(조회/이름/등록)을 유지 <br>
+  JPQL + Pageable Sort만으로는 한계가 있음 <br>
 
-	      
+
+✅ **문제 해결**  <br>
+- Native Query 전환 → WHERE + ORDER BY + GROUP BY + HAVING 커스터마이즈 <br>
+  다중 선택 파라미터(키워드 목록) + 기존 필터(주차/영업/주소 검색) + 페이지 변경 시나리오까지
+  일관 동작하도록 리팩터링 완료
+
+
+		  
 		  
 ### 🚨채상진
 
