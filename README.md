@@ -14,8 +14,15 @@
       <td><img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/7c39b0a5-9df3-4034-ac5a-1ae781c3fdb3" /></td>
       <td>사진</td>
       <td>사진</td>
-      <td><img src="18b9aa52-6db9-4f4a-b198-885e16b88c01.png" width="100" height="100" alt="프로필 이미지" />
-</td>
+      <td style="text-align: center;">
+        <img 
+          src="https://github.com/user-attachments/assets/878654ea-a0cc-4dc4-95e2-afa0eb394472" 
+          style="display: block; margin: 0 auto;" 
+          width="100" 
+          height="100" 
+          alt="프로필 이미지" 
+        />
+      </td>
     </tr>
     <tr>
       <td><a href="https://github.com/hyojung-kim" target="_blank">@hyojung-kim</a></td>
