@@ -11,7 +11,7 @@
   </thead>
   <tbody>
     <tr>
-      <td><img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/7c39b0a5-9df3-4034-ac5a-1ae781c3fdb3" /></td>
+      <td>&nbsp &nbsp &nbsp<img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/7c39b0a5-9df3-4034-ac5a-1ae781c3fdb3" /></td>
       <td>사진</td>
       <td>사진</td>
       <td style="text-align: center;">
