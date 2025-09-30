@@ -1,7 +1,4 @@
-# 프로젝트 : Bean Spot ERD
-
-<img width="1239" height="795" alt="전체 ERD" src="https://github.com/user-attachments/assets/0c0b4557-b17d-4e00-8b45-2a2e651ff067" />
-
+## 💻 기술 스택
 
 <div>
 
@@ -35,6 +32,14 @@
 <img src="https://img.shields.io/badge/kakaotalk-FFCD00?style=for-the-badge&logo=kakaotalk&logoColor=white">
   <br>
 </div>
+
+
+# 프로젝트 : Bean Spot ERD
+
+<img width="1239" height="795" alt="전체 ERD" src="https://github.com/user-attachments/assets/0c0b4557-b17d-4e00-8b45-2a2e651ff067" />
+
+
+
 
 ``` ## 패키지 요약본 
 === JAVA (com.team.cafe) ===
