@@ -95,7 +95,7 @@ const formStatusCopy = {
         label: '카페 반경 밖이에요',
         message: '카페 반경 50m 이내로 이동해 주세요.',
         variant: STATUS_VARIANTS.WARNING,
-        proceedLabel: '반경 안으로 이동해 주세요',
+        proceedLabel: '반경 외의 위치',
         proceedDisabled: true
     },
     [FormStatus.ERROR]: {
