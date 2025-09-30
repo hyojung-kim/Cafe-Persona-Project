@@ -50,7 +50,7 @@ const overlayCopy = {
     }
 };
 
-const DISTANCE_THRESHOLD = 5000; // meters
+const DISTANCE_THRESHOLD = 50; // meters
 const STAY_DURATION = 5000; // milliseconds
 const THRESHOLD_BUFFER = 50; // meters of tolerance when exiting the zone
 
