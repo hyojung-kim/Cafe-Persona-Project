@@ -1,6 +1,6 @@
 
 ## ☕ 프로젝트 소개
-<img width="900" height="500" alt="image" src="https://github.com/user-attachments/assets/f9595ff2-4087-4a17-bc05-ae4fe36a6e0e" />
+<img width="900" height="auto" alt="image" src="https://github.com/user-attachments/assets/d6d52441-a29b-4aaa-9c51-f68c3b26e7d5" />
 
 **BeanSpot 설명**  
 상황·취향 맞춤 카페 탐색 카페 추천 및 리뷰 플랫폼  
