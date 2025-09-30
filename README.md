@@ -11,7 +11,7 @@
   </thead>
   <tbody>
     <tr>
-      <td><img width="100" height="100" alt="탁구채" src="https://github.com/user-attachments/assets/7031307a-84b8-40a7-857c-a97cdc86c6fb" /></td>
+      <td><img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/7c39b0a5-9df3-4034-ac5a-1ae781c3fdb3" /></td>
       <td>사진</td>
       <td>사진</td>
       <td><img src="18b9aa52-6db9-4f4a-b198-885e16b88c01.png" width="100" height="100" alt="프로필 이미지" />
