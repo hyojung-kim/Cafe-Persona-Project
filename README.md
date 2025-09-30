@@ -394,25 +394,48 @@ ex) 3개의 키워드 선택
 
 ---
 
+
 ### 3. 로그인
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/f2b00cb4-796f-4a5f-9986-30db031f779e" />
 <br>
-- 1유저로그인
+
+#### 3-1. 일반 유저 로그인
+
+- 아이디/비밀번호 입력창
+- 로그인 버튼 : security로 정보 일치시 로그인 (Role User만 가능)
+- 소셜 로그인 버튼 : 각 페이지 이동 후 로그인
+- 하단 3버튼 : 각 이름에 맞는 페이지로 이동
 <br><br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/87c6b2c1-a575-44af-b7dd-a2d668ea72c2" />
 <br>
-- 2사업자로그인
+
+#### 3-2. 사업자 유저 로그인
+
+- 아이디/비밀번호 입력창
+- 로그인 버튼 : security로 정보 일치시 로그인 (Role Business만 가능)
+- 하단 3버튼 : 각 이름에 맞는 페이지로 이동
 <br><br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/a63c8b54-d334-4371-baa8-3884371b0216" />
-<br>3아이디찾기
+<br>
+
+#### 3-3. 아이디 찾기
+
+- DB에 저장된 이메일 입력시 해당 이메일로 인증번호 발송
+- 인증번호 입력 후 일치시 아이디 출력
 <br><br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/244f1bfd-b9d1-4701-8dec-aa6f1125d441" />
-<br>4비밀번호찾기
+<br>
+
+#### 3-4. 비밀번호 찾기
+
+ - DB에 저장된 아이디와 이메일 일치시 이메일로 인증번호 발송
+ - 인증번호 입력 후 일치시 비밀번호 재설정
 <br><br><br>
+
 
 ---
 
