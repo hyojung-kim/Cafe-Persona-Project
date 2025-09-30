@@ -27,7 +27,7 @@
     <tr>
       <td><a href="https://github.com/hyojung-kim" target="_blank">@hyojung-kim</a></td>
       <td><a href="https://github.com/0n0ng" target="_blank">@0n0ng</a></td>
-      <td>깃 주소</td>
+      <td><a herf="https://github.com/Chae-sangjin" target="_blank">@Chae-SangJin</a> </td>
       <td><a href="https://github.com/HwangJeongSeong" target="_blank">@HwangJeongSeong</a></td>
 		
     </tr>
@@ -64,6 +64,12 @@
 - 카페 상세페이지 리뷰 Top4 최신/인기순 정렬 기능 구현
 
 #### 채상진
+- 일반/사업자 회원 가입
+- 다음 api 활용한 주소 검색
+- 국세청 api 활용한 사업자 등록번호 검증
+- 회원 가입 페이지 실시간 검증
+- 개인정보 수정 페이지 비밀번호 재입력 및 뒤로가기 후 앞으로가기, url 복붙으로 접근 막기
+- 사업자 등록 페이지에서 내 문서 열어서 사진 등록하기
 
 #### 황정성
 
@@ -407,11 +413,15 @@ ex) 3개의 키워드 선택
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/c3092b52-1f4c-4a1a-ae32-41990779aa76" />
 <br>5회원가입
-<br><br><br>
+<br>
+실시간 중복 검증 기능, 비밀번호 특스문자 포함
+<br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/26363d28-a553-45fa-b6e5-b415535bd18c" />
 <br>6사업자회원가입
-<br><br><br>
+<br>
+주소 검색 기능과 사업자등록번호 검증 기능에서 힘을 쓰기는 했지만 시작부터 방향성이 잘 못 됐다는 걸 인지하고 바로 해결
+<br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/416c606c-eb72-4432-9b07-990a5eafae15" />
 <br>7내 북마크 목록
@@ -419,15 +429,22 @@ ex) 3개의 키워드 선택
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/79fbb030-5fb0-49bb-865b-63df64dfb695" />
 <br>8내정보수정
-<br><br><br>
+<br>
+내 정보 수정 뒤로 가기 한 후 앞으로 가기, url 복사로 접근 막는 부분에서 애를 먹었으나 집념으로 해결
+<br><br>
 
 <img width="700" height="auto" alt="localhost_8080_mypage_cafe_manage_cafeId=270 reauth=facbb740-a064-472b-bbe2-a8e6d067a2cd" src="https://github.com/user-attachments/assets/72d40c4d-ba9e-4f90-ac59-ade23896f40d" />
 <br>9사업장관리
-<br><br><br>
+<br>
+북마크, 리뷰, 평점 등 팀원들이 만든 부분을 연결해서 보여 주다 보니 어려움이 있었지만 팀원들 코드 면밀히 보면서 해결
+<br><br>
 
 <img width="700" height="auto" alt="사업장수정" src="https://github.com/user-attachments/assets/9b45c0d8-1f1f-43d0-b0cc-04cd5279cb26" />
 <br>10 사업장 수정
-<br><br><br>
+<br>
+사진 등록 하고 저장되는 파일이 팀원과 달라 표시되지 않는 문제가 있었지만 서로 사진을 보여주는 페이지가 달라서 분리하고 해결
+<br><br>
+
 
 ---
 # 리뷰
