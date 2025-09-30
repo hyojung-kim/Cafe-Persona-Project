@@ -116,7 +116,7 @@
 </div>
 
 
-# 프로젝트 : Bean Spot ERD
+## 프로젝트 : Bean Spot ERD
 
 <img width="1239" height="795" alt="전체 ERD" src="https://github.com/user-attachments/assets/0c0b4557-b17d-4e00-8b45-2a2e651ff067" />
 
