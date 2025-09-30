@@ -559,10 +559,11 @@ ex) 3개의 키워드 선택
 </br>▶▶▶ Security가 로그인 인증 처리를 하여 화면에서도 로그인 처리가 되었고, 모든 권한 일반 로그인 유저와 같이 부여됨 ( 로그인버튼 -> 로그아웃버튼 변경 ⭕)
 ### 🚨황정성
 
+<br><br>
 ---
 
 ## 📺 프로젝트 시연 영상
 
 [![BeanSpot 프로젝트 시연](https://img.youtube.com/vi/nvzq5ZW2wJI/0.jpg)](https://www.youtube.com/watch?v=nvzq5ZW2wJI)
 <br>
-<a onclick="window.open('https://www.youtube.com/watch?v=nvzq5ZW2wJI','시연영상','width=600,height=600,location=no,status=no,scrollbars=no');"> ▶ BeanSpot 프로젝트 시연 보러가기</a>
+
