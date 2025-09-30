@@ -1,10 +1,30 @@
 ## ☕Bean Spot 팀원소개
 
-| 김효중👑 |           조현영            | 채상진  | 황정성  |
-|:-----:|:------------------------:|:----:|:----:|
-|  사진   |            사진            |  사진  |  <img width="325" height="324" alt="스크린샷 2025-09-30 오후 4 44 16" src="https://github.com/user-attachments/assets/1fe9e3c7-1f19-4ccc-9698-01bcf480af76" />
-  |
-| 깃 주소  | https://github.com/0n0ng | 깃 주소 | @HwangJeongSeong |
+<table border="1" style="border-collapse: collapse; text-align: center;">
+  <thead>
+    <tr>
+      <th>김효중👑</th>
+      <th>조현영</th>
+      <th>채상진</th>
+      <th>황정성</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>사진</td>
+      <td>사진</td>
+      <td>사진</td>
+      <td><img src="18b9aa52-6db9-4f4a-b198-885e16b88c01.png" width="100" height="100" alt="프로필 이미지" />
+</td>
+    </tr>
+    <tr>
+      <td>깃 주소</td>
+      <td><a href="https://github.com/0n0ng" target="_blank">https://github.com/0n0ng</a></td>
+      <td>깃 주소</td>
+      <td>@HwangJeongSeong</td>
+    </tr>
+  </tbody>
+</table>
 
 ### - 맡은 역할
 #### 김효중👑
