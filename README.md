@@ -23,7 +23,7 @@
       <td><img width="190" height="190" alt="image" src="https://github.com/user-attachments/assets/7c39b0a5-9df3-4034-ac5a-1ae781c3fdb3" /></td>
       <td><img width="190" height="190" alt="image" src="https://github.com/user-attachments/assets/a93aa25a-2e4d-43ba-99c0-8af9d93fb29d" />
 </td>
-      <td>사진</td>
+      <td><img width="190" height="190" alt="image" src="https://avatars.githubusercontent.com/u/84109674?v=4" /></td>
       <td style="text-align: center;">
         <img src="https://github.com/user-attachments/assets/878654ea-a0cc-4dc4-95e2-afa0eb394472" style="display: block; margin: 0 auto;" width="190" height="190" /></td>
     </tr>
