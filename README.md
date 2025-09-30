@@ -28,7 +28,8 @@
       <td><a href="https://github.com/hyojung-kim" target="_blank">@hyojung-kim</a></td>
       <td><a href="https://github.com/0n0ng" target="_blank">@0n0ng</a></td>
       <td>깃 주소</td>
-      <td>@HwangJeongSeong</td>
+      <td><a href="https://github.com/HwangJeongSeong" target="_blank">@HwangJeongSeong</a></td>
+		
     </tr>
   </tbody>
 </table>
