@@ -381,6 +381,7 @@ ex) 3개의 키워드 선택
 ---
 # 리뷰
 
+### 리뷰 리스트
 <img width="700" height="auto" alt="리뷰" src="https://github.com/user-attachments/assets/0cb7582a-5712-4c99-bea4-d931d51c2e56" />
 <ul>
 <li>위치 인증 후 리뷰 작성가능</li>
@@ -393,6 +394,7 @@ ex) 3개의 키워드 선택
 </ul>
 <br><br>
 
+### 위치인증
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/f069418d-2d6e-4be6-942f-01a6b64b6614" />
 <br>
 <ul>
@@ -404,6 +406,7 @@ ex) 3개의 키워드 선택
 
 <br><br>
 
+### 리뷰 작성
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/0ff143fb-4285-4d9d-aa2b-5dfca9c7cda4" />
 <br>
 <ul>
@@ -414,6 +417,7 @@ ex) 3개의 키워드 선택
 </ul>
 <br><br>
 
+### 리뷰 디테일
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/9f089593-2094-41c3-90c0-e26a42347450" />
 <br>
 <ul>
@@ -424,6 +428,7 @@ ex) 3개의 키워드 선택
 </ul>
 <br><br>
 
+### 리뷰 수정
 <img width="700" height="auto" alt="localhost_8080_reviews_4003_edit" src="https://github.com/user-attachments/assets/6b76cfb2-9d6f-489b-803b-7352318241ed" />
 <br>
 <ul>
