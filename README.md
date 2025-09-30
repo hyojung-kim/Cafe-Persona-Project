@@ -1,5 +1,5 @@
 
-## ☕ *BeanSpot 프로젝트
+## ☕ BeanSpot 프로젝트
 <img width="600" height="auto" alt="image" src="https://github.com/user-attachments/assets/d6d52441-a29b-4aaa-9c51-f68c3b26e7d5" />
 ## **BeanSpot 설명**  
 
