@@ -139,7 +139,7 @@
          }
 
                  /* 카카오 로그인 버튼 */
-         .kakao-login-btn img {
+         /*.kakao-login-btn img {
              width: 100%;
              height: 60px;
              margin-top: 5px;
@@ -152,16 +152,80 @@
             -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
            transition: 0.3s;
+        }*/
+
+        .kakao-material-button {
+            -webkit-appearance: none;
+            background-color: #FEE500;
+            border: none;
+            border-radius: 8px;
+            box-sizing: border-box;
+            cursor: pointer;
+            font-size: 14px;
+            height: 40px;
+            outline: none;
+            overflow: hidden;
+            padding: 0 12px;
+            position: relative;
+            text-align: center;
+            transition: background-color .218s, box-shadow .218s;
+            vertical-align: middle;
+            white-space: nowrap;
+            width: auto;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            max-width: 500px;
+            min-width: min-content;
+            /*margin-left: -3px;*/
         }
 
-         .google-login-btn img {
-             width: 100%;
-             height: 60px;
-             margin-top: 5px;
-             margin-left: -3px;
-             margin-bottom: 10px;
-             border-radius: 12px;
-         }
+        .kakao-material-button .kakao-material-button-icon {
+            height: 24px;
+            margin-right: 12px;
+            min-width: 24px;
+            width: 24px;
+        }
+
+        .kakao-material-button .kakao-material-button-content-wrapper {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            height: 100%;
+            width: 100%;
+        }
+
+        .kakao-material-button .kakao-material-button-contents {
+            flex-grow: 1;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.85); /* 레이블: #000000 85% */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .kakao-material-button .kakao-material-button-state {
+            transition: opacity .218s;
+            bottom: 0;
+            left: 0;
+            opacity: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        .kakao-material-button:not(:disabled):hover {
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30),
+                        0 1px 3px 1px rgba(60, 64, 67, .15);
+        }
+
+        .kakao-material-button:not(:disabled):hover .kakao-material-button-state {
+            background-color: #000000;
+            opacity: 8%;
+        }
+
+        .kakao-material-button:disabled {
+            cursor: default;
+            background-color: #FEE50099;
+        }
 
 
 
@@ -197,7 +261,7 @@
            margin-bottom: 5px;
            max-width: 500px;
            min-width: min-content;
-           margin-left: -3px;
+           /*margin-left: -3px;*/
          }
 
          .gsi-material-button .gsi-material-button-icon {

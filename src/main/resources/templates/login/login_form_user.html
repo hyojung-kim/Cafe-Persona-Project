@@ -29,12 +29,31 @@
             <button type="submit" class="btn btn-primary">Login</button>
             <div class="or">or</div>
             <!-- kakao button -->
-            <a class="kakao-login-btn" href="https://kauth.kakao.com/oauth/authorize"
+<!--            <a class="kakao-login-btn" href="https://kauth.kakao.com/oauth/authorize"-->
+<!--               th:href="@{https://kauth.kakao.com/oauth/authorize(-->
+<!--               client_id=${kakaoApiKey},-->
+<!--               redirect_uri=${redirectUri},-->
+<!--               response_type='code')}">-->
+<!--                <img th:src="@{/images/kakao_login_medium_wide.png}" alt="카카오 로그인 버튼">-->
+<!--            </a>-->
+            <a class="kakao-login-btn"
+               href="https://kauth.kakao.com/oauth/authorize"
                th:href="@{https://kauth.kakao.com/oauth/authorize(
-               client_id=${kakaoApiKey},
-               redirect_uri=${redirectUri},
-               response_type='code')}">
-                <img th:src="@{/images/kakao_login_medium_wide.png}" alt="카카오 로그인 버튼">
+       client_id=${kakaoApiKey},
+       redirect_uri=${redirectUri},
+       response_type='code')}">
+                <div class="kakao-material-button" style="width:500px">
+                    <div class="kakao-material-button-state"></div>
+                    <div class="kakao-material-button-content-wrapper">
+                        <div class="kakao-material-button-icon">
+                            <!-- 카카오 심볼 (K 아이콘 대신 Speech Bubble 로고) -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:block;">
+                                <path fill="#000000" d="M12 2C6.48 2 2 5.94 2 10.5c0 2.63 1.64 4.95 4.16 6.45L5 22l5.2-3.1c.56.1 1.13.15 1.8.15 5.52 0 10-3.94 10-8.5S17.52 2 12 2z"/>
+                            </svg>
+                        </div>
+                        <span class="kakao-material-button-contents">Login with Kakao</span>
+                    </div>
+                </div>
             </a>
             <a class="google-login-btn"
                href="http://accounts.google.com/o/oauth2/v2/auth"
@@ -55,7 +74,7 @@
                             <path fill="none" d="M0 0h48v48H0z"></path>
                         </svg>
                     </div>
-                    <span class="gsi-material-button-contents">Sign in with Google</span>
+                    <span class="gsi-material-button-contents">Login with Google</span>
                     <span style="display: none;">Sign in with Google</span>
                 </div>
 <!--                 <img th:src="@{/images/web_light_sq_SI@3x.png}" alt="구글 로그인 버튼">-->
