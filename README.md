@@ -551,8 +551,8 @@ keyword 타입별 AND매칭 구현할 떄 기존 로직에서 SQL을 어떻게 �
 	
 ✅ **문제 해결**  <br>
 - 필터 조건들을 유지한 상태로 keyword목록 정렬을 추가해야 했었다. keyword테이블을 조인 할 경우 조건 갯수별 AND매칭 구현을 위해서  <br>
-groupby로 집계, having조건으로 keyword 매칭 갯수를 필터링 해야한다. <br><br>
-결과적으로 where + orderby + groupby + having 을 전부 사용하기 때문에 커스텀을 위해 JPQL에서 Native Query방식으로 변경, 리팩토링 진행  <br>
+groupby로 집계, having조건으로 매칭 갯수를 필터링 해야한다. <br><br>
+결과적으로 where + orderby + groupby + having 등의 커스텀을 위해 JPQL에서 Native Query방식으로 변경, 리팩토링 진행  <br>
 파라미터값이 다중선택으로 목록으로 전달이 됨, 기존 sql로직도 동작, 페이지 변경, 카페주소 검색을 해도 일관성있게 동작함 ! <br>
 
 	      
