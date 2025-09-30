@@ -565,4 +565,4 @@ ex) 3개의 키워드 선택
 
 [![BeanSpot 프로젝트 시연](https://img.youtube.com/vi/nvzq5ZW2wJI/0.jpg)](https://www.youtube.com/watch?v=nvzq5ZW2wJI)
 <br>
-<a href="https://www.youtube.com/watch?v=nvzq5ZW2wJI" target="_blank">▶ BeanSpot 프로젝트 시연 보러가기</a>
+<a onclick="window.open('https://www.youtube.com/watch?v=nvzq5ZW2wJI','시연영상','width=600,height=600,location=no,status=no,scrollbars=no');"> ▶ BeanSpot 프로젝트 시연 보러가기</a>
