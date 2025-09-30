@@ -11,14 +11,14 @@
   </thead>
   <tbody>
     <tr>
-      <td>사진</td>
+      <td><img width="100" height="100" alt="탁구채" src="https://github.com/user-attachments/assets/7031307a-84b8-40a7-857c-a97cdc86c6fb" /></td>
       <td>사진</td>
       <td>사진</td>
       <td><img src="18b9aa52-6db9-4f4a-b198-885e16b88c01.png" width="100" height="100" alt="프로필 이미지" />
 </td>
     </tr>
     <tr>
-      <td>깃 주소</td>
+      <td>@hyojung-kim</td>
       <td><a href="https://github.com/0n0ng" target="_blank">https://github.com/0n0ng</a></td>
       <td>깃 주소</td>
       <td>@HwangJeongSeong</td>
@@ -28,6 +28,10 @@
 
 ### - 맡은 역할
 #### 김효중👑
+* 메인페이지 : 인기순 카페, 리뷰순 카페(인기순 최신리뷰)
+* 카페 목록 : /검색/필터(테마별 태그·주차·영업중)
+* 카페 상세 : (이미지, 기본정보, 영업시간, 위치, 평균평점, 리뷰 수, 좋아요/북마크 토글)
+* 초기데이터 : 구글 placeApi 위치정보 데이터 수집
 #### 조현영
 -  일반/사업자 회원 로그인, 
 - OAuth2 기반 구글 로그인,
