@@ -382,44 +382,54 @@ ex) 3개의 키워드 선택
 # 리뷰
 
 <img width="700" height="auto" alt="리뷰" src="https://github.com/user-attachments/assets/0cb7582a-5712-4c99-bea4-d931d51c2e56" />
-<br>
-- 위치 인증 후 리뷰 작성가능
-- 리뷰 좋아요
-- 리뷰 대표이미지
-- 리뷰 검색, 정렬필터
-- 이미지는 3장, 내용은 300자 까지 노출
-- 대표 이미지 10장까지 슬라이딩
-- 리뷰 CRUD
+<ul>
+<li>위치 인증 후 리뷰 작성가능</li>
+<li>리뷰 좋아요</li>
+<li>리뷰 대표이미지</li>
+<li>리뷰 검색, 정렬필터</li>
+<li>이미지는 3장, 내용은 300자 까지 노출</li>
+<li>대표 이미지 10장까지 슬라이딩</li>
+<li>리뷰 CRUD</li>
+</ul>
 <br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/f069418d-2d6e-4be6-942f-01a6b64b6614" />
 <br>
-- 사용자가 카페로 부터 50m 이내 5초 동안 머무를 경우 위치인증 성공
-- 카페 마커는 갈색, 사용자 마커는 smile face
-- 카페와 사용자의 위치 표시
-- 위치인증 5초 로딩 구현
+<ul>
+<li>사용자가 카페로 부터 50m 이내 5초 동안 머무를 경우 위치인증 성공</li>
+<li>카페 마커는 갈색, 사용자 마커는 smile face</li>
+<li>카페와 사용자의 위치 표시</li>
+<li>위치인증 5초 로딩 구현</li>
+</ul>
+
 <br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/0ff143fb-4285-4d9d-aa2b-5dfca9c7cda4" />
 <br>
-- 위치인증 후 리뷰 작성
-- 5자 이상 4000자 이하, 이미지는 5장까지
-- 최소 0.5점, 최대 5점 별점 부여 가능
-- 리뷰 재작성시 위치 인증 재시도 필요
+<ul>
+<li>위치인증 후 리뷰 작성</li>
+<li>5자 이상 4000자 이하, 이미지는 5장까지</li>
+<li>최소 0.5점, 최대 5점 별점 부여 가능</li>
+<li>리뷰 재작성시 위치 인증 재시도 필요</li>
+</ul>
 <br><br>
 
 <img width="700" height="auto" alt="image" src="https://github.com/user-attachments/assets/9f089593-2094-41c3-90c0-e26a42347450" />
 <br>
-- 리뷰 CRUD
-- 이미지 슬라이딩으로 이미지 5장 전체 보기
-- 리뷰 컨텐츠 전체 보기
-- 리퀴드 글라스로 이미지 확대 보기가능
+<ul>
+	<li>리뷰 CRUD</li>
+	<li>이미지 슬라이딩으로 이미지 5장 전체 보기</li>
+	<li>리뷰 컨텐츠 전체 보기</li>
+	<li>리퀴드 글라스로 이미지 확대 보기가능</li>
+</ul>
 <br><br>
 
 <img width="700" height="auto" alt="localhost_8080_reviews_4003_edit" src="https://github.com/user-attachments/assets/6b76cfb2-9d6f-489b-803b-7352318241ed" />
 <br>
-- 작성된 리뷰 에서 수정
-- 리뷰 이미지 수정 가능
+<ul>
+	<li>작성된 리뷰 에서 수정</li>
+	<li>리뷰 이미지 수정 가능</li>
+</ul>
 <br><br>
 
 ---
