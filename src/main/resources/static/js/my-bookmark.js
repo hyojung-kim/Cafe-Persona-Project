@@ -39,6 +39,7 @@ $(document).ready(function() {
     });
 });
 
+
 //document.querySelectorAll(".bookmark-remove-form .btn-remove-bookmark").forEach(btn => {
 //  btn.addEventListener("click", function () {
 //    const form = this.closest(".bookmark-remove-form");
