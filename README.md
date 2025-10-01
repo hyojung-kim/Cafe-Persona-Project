@@ -548,7 +548,7 @@ ex) 3개의 키워드 선택
 📍 **문제 상황** <br>
 <br>
 
-.- 초기 버전 Pageable + JPQL(@Query)로 등록일(createdAt), 이름(name), 조회수(viewCount) 정렬 <br>
+- 초기 버전 Pageable + JPQL(@Query)로 등록일(createdAt), 이름(name), 조회수(viewCount) 정렬 <br>
   요구사항 증가: keyword 타입별 AND 매칭(선택한 키워드 모두 포함) + 키워드 기반 정렬 필요 <br>
   동시에 기존 WHERE 필터(주차/영업)와 ORDER BY(조회/이름/등록)을 유지 <br>
   JPQL + Pageable Sort만으로는 한계가 있음 <br>
@@ -557,10 +557,11 @@ ex) 3개의 키워드 선택
 
 - 필터태그가 모두 적용된 Cafe 엔티티를 페이징/정렬로 조회 했으나.<br>
 화면 카드에 평균 별점, 리뷰 수, 좋아요 수, 대표 이미지 등 부가정보가 추가로 필요. 기존로직에 추가하면 쿼리 복잡도 증가함.<br>
-또한 LAZY 컬렉션 접근하면 N+1 쿼리 발생.<br>
+또한 LAZY 컬렉션 접근하면 N+1 쿼리 발생.
+<br>
 
 ✅ **문제 해결**  <br>
-<br>
+
 
 Native Query 전환 → WHERE + ORDER BY + GROUP BY + HAVING 커스터마이즈 <br>
 - 다중 선택 파라미터(키워드 목록) + 기존 필터(주차/영업/주소 검색) + 페이지 변경 시나리오까지
