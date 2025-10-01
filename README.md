@@ -563,8 +563,8 @@ ex) 3개의 키워드 선택
 ✅ **문제 해결**  <br>
 
 
-Native Query 전환 → WHERE + ORDER BY + GROUP BY + HAVING 커스터마이즈 <br>
-- 다중 선택 파라미터(키워드 목록) + 기존 필터(주차/영업/주소 검색) + 페이지 변경 시나리오까지
+- Native Query 전환 → WHERE + ORDER BY + GROUP BY + HAVING 커스터마이즈 <br>
+  다중 선택 파라미터(키워드 목록) + 기존 필터(주차/영업/주소 검색) + 페이지 변경 시나리오까지
   일관 동작하도록 리팩터링 완료
   
 <br>
